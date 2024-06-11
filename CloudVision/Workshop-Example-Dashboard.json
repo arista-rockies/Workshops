@@ -1,0 +1,1587 @@
+{
+  "dashboards": [
+    {
+      "key": "c5245179-5c1c-4e88-b22b-4dcd7e2d8867",
+      "createdAt": [
+        99292883,
+        1599
+      ],
+      "createdBy": "addAccounts",
+      "metaData": {
+        "schemaVersion": "3",
+        "legacyKey": "",
+        "legacyVersion": "",
+        "fromPackage": ""
+      },
+      "name": "Workshop Example Dashboard",
+      "description": "Simple is reliable",
+      "widgets": [
+        {
+          "id": "22f335cd-a7b0-4526-a954-cb61e303264d",
+          "name": "Routing Agent",
+          "position": {
+            "x": 3,
+            "y": 0
+          },
+          "dimensions": {
+            "width": 3,
+            "height": 3
+          },
+          "type": "aql-query-widget",
+          "inputs": {
+            "expression": "let data = `*:/Sysdb/l3/status/protocolAgentModelStatus` | map(merge(_value))\nlet ribd = 0\nfor device,deviceData in data {\n    if dictHasKey(_Tags, device) {\n        if deviceData[\"protocolAgentModel\"][\"value\"] == \"ribd\" {\n            let ribd = ribd + 1\n        }\n    }\n}\nif ribd > 0 {\n    let allGood = \"Fail\"\n} else {\n    let allGood = \"Pass\"\n}\nallGood",
+            "graphConfig": {
+              "showDotIndicator": false,
+              "colorMappings": [
+                {
+                  "type": "value",
+                  "options": {
+                    "Pass": {
+                      "color": "green",
+                      "index": 0
+                    },
+                    "Fail": {
+                      "color": "red",
+                      "index": 1
+                    }
+                  }
+                }
+              ],
+              "type": "string",
+              "fontSize": 38,
+              "description": "**Routing Agent**"
+            },
+            "visualization": "singleValue"
+          },
+          "location": "main",
+          "styles": {
+            "hideTitle": true,
+            "backgroundColor": "",
+            "hideHorizontalBar": false,
+            "titleSize": 14
+          },
+          "parent": ""
+        },
+        {
+          "id": "e5b6217d-2ebe-4426-87d5-345a0482c4ba",
+          "name": "NTP",
+          "position": {
+            "x": 9,
+            "y": 0
+          },
+          "dimensions": {
+            "width": 3,
+            "height": 3
+          },
+          "type": "aql-query-widget",
+          "inputs": {
+            "expression": "let ntpData = `*:/NTP/status/system/variables` | map(merge(_value))\nlet ntpConfigured = `*:/NTP/status/system` | map(merge(_value))\nlet stratumSixteen = 0\n\nfor device, devData in ntpConfigured {\n    if dictHasKey(_Tags, device) {\n        if devData[\"clockSource\"] == \"unknown\" {\n            let stratumSixteen = stratumSixteen + 1\n        }\n    }\n}\nif stratumSixteen > 0 {\n    let allGood = \"Fail\"\n} else {\n    let allGood = \"Pass\"\n}\nallGood",
+            "graphConfig": {
+              "showDotIndicator": false,
+              "colorMappings": [
+                {
+                  "type": "value",
+                  "options": {
+                    "Pass": {
+                      "color": "green",
+                      "index": 0
+                    },
+                    "Fail": {
+                      "color": "red",
+                      "index": 1
+                    }
+                  }
+                }
+              ],
+              "fontSize": 38,
+              "description": "**NTP Sync'ed**"
+            },
+            "visualization": "singleValue"
+          },
+          "location": "main",
+          "styles": {
+            "hideTitle": true,
+            "backgroundColor": "",
+            "hideHorizontalBar": false,
+            "titleSize": 14
+          },
+          "parent": ""
+        },
+        {
+          "id": "a2aeb738-1819-48ee-9246-62a32053df88",
+          "name": "Free Space",
+          "position": {
+            "x": 6,
+            "y": 0
+          },
+          "dimensions": {
+            "width": 3,
+            "height": 3
+          },
+          "type": "aql-query-widget",
+          "inputs": {
+            "expression": "let data = `analytics:/Devices/*/versioned-data/hardware/disk/\\/mnt\\/flash`\nlet freeSpaceLow = 0\n\nfor device, devData in data {\n    if dictHasKey(_Tags, device) {\n        if dictHasKey(merge(devData), \"usedPartitionPercent\") {\n            let usedSpace = merge(devData)[\"usedPartitionPercent\"]\n            if num(usedSpace) > 70 {\n                let freeSpaceLow = freeSpaceLow + 1\n            }\n        }\n    }\n}\nif freeSpaceLow > 0 {\n    let allGood = \"Fail\"\n} else {\n    let allGood = \"Pass\"\n}\nallGood",
+            "graphConfig": {
+              "fontSize": 38,
+              "showDotIndicator": false,
+              "colorMappings": [
+                {
+                  "type": "value",
+                  "options": {
+                    "Pass": {
+                      "color": "green",
+                      "index": 0
+                    },
+                    "Fail": {
+                      "color": "red",
+                      "index": 1
+                    }
+                  }
+                }
+              ],
+              "mapToHostname": false,
+              "description": "**Flash Used < 70%**"
+            },
+            "visualization": "singleValue"
+          },
+          "location": "main",
+          "styles": {
+            "hideTitle": true,
+            "backgroundColor": "",
+            "hideHorizontalBar": false,
+            "titleSize": 14
+          },
+          "parent": ""
+        },
+        {
+          "id": "19b650dc-0be5-4e4a-88d1-07b17a645227",
+          "name": "Device details: Routing Agent / Free Space / NTP / Core Dump ",
+          "position": {
+            "x": 0,
+            "y": 9
+          },
+          "dimensions": {
+            "width": 13,
+            "height": 11
+          },
+          "type": "aql-query-widget",
+          "inputs": {
+            "expression": "# Create dict to hold all the processed data\nlet output = newDict()\n\n# # Streaming Status \n# let streamingStatus = `analytics:/Devices/*/status/streamingStatus`\n\n# for device, devData in streamingStatus {\n#     if dictHasKey(_Tags, device) {\n#         output[device] = newDict()\n#         output[device][\"Streaming Status\"] = merge(devData)[\"streamingStatus\"]\n#     }\n# }\n\n# Multi-agent Data\nlet multiAgentData = `*:/Sysdb/l3/status/protocolAgentModelStatus` | map(merge(_value))\n\nfor device, deviceData in multiAgentData {\n    if dictHasKey(_Tags, device) {\n        if !dictHasKey(output, device) {\n            output[device] = newDict()\n        }\n        output[device][\"Routing Agent\"] = deviceData[\"protocolAgentModel\"][\"value\"]\n    }\n}\n\n# NTP Data\nlet ntpData = `*:/NTP/status/system/variables` | map(merge(_value))\nlet ntpConfigured = `*:/NTP/status/system` | map(merge(_value))\n\nfor device, devData in ntpConfigured {\n    if dictHasKey(_Tags, device) {\n        if !dictHasKey(output, device) {\n            output[device] = newDict()\n        }\n        if devData[\"clockSource\"] == \"unknown\" {\n            output[device][\"Stratum\"] = \"16\"\n            output[device][\"NTP Peer\"]= \"Not Configured\"\n        }\n    }\n}\nfor device,devData in ntpData {\n    if dictHasKey(_Tags, device) {\n        if !dictHasKey(output, device) {\n            output[device] = newDict()\n        }\n        if dictHasKey(devData, \"refid\") {\n            output[device][\"NTP Peer\"]= devData[\"refid\"]\n        }\n        if dictHasKey(devData, \"stratum\") {\n            output[device][\"Stratum\"]= devData[\"stratum\"]\n        }\n    }\n}\n# Flash Used percent\nlet flashData = `analytics:/Devices/*/versioned-data/hardware/disk/\\/mnt\\/flash`\n\nfor device, devData in flashData {\n    if dictHasKey(_Tags, device) {\n        if !dictHasKey(output, device) {\n            output[device] = newDict()\n        }\n        if dictHasKey(merge(devData), \"usedPartitionPercent\") {\n            output[device][\"Flash Used\"] = merge(devData)[\"usedPartitionPercent\"]\n        }\n    }\n}\n\n# Core dump data\nlet coreDumpData = `*:/Kernel/vfs/stat/\\/var\\/core` | map(merge(_value))\n\nfor device, diskStat in coreDumpData {\n    if dictHasKey(_Tags, device) {\n        if !dictHasKey(output, device) {\n            output[device] = newDict()\n        }\n        let blocksTotal = diskStat[\"blocks\"]\n        let blocksAvailable = diskStat[\"bavail\"]\n        if blocksTotal == blocksAvailable {\n            output[device][\"Core Dump\"] = \"None\"\n        } else {\n            output[device][\"Core Dump\"] = \"File found\"\n        }\n    }\n}\n\n# # CPU Usage\n# let cpuData =`analytics:/Devices/*/versioned-data/hardware/cpu/total/aggregate/1m`\n# let cpuData = cpuData | map(merge(_value) | fields(\"util\"))\n\n# for device, deviceData in cpuData {\n#     if dictHasKey(_Tags, device) {\n#         if dictHasKey(deviceData, \"util\") {\n#             if !dictHasKey(output, device) {\n#                 output[device] = newDict()\n#             }\n#             output[device][\"CPU Usage\"] = deviceData[\"util\"][\"avg\"]\n#         }\n#     }\n# }\n\n# # Memory Usage\n# let memoryData =`analytics:/Devices/*/versioned-data/hardware/meminfo/memoryUsage`\n# let memoryData = memoryData | map(merge(_value) | fields(\"usedMemoryPercent\"))\n\n# for device, deviceData in memoryData {\n#     if dictHasKey(_Tags, device) {\n#         if dictHasKey(deviceData, \"usedMemoryPercent\") {\n#             if !dictHasKey(output, device) {\n#                 output[device] = newDict()\n#             }\n#             output[device][\"Memory Usage\"] = deviceData[\"usedMemoryPercent\"]\n#         }\n#     }\n# }\noutput",
+            "graphConfig": {
+              "columns": {
+                "key": {
+                  "mapToHostname": true,
+                  "columnTitle": "Hostname"
+                },
+                "Routing Agent": {
+                  "colorMappings": [
+                    {
+                      "type": "value",
+                      "options": {
+                        "ribd": {
+                          "color": "red",
+                          "index": 0
+                        },
+                        "multi-agent": {
+                          "color": "green",
+                          "index": 1
+                        }
+                      }
+                    }
+                  ]
+                },
+                "Stratum": {
+                  "type": "number",
+                  "decimals": 0,
+                  "colorMappings": [
+                    {
+                      "type": "value",
+                      "options": {
+                        "16": {
+                          "color": "red",
+                          "index": 0
+                        }
+                      }
+                    }
+                  ]
+                },
+                "Core Dump": {
+                  "colorMappings": [
+                    {
+                      "type": "value",
+                      "options": {
+                        "None": {
+                          "color": "green",
+                          "index": 0
+                        },
+                        "File found": {
+                          "color": "red",
+                          "index": 1
+                        }
+                      }
+                    }
+                  ]
+                },
+                "Streaming Status": {
+                  "colorMappings": [
+                    {
+                      "type": "value",
+                      "options": {
+                        "active": {
+                          "color": "green",
+                          "index": 0
+                        },
+                        "inactive": {
+                          "color": "red",
+                          "index": 1
+                        }
+                      }
+                    }
+                  ]
+                },
+                "NTP Peer": {
+                  "colorMappings": [
+                    {
+                      "type": "value",
+                      "options": {
+                        "Not Configured": {
+                          "color": "red",
+                          "index": 0
+                        }
+                      }
+                    }
+                  ]
+                },
+                "CPU Usage": {
+                  "type": "number",
+                  "decimals": 1,
+                  "unit": "%",
+                  "colorMappings": [
+                    {
+                      "type": "regex",
+                      "options": {
+                        "^[1-5]?[0-9]\\..*": {
+                          "color": "green",
+                          "index": 0
+                        },
+                        "^[6-7][0-9].*": {
+                          "color": "yellow",
+                          "index": 1
+                        },
+                        "^[8-9][0-9].*": {
+                          "color": "red",
+                          "index": 2
+                        }
+                      }
+                    }
+                  ]
+                },
+                "Memory Usage": {
+                  "type": "number",
+                  "decimals": 1,
+                  "unit": "%",
+                  "colorMappings": [
+                    {
+                      "type": "regex",
+                      "options": {
+                        "^[1-5]?[0-9]\\..*": {
+                          "color": "green",
+                          "index": 0
+                        },
+                        "^[6-7][0-9].*": {
+                          "color": "yellow",
+                          "index": 1
+                        },
+                        "^[8-9][0-9].*": {
+                          "color": "red",
+                          "index": 2
+                        }
+                      }
+                    }
+                  ]
+                },
+                "Flash Used": {
+                  "type": "number",
+                  "decimals": 1,
+                  "unit": "%",
+                  "colorMappings": [
+                    {
+                      "type": "range",
+                      "options": {
+                        "from": 85,
+                        "to": 100,
+                        "result": {
+                          "color": "red",
+                          "index": 0
+                        }
+                      }
+                    },
+                    {
+                      "type": "range",
+                      "options": {
+                        "from": 70,
+                        "to": 84.99,
+                        "result": {
+                          "color": "yellow",
+                          "index": 1
+                        }
+                      }
+                    },
+                    {
+                      "type": "range",
+                      "options": {
+                        "from": 5,
+                        "to": 69.99,
+                        "result": {
+                          "color": "green",
+                          "index": 2
+                        }
+                      }
+                    },
+                    {
+                      "type": "range",
+                      "options": {
+                        "from": 0,
+                        "to": 4.99,
+                        "result": {
+                          "color": "red",
+                          "index": 3
+                        }
+                      }
+                    }
+                  ]
+                }
+              },
+              "columnOrders": {
+                "key": 1,
+                "Routing Agent": 3,
+                "peer": 3,
+                "Stratum": 6,
+                "NTP Peer": 5,
+                "Free Space": 4,
+                "BGP Established": 7,
+                "BGP Unestablished": 8,
+                "Streaming Status": 2,
+                "Core Dump": 7,
+                "MLAG Status": 10,
+                "Flash Used": 4,
+                "CPU Usage": 8,
+                "Memory Usage": 9
+              }
+            },
+            "visualization": "table"
+          },
+          "location": "main",
+          "styles": {
+            "hideTitle": true,
+            "backgroundColor": "",
+            "hideHorizontalBar": false,
+            "titleSize": 14
+          },
+          "parent": ""
+        },
+        {
+          "id": "296a8448-2520-406b-b796-4782661ddb91",
+          "name": "BGP Neighbors",
+          "position": {
+            "x": 6,
+            "y": 6
+          },
+          "dimensions": {
+            "width": 3,
+            "height": 3
+          },
+          "type": "aql-query-widget",
+          "inputs": {
+            "expression": "let bgpNeighborData = `analytics:/Devices/*/versioned-data/routing/bgp/status/vrf/default/bgpPeerInfoStatusEntry/*`\nlet unestablishedPeer = 0\n\n# Loop over each device\nfor device, deviceSessions in bgpNeighborData {\n    if dictHasKey(_Tags, device) {\n        # Loop over each session on each device\n        for ip, sessionData in deviceSessions{\n            let data = merge(sessionData)\n            # Have we used this status yet?\n            let status = data[\"bgpState\"][\"Name\"]\n            if status != \"Established\" {\n                let unestablishedPeer = unestablishedPeer + 1\n            }\n        }\n    }\n}\nif unestablishedPeer > 0 {\n    let allGood = \"Fail\"\n} else {\n    let allGood = \"Pass\"\n}\nallGood",
+            "graphConfig": {
+              "fontSize": 38,
+              "showDotIndicator": false,
+              "colorMappings": [
+                {
+                  "type": "value",
+                  "options": {
+                    "Pass": {
+                      "color": "green",
+                      "index": 0
+                    },
+                    "Fail": {
+                      "color": "red",
+                      "index": 1
+                    }
+                  }
+                }
+              ],
+              "description": "**BGP Neighbors**"
+            },
+            "visualization": "singleValue"
+          },
+          "location": "main",
+          "styles": {
+            "hideTitle": true,
+            "backgroundColor": "",
+            "hideHorizontalBar": false,
+            "titleSize": 14
+          },
+          "parent": ""
+        },
+        {
+          "id": "cf773f01-b358-425e-826a-512a326eff8f",
+          "name": "Core Dump",
+          "position": {
+            "x": 12,
+            "y": 0
+          },
+          "dimensions": {
+            "width": 3,
+            "height": 3
+          },
+          "type": "aql-query-widget",
+          "inputs": {
+            "expression": "let coreDumpData = `*:/Kernel/vfs/stat/\\/var\\/core` | map(merge(_value))\nlet coreDumps = 0\n\nfor device, diskStat in coreDumpData {\n    if dictHasKey(_Tags, device) {\n        let blocksTotal = diskStat[\"blocks\"]\n        let blocksAvailable = diskStat[\"bavail\"]\n        if blocksTotal != blocksAvailable {\n            let coreDumps = coreDumps + 1 \n        }\n    }\n}\nif coreDumps > 0 {\n    let allGood = \"Fail\"\n} else {\n    let allGood = \"Pass\"\n}\nallGood",
+            "graphConfig": {
+              "fontSize": 38,
+              "colorMappings": [
+                {
+                  "type": "value",
+                  "options": {
+                    "Pass": {
+                      "color": "green",
+                      "index": 0
+                    },
+                    "Fail": {
+                      "color": "red",
+                      "index": 1
+                    }
+                  }
+                }
+              ],
+              "description": "**Core Dump**"
+            },
+            "visualization": "singleValue"
+          },
+          "location": "main",
+          "styles": {
+            "hideTitle": true,
+            "backgroundColor": "",
+            "hideHorizontalBar": false,
+            "titleSize": 14
+          },
+          "parent": ""
+        },
+        {
+          "id": "52b1a7aa-7443-4349-a5a1-69c216ca1d93",
+          "name": "MLAG",
+          "position": {
+            "x": 0,
+            "y": 6
+          },
+          "dimensions": {
+            "width": 3,
+            "height": 3
+          },
+          "type": "aql-query-widget",
+          "inputs": {
+            "expression": "let mlagData = `*:/Sysdb/mlag/status` | map(merge(_value))\nlet mlagNotGood = 0\n\nfor device,devData in mlagData {\n    if dictHasKey(_Tags, device) {\n        if devData[\"negotiationStatus\"] != \"\" && devData[\"negotiationStatus\"] != \"Connected\" {\n            let mlagNotGood = mlagNotGood + 1\n        }  \n    }\n}\nif mlagNotGood > 0 {\n    let allGood = \"Fail\"\n} else {\n    let allGood = \"Pass\"\n}\nallGood",
+            "graphConfig": {
+              "fontSize": 38,
+              "colorMappings": [
+                {
+                  "type": "value",
+                  "options": {
+                    "Pass": {
+                      "color": "green",
+                      "index": 0
+                    },
+                    "Fail": {
+                      "color": "red",
+                      "index": 1
+                    }
+                  }
+                }
+              ],
+              "description": "**MLAG**"
+            },
+            "visualization": "singleValue"
+          },
+          "location": "main",
+          "styles": {
+            "hideTitle": true,
+            "backgroundColor": "",
+            "hideHorizontalBar": false,
+            "titleSize": 14
+          },
+          "parent": ""
+        },
+        {
+          "id": "a84dba3c-3f96-4ab0-969f-cfb11b8c0158",
+          "name": "Error Disabled",
+          "position": {
+            "x": 9,
+            "y": 6
+          },
+          "dimensions": {
+            "width": 3,
+            "height": 3
+          },
+          "type": "aql-query-widget",
+          "inputs": {
+            "expression": "let errDisabledData = `*:/Sysdb/interface/errdisable/status/errdisabledIntf` | map(merge(_value))\nlet errDisabledGood = 0\n\nfor device,devData in errDisabledData {\n    if dictHasKey(_Tags, device) {\n        for intKey, intVal in devData {\n            let errDisabledGood = errDisabledGood + 1\n        }\n    }\n}\nif errDisabledGood > 0 {\n    let allGood = \"Fail\"\n} else {\n    let allGood = \"Pass\"\n}\nallGood",
+            "graphConfig": {
+              "fontSize": 38,
+              "colorMappings": [
+                {
+                  "type": "value",
+                  "options": {
+                    "Pass": {
+                      "color": "green",
+                      "index": 0
+                    },
+                    "Fail": {
+                      "color": "red",
+                      "index": 1
+                    }
+                  }
+                }
+              ],
+              "description": "**Error Disabled**"
+            },
+            "visualization": "singleValue"
+          },
+          "location": "main",
+          "styles": {
+            "hideTitle": true,
+            "backgroundColor": "",
+            "hideHorizontalBar": false,
+            "titleSize": 14
+          },
+          "parent": ""
+        },
+        {
+          "id": "763e07b3-92af-4f33-b1a5-c7871db9fde6",
+          "name": "Device details: MLAG / Port-Channels / Error disabled interfaces ",
+          "position": {
+            "x": 0,
+            "y": 32
+          },
+          "dimensions": {
+            "width": 24,
+            "height": 13
+          },
+          "type": "aql-query-widget",
+          "inputs": {
+            "expression": "# Create dict to hold all the processed data\nlet output = newDict()\n\n#MLAG data\nlet mlagData = `*:/Sysdb/mlag/status` | map(merge(_value))\n\nfor device,devData in mlagData {\n    if dictHasKey(_Tags, device) {\n        if !dictHasKey(output, device) {\n            output[device] = newDict()\n        }\n        if devData[\"negotiationStatus\"] == \"\" {\n            output[device][\"MLAG Status\"] = \"Not Configured\" \n        } else {\n            output[device][\"MLAG Status\"] = devData[\"negotiationStatus\"]\n        }  \n    }\n}\n\n# Error Disabled Interfaces\nlet errDisabledData = `*:/Sysdb/interface/errdisable/status/errdisabledIntf` | map(merge(_value))\nlet errDisabledData2 = `*:/Sysdb/interface/errdisable/status` | map(merge(_value))\n\nfor device,devData in errDisabledData2 {\n    if dictHasKey(_Tags, device) {\n        if !dictHasKey(output, device) {\n            output[device] = newDict()\n        }\n        output[device][\"Error Disabled\"] = newDict()\n        output[device][\"Error Disabled\"] = \"None\"\n        output[device][\"Port-Channel Down\"] = \"None Configured\"\n        output[device][\"Port-Channel Member Down\"] = \"None Configured\"\n    }\n}\nfor device, devData in errDisabledData {\n    if dictHasKey(_Tags, device) {\n        let interfaces = \"\"\n        for intKey, intVal in devData {\n            if interfaces == \"\" {\n                let interfaces = intKey\n            } else {\n                let interfaces = interfaces + \", \" + intKey\n            }\n        }\n        if interfaces != \"\" {\n            output[device][\"Error Disabled\"] = interfaces\n        }\n    }\n}\n\n# Port Channels\nlet poData = `*:/Sysdb/lag/input/interface/lag/intfStatus/*`\nlet poPhyData = `*:/Sysdb/lag/input/config/cli/phyIntf/*`\nlet poMemberData = `*:/Sysdb/lag/input/interface/lag/intfStatus/*/member` | recmap(2, merge(_value))\nlet workingData = newDict()\n\n# Get the status of all port-channels\nfor device, devData in poData {\n    if dictHasKey(_Tags, device) {\n        workingData[device] = newDict()\n        for int,intData in devData {\n            let data = merge(intData)\n            workingData[device][int] = newDict()\n            workingData[device][int][\"operStatus\"] = data[\"operStatus\"][\"Name\"]\n        }\n    }\n}\n# Find all the interfaces configured to be in a port-channel\nfor device, devData in poPhyData {\n    if dictHasKey(_Tags, device) {\n        if !dictHasKey(workingData, device) {\n            workingData[device] = newDict()\n        }\n        for int,intData in devData {\n            let intData = merge(intData)\n            # Convert to string, find the start (index) of the port-channel name and then isolate the name \n            let lagStr = str(intData[\"lag\"])\n            let lagIntLocation = strIndex(lagStr, \"Port-Channel\")\n            let lag = strCut(lagStr, lagIntLocation, -1)\n            if !dictHasKey(workingData[device], lag) {\n                workingData[device][lag] = newDict()\n            }\n            workingData[device][lag][int] = false\n        }\n    }\n}\n# Change false to true for physical interfaces that are members of a port-channel.\n# The falses that remain are interfaces configured to be in a port-channel but are not.\nfor device, devData in poMemberData {\n    if dictHasKey(_Tags, device) {\n        if !dictHasKey(workingData, device) {\n            workingData[device] = newDict()\n        }\n        for lag, lagVal in devData {\n            if !dictHasKey(workingData[device], lag) {\n                workingData[device][lag] = newDict()\n            }\n            for int, intVal in lagVal {\n                workingData[device][lag][int] = true\n            }\n        }\n    }\n}\n# Report which interfaces are not up in the port-channel\nfor device, devData in workingData {\n    if dictHasKey(_Tags, device) {\n        if !dictHasKey(output, device) {\n            output[device] = newDict()\n        }\n        let poInterfaceList = \"\"\n        let phyInterfaceList = \"\"\n        # Find all the port-channels that are down\n        for interface, interfaceData in devData {\n            if interfaceData[\"operStatus\"] != \"intfOperUp\" {\n                if poInterfaceList == \"\" {\n                    let poInterfaceList = interface\n                } else {\n                    let poInterfaceList = poInterfaceList + \", \" + interface\n                }\n            }\n            # Find all the member interfaces that are down. The port-channel could be up and just missing a member.\n            for phyInt, phyIntVal in interfaceData {\n                if strHasPrefix(phyInt, \"Ethernet\") {\n                    if phyIntVal == false {\n                        if phyInterfaceList == \"\" {\n                            let phyInterfaceList = phyInt\n                        } else {\n                            let phyInterfaceList = phyInterfaceList + \", \" + phyInt\n                        }\n                    }\n                }\n            }\n        }\n        # Add port-channels to output\n        if poInterfaceList == \"\" {\n            output[device][\"Port-Channel Down\"] = \"All up\"\n        } else {\n            output[device][\"Port-Channel Down\"] = poInterfaceList\n        }\n        # Add physical interfaces to output\n        if phyInterfaceList == \"\" {\n            output[device][\"Port-Channel Member Down\"] = \"All up\"\n        } else {\n            output[device][\"Port-Channel Member Down\"] = phyInterfaceList\n        }\n    }\n}\noutput",
+            "graphConfig": {
+              "columns": {
+                "key": {
+                  "mapToHostname": true,
+                  "colorMappings": [],
+                  "columnTitle": "Hostname"
+                },
+                "Error Disabled": {
+                  "colorMappings": [
+                    {
+                      "type": "regex",
+                      "options": {
+                        "^(?!None$).*": {
+                          "color": "red",
+                          "index": 1
+                        }
+                      }
+                    },
+                    {
+                      "type": "value",
+                      "options": {
+                        "None": {
+                          "color": "green",
+                          "index": 0
+                        }
+                      }
+                    }
+                  ]
+                },
+                "Port-Channel Down": {
+                  "colorMappings": [
+                    {
+                      "type": "regex",
+                      "options": {
+                        "^Port.*": {
+                          "color": "red",
+                          "index": 1
+                        }
+                      }
+                    },
+                    {
+                      "type": "value",
+                      "options": {
+                        "All up": {
+                          "color": "green",
+                          "index": 0
+                        }
+                      }
+                    }
+                  ]
+                },
+                "Port-Channel Member Down": {
+                  "colorMappings": [
+                    {
+                      "type": "regex",
+                      "options": {
+                        "^Ether.*": {
+                          "color": "red",
+                          "index": 1
+                        }
+                      }
+                    },
+                    {
+                      "type": "value",
+                      "options": {
+                        "All up": {
+                          "color": "green",
+                          "index": 0
+                        }
+                      }
+                    }
+                  ]
+                },
+                "MLAG Status": {
+                  "colorMappings": [
+                    {
+                      "type": "value",
+                      "options": {
+                        "Connected": {
+                          "color": "green",
+                          "index": 0
+                        },
+                        "Not Configured": {
+                          "color": "base7",
+                          "index": 1
+                        },
+                        "In negotiation": {
+                          "color": "red",
+                          "index": 2
+                        },
+                        "Connecting": {
+                          "color": "red",
+                          "index": 3
+                        }
+                      }
+                    }
+                  ]
+                }
+              },
+              "columnOrders": {
+                "key": 1,
+                "Error Disabled": 7,
+                "Port-Channel Down": 3,
+                "Port-Channel Member Down": 4,
+                "Intake Temp": 5,
+                "MLAG Status": 2,
+                "BGP Established": 5,
+                "BGP Unestablished": 6,
+                "Interface Flaps": 8
+              }
+            },
+            "visualization": "table"
+          },
+          "location": "main",
+          "styles": {
+            "hideTitle": true,
+            "backgroundColor": "",
+            "hideHorizontalBar": false,
+            "titleSize": 14
+          },
+          "parent": ""
+        },
+        {
+          "id": "c3ac2e02-748f-45b4-84cb-479f83c69f09",
+          "name": "Port-Channels",
+          "position": {
+            "x": 3,
+            "y": 6
+          },
+          "dimensions": {
+            "width": 3,
+            "height": 3
+          },
+          "type": "aql-query-widget",
+          "inputs": {
+            "expression": "let poData = `*:/Sysdb/lag/input/interface/lag/intfStatus/*`\nlet poPhyData = `*:/Sysdb/lag/input/config/cli/phyIntf/*`\nlet poMemberData = `*:/Sysdb/lag/input/interface/lag/intfStatus/*/member` | recmap(2, merge(_value))\nlet workingData = newDict()\n\n# Get the status of all port-channels\nfor device, devData in poData {\n    if dictHasKey(_Tags, device) {\n        workingData[device] = newDict()\n        for int,intData in devData {\n            let data = merge(intData)\n            workingData[device][int] = newDict()\n            workingData[device][int][\"operStatus\"] = data[\"operStatus\"][\"Name\"]\n        }\n    }\n}\n# Find all the interfaces configured to be in a port-channel\nfor device, devData in poPhyData {\n    if dictHasKey(_Tags, device) {\n        if !dictHasKey(workingData, device) {\n            workingData[device] = newDict()\n        }\n        for int,intData in devData {\n            let intData = merge(intData)\n            # Convert to string, find the start (index) of the port-channel name and then isolate the name \n            let lagStr = str(intData[\"lag\"])\n            let lagIntLocation = strIndex(lagStr, \"Port-Channel\")\n            let lag = strCut(lagStr, lagIntLocation, -1)\n            if !dictHasKey(workingData[device], lag) {\n                workingData[device][lag] = newDict()\n            }\n            workingData[device][lag][int] = false\n        }\n    }\n}\n# Change false to true for physical interfaces that are members of a port-channel.\n# The falses that remain are interfaces configured to be in a port-channel but are not.\nfor device, devData in poMemberData {\n    if dictHasKey(_Tags, device) {\n        if !dictHasKey(workingData, device) {\n            workingData[device] = newDict()\n        }\n        for lag, lagVal in devData {\n            if !dictHasKey(workingData[device], lag) {\n                workingData[device][lag] = newDict()\n            }\n            for int, intVal in lagVal {\n                workingData[device][lag][int] = true\n            }\n        }\n    }\n}\n# Report which interfaces are not up in the port-channel\nlet output = newDict()\nlet poBad = 0\nfor device, devData in workingData {\n    if dictHasKey(_Tags, device) {\n        if !dictHasKey(output, device) {\n            output[device] = newDict()\n        }\n        let poInterfaceList = \"\"\n        let phyInterfaceList = \"\"\n        # Find all the port-channels that are down\n        for interface, interfaceData in devData {\n            if interfaceData[\"operStatus\"] != \"intfOperUp\" {\n                if poInterfaceList == \"\" {\n                    let poInterfaceList = interface\n                } else {\n                    let poInterfaceList = poInterfaceList + \", \" + interface\n                }\n            }\n            # Find all the member interfaces that are down. The port-channel could be up and just missing a member.\n            for phyInt, phyIntVal in interfaceData {\n                if strHasPrefix(phyInt, \"Ethernet\") {\n                    if phyIntVal == false {\n                        if phyInterfaceList == \"\" {\n                            let phyInterfaceList = phyInt\n                        } else {\n                            let phyInterfaceList = phyInterfaceList + \", \" + phyInt\n                        }\n                    }\n                }\n            }\n        }\n        # Add port-channels to output\n        if poInterfaceList != \"\" {\n        let poBad = poBad + 1\n        }\n        # Add physical interfaces to output\n        if phyInterfaceList != \"\" {\n            let poBad = poBad + 1\n        }\n    }\n}\nif poBad > 0 {\n    let allGood = \"Fail\"\n} else {\n    let allGood = \"Pass\"\n}\nallGood",
+            "graphConfig": {
+              "fontSize": 38,
+              "colorMappings": [
+                {
+                  "type": "value",
+                  "options": {
+                    "Pass": {
+                      "color": "green",
+                      "index": 0
+                    },
+                    "Fail": {
+                      "color": "red",
+                      "index": 1
+                    }
+                  }
+                }
+              ],
+              "description": "**Port-Channels**"
+            },
+            "visualization": "singleValue"
+          },
+          "location": "main",
+          "styles": {
+            "hideTitle": true,
+            "backgroundColor": "",
+            "hideHorizontalBar": false,
+            "titleSize": 14
+          },
+          "parent": ""
+        },
+        {
+          "id": "90da3ec7-6590-4f4f-a1b6-0377bba98dcb",
+          "name": "Intake Temp",
+          "position": {
+            "x": 0,
+            "y": 3
+          },
+          "dimensions": {
+            "width": 3,
+            "height": 3
+          },
+          "type": "aql-query-widget",
+          "inputs": {
+            "expression": "let intakeData = `*:/Sysdb/environment/thermostat/status` | map(merge(_value))\nlet highIntakeTemp = 0\nfor device, devData in intakeData {\n\tif dictHasKey(_Tags, device) {\n\t\tlet tempC = devData[\"inletTemperature\"][\"value\"]\n\t\t# Need to account for devices reporting null which shows up as -Infinity\n\t\tif tempC >= 40 {\n\t\t\tlet highIntakeTemp = highIntakeTemp + 1\n\t\t}\n\t}\n}\nif highIntakeTemp > 0 {\n    let allGood = \"Fail\"\n} else {\n    let allGood = \"Pass\"\n}\nallGood",
+            "graphConfig": {
+              "fontSize": 38,
+              "colorMappings": [
+                {
+                  "type": "value",
+                  "options": {
+                    "Pass": {
+                      "color": "green",
+                      "index": 0
+                    },
+                    "Fail": {
+                      "color": "red",
+                      "index": 1
+                    }
+                  }
+                }
+              ],
+              "description": "**Intake Temp < 40C**"
+            },
+            "visualization": "singleValue"
+          },
+          "location": "main",
+          "styles": {
+            "hideTitle": true,
+            "backgroundColor": "",
+            "hideHorizontalBar": false,
+            "titleSize": 14
+          },
+          "parent": ""
+        },
+        {
+          "id": "f8ac8d38-8b57-489c-90ac-fec2f59341b4",
+          "name": "Device details: Intake Temp / Optic Temp < 60C",
+          "position": {
+            "x": 0,
+            "y": 45
+          },
+          "dimensions": {
+            "width": 11,
+            "height": 11
+          },
+          "type": "aql-query-widget",
+          "inputs": {
+            "expression": "### Create dict to hold all the processed data\nlet output = newDict()\n\n# ### Intake Temperature \n# let intakeData = `*:/Sysdb/environment/thermostat/status` | map(merge(_value))\n# for device, devData in intakeData {\n#     if dictHasKey(_Tags, device) {\n#         if !dictHasKey(output, device) {\n#             output[device] = newDict()\n#         }\n#         let tempC = devData[\"inletTemperature\"][\"value\"]\n#         # Need to account for devices reporting null which shows up as -Infinity\n#         if tempC > -1000 {\n#             let tempF = (tempC * (9/5)) + 32\n#             if length(str(tempC)) > 5 {\n#                 let tempC = strCut(str(tempC), 0, 5)\n#             }\n#             if length(str(tempF)) > 5 {\n#                 let tempF = strCut(str(tempF), 0, 5)\n#             }\n#             let intakeTempBoth = str(tempC) + \"C / \" + str(tempF) + \"F\"\n#             output[device][\"Intake Temp\"] = intakeTempBoth\n#         } else {\n#             output[device][\"Intake Temp\"] = \"Unknown\"\n#         }\n#     }\n# }\n\n### Fans\nlet fans = `*:/Sysdb/environment/archer/cooling/status/*`\nlet resultFans = fans | where(dictHasKey(fans, _key) == true) | recmap(2, (merge(_value)[\"hwStatus\"][\"Name\"]))\n\nfor device, deviceValue in resultFans {\n    if dictHasKey(_Tags, device) {\n        if !dictHasKey(output, device) {\n            output[device] = newDict()\n        }\n        let fansNotGood = \"\"\n        for fansKey, fansValue in deviceValue {\n            if fansValue != \"ok\" {\n                if fansNotGood == \"\" {\n                    let fansNotGood = fansKey + \" (\" + fansValue + \")\"\n                } else {\n                    let fansNotGood = fansNotGood + \", \" + fansKey + \" (\" + fansValue + \")\"\n                }\n            }\n        }\n        if fansNotGood == \"\" {\n            output[device][\"Fan Sensors\"] = \"ok\"\n        } else {\n            output[device][\"Fan Sensors\"] = fansNotGood\n        }\n    }\n}\n\n### Optic Temp\nlet xcvrTempData = `analytics:/Devices/*/versioned-data/interfaces/data/*/aggregate/hardware/xcvr/15m` | recmap(2, merge(_value))\nfor device, interfaces in xcvrTempData {\n    if dictHasKey(_Tags, device) {\n        if !dictHasKey(output, device) {\n            output[device] = newDict()\n        }\n        let opticOverTemp = \"\"\n        for interface, intData in interfaces {\n            if dictHasKey(intData, \"temperature\") {\n                let xcvrTemp = intData[\"temperature\"][\"avg\"]\n                # limit temp display length\n                if length(str(xcvrTemp)) > 4 {\n                    let xcvrTemp = strCut(str(xcvrTemp), 0, 4)\n                }\n                if num(xcvrTemp) >= 60 {\n                    if opticOverTemp == \"\" {\n                        let opticOverTemp = interface + \" (\" + str(xcvrTemp) + \"C)\"\n                    } else {\n                        let opticOverTemp = opticOverTemp + \", \" + interface + \" (\" + str(xcvrTemp) + \"C)\"\n                    }\n                }\n            }\n        }\n        if opticOverTemp == \"\" {\n            output[device][\"Optic > 60C\"] = \"None\"\n        } else {\n            output[device][\"Optic > 60C\"] = opticOverTemp\n        }\n    }\n}\noutput",
+            "graphConfig": {
+              "columns": {
+                "key": {
+                  "mapToHostname": true,
+                  "columnTitle": "Hostname"
+                },
+                "Intake Temp": {
+                  "colorMappings": [
+                    {
+                      "type": "regex",
+                      "options": {
+                        "^[1-2].*": {
+                          "color": "green",
+                          "index": 0
+                        },
+                        "^3.*": {
+                          "color": "yellow",
+                          "index": 1
+                        },
+                        "^[4-9].*": {
+                          "color": "red",
+                          "index": 2
+                        }
+                      }
+                    }
+                  ]
+                },
+                "Optic > 60C": {
+                  "colorMappings": [
+                    {
+                      "type": "regex",
+                      "options": {
+                        "^E.*": {
+                          "color": "red",
+                          "index": 1
+                        }
+                      }
+                    },
+                    {
+                      "type": "value",
+                      "options": {
+                        "None": {
+                          "color": "green",
+                          "index": 0
+                        }
+                      }
+                    }
+                  ]
+                },
+                "Fan Sensors": {
+                  "colorMappings": [
+                    {
+                      "type": "regex",
+                      "options": {
+                        "^(?!ok).*": {
+                          "color": "red",
+                          "index": 1
+                        }
+                      }
+                    },
+                    {
+                      "type": "value",
+                      "options": {
+                        "ok": {
+                          "color": "green",
+                          "index": 0
+                        }
+                      }
+                    }
+                  ]
+                }
+              },
+              "columnOrders": {
+                "key": 1,
+                "Intake Temp": 2,
+                "PowerSupply1": 13,
+                "PowerSupply2": 15,
+                "Fan1/1": 5,
+                "Fan1/2": 6,
+                "Fan2/1": 7,
+                "Fan2/2": 8,
+                "Fan3/1": 9,
+                "Fan3/2": 10,
+                "Fan4/1": 11,
+                "Fan5/1": 12,
+                "FanP1/1": 4,
+                "FanP2/1": 14,
+                "TempSensor1": 16,
+                "TempSensor2": 17,
+                "TempSensor3": 18,
+                "TempSensor4": 19,
+                "TempSensor5": 20,
+                "TempSensor6": 21,
+                "TempSensor7": 22,
+                "TempSensor8": 23,
+                "TempSensor9": 24,
+                "TempSensor10": 25,
+                "TempSensor11": 26,
+                "TempSensor12": 27,
+                "TempSensor13": 28,
+                "TempSensor14": 29,
+                "TempSensor15": 30,
+                "TempSensor16": 31,
+                "TempSensor17": 32,
+                "TempSensor18": 33,
+                "TempSensor19": 34,
+                "TempSensor20": 35,
+                "TempSensor21": 36,
+                "TempSensor22": 37,
+                "TempSensor23": 38,
+                "TempSensor24": 39,
+                "TempSensor25": 40,
+                "TempSensor26": 41,
+                "TempSensor27": 42,
+                "TempSensor28": 43,
+                "TempSensor29": 44,
+                "TempSensor30": 45,
+                "Optic Temp": 3,
+                "Optic Hot": 3
+              }
+            },
+            "visualization": "table"
+          },
+          "location": "main",
+          "styles": {
+            "hideTitle": true,
+            "backgroundColor": "",
+            "hideHorizontalBar": false,
+            "titleSize": 14
+          },
+          "parent": ""
+        },
+        {
+          "id": "c0b8271e-99f9-41a2-9bc9-f63b9836d16e",
+          "name": "Power Supplies",
+          "position": {
+            "x": 9,
+            "y": 3
+          },
+          "dimensions": {
+            "width": 3,
+            "height": 3
+          },
+          "type": "aql-query-widget",
+          "inputs": {
+            "expression": "let powerSupply = `*:/Sysdb/environment/archer/power/status/powerSupply/*`\nlet resultPS = powerSupply | where(dictHasKey(powerSupply, _key) == true) | recmap(2, (merge(_value)[\"state\"][\"Name\"]))\nlet badPowerSupply = 0\n\nfor device, deviceValue in resultPS {\n    if dictHasKey(_Tags, device) {\n        for powerSupplyKey, powerSupplyValue in deviceValue {\n            if powerSupplyValue != \"ok\" {\n                let badPowerSupply = badPowerSupply + 1\n            }\n        }\n    }\n}\n\nif badPowerSupply > 0 {\n    let allGood = \"Fail\"\n} else {\n    let allGood = \"Pass\"\n}\nallGood",
+            "graphConfig": {
+              "fontSize": 38,
+              "colorMappings": [
+                {
+                  "type": "value",
+                  "options": {
+                    "Pass": {
+                      "color": "green",
+                      "index": 0
+                    },
+                    "Fail": {
+                      "color": "red",
+                      "index": 1
+                    }
+                  }
+                }
+              ],
+              "description": "**Power Supplies**"
+            },
+            "visualization": "singleValue"
+          },
+          "location": "main",
+          "styles": {
+            "hideTitle": true,
+            "backgroundColor": "",
+            "hideHorizontalBar": false,
+            "titleSize": 14
+          },
+          "parent": ""
+        },
+        {
+          "id": "65e56ae4-0d98-4e90-923b-08edca79e946",
+          "name": "Fans",
+          "position": {
+            "x": 6,
+            "y": 3
+          },
+          "dimensions": {
+            "width": 3,
+            "height": 3
+          },
+          "type": "aql-query-widget",
+          "inputs": {
+            "expression": "let fans = `*:/Sysdb/environment/archer/cooling/status/*`\nlet resultFans = fans | where(dictHasKey(fans, _key) == true) | recmap(2, (merge(_value)[\"hwStatus\"][\"Name\"]))\nlet badFan = 0\n\nfor device, deviceValue in resultFans {\n    if dictHasKey(_Tags, device) {\n        for fansKey, fansValue in deviceValue {\n            if fansValue != \"ok\" {\n                let badFan = badFan + 1\n            }\n        }\n    }\n}\n\nif badFan > 0 {\n    let allGood = \"Fail\"\n} else {\n    let allGood = \"Pass\"\n}\nallGood",
+            "graphConfig": {
+              "fontSize": 38,
+              "colorMappings": [
+                {
+                  "type": "value",
+                  "options": {
+                    "Pass": {
+                      "color": "green",
+                      "index": 0
+                    },
+                    "Fail": {
+                      "color": "red",
+                      "index": 1
+                    }
+                  }
+                }
+              ],
+              "description": "**Fans**"
+            },
+            "visualization": "singleValue"
+          },
+          "location": "main",
+          "styles": {
+            "hideTitle": true,
+            "backgroundColor": "",
+            "hideHorizontalBar": false,
+            "titleSize": 14
+          },
+          "parent": ""
+        },
+        {
+          "id": "a1622bc7-c37f-471d-afec-722243dbbb57",
+          "name": "Temp Sensors",
+          "position": {
+            "x": 12,
+            "y": 3
+          },
+          "dimensions": {
+            "width": 3,
+            "height": 3
+          },
+          "type": "aql-query-widget",
+          "inputs": {
+            "expression": "let temperature = `*:/Sysdb/environment/archer/temperature/status/cell/1/*`\nlet resultTempStats = temperature | where(dictHasKey(temperature, _key) == true) | recmap(2, (merge(_value)[\"alertRaised\"]))\nlet badTempSensor = 0\n\nfor device, deviceValue in resultTempStats {\n    if dictHasKey(_Tags, device) {\n        for sensorKey, sensorValue in deviceValue {\n            if sensorValue != false {\n                let badFan = badFan + 1\n            }\n        }\n    }\n}\n\nif badTempSensor > 0 {\n    let allGood = \"Fail\"\n} else {\n    let allGood = \"Pass\"\n}\nallGood",
+            "graphConfig": {
+              "fontSize": 38,
+              "colorMappings": [
+                {
+                  "type": "value",
+                  "options": {
+                    "Pass": {
+                      "color": "green",
+                      "index": 0
+                    },
+                    "Fail": {
+                      "color": "red",
+                      "index": 1
+                    }
+                  }
+                }
+              ],
+              "description": "**Temp Sensors**"
+            },
+            "visualization": "singleValue"
+          },
+          "location": "main",
+          "styles": {
+            "hideTitle": true,
+            "backgroundColor": "",
+            "hideHorizontalBar": false,
+            "titleSize": 14
+          },
+          "parent": ""
+        },
+        {
+          "id": "73e3f7e2-803b-448d-b8ad-704e4a61a4a9",
+          "name": "Streaming",
+          "position": {
+            "x": 0,
+            "y": 0
+          },
+          "dimensions": {
+            "width": 3,
+            "height": 3
+          },
+          "type": "aql-query-widget",
+          "inputs": {
+            "expression": "let data = `analytics:/Devices/*/status/streamingStatus`\nlet devicesNotStreaming = 0\nfor device, devData in data {\n    if dictHasKey(_Tags, device) {\n        if merge(devData)[\"streamingStatus\"] != \"active\" {\n            let devicesNotStreaming = devicesNotStreaming + 1\n        }\n    }\n}\nif devicesNotStreaming > 0 {\n    let allGood = \"Fail\"\n} else {\n    let allGood = \"Pass\"\n}\nallGood",
+            "graphConfig": {
+              "fontSize": 38,
+              "colorMappings": [
+                {
+                  "type": "value",
+                  "options": {
+                    "Pass": {
+                      "color": "green",
+                      "index": 0
+                    },
+                    "Fail": {
+                      "color": "red",
+                      "index": 1
+                    }
+                  }
+                }
+              ],
+              "showDotIndicator": false,
+              "unitPlacement": "right",
+              "unit": "",
+              "description": "**Streaming Status**"
+            },
+            "visualization": "singleValue"
+          },
+          "location": "main",
+          "styles": {
+            "hideTitle": true,
+            "backgroundColor": "",
+            "hideHorizontalBar": false,
+            "titleSize": 14
+          },
+          "parent": ""
+        },
+        {
+          "id": "c38c9d3b-6ddd-4054-858c-e6ec5c8def3d",
+          "name": "CPU Usage",
+          "position": {
+            "x": 15,
+            "y": 0
+          },
+          "dimensions": {
+            "width": 3,
+            "height": 3
+          },
+          "type": "aql-query-widget",
+          "inputs": {
+            "expression": "let data =`analytics:/Devices/*/versioned-data/hardware/cpu/total/aggregate/1m`\nlet data = data | map(merge(_value) | fields(\"util\"))\nlet highCPU = 0\n\nfor device, deviceData in data {\n    if dictHasKey(_Tags, device) {\n        if dictHasKey(deviceData, \"util\") {\n            let cpuStatus = deviceData[\"util\"][\"avg\"]\n            if cpuStatus > 80 {\n                let highCPU = highCPU + 1\n            }\n        }\n    }\n}\nif highCPU > 0 {\n    let allGood = \"Fail\"\n} else {\n    let allGood = \"Pass\"\n}\nallGood",
+            "graphConfig": {
+              "fontSize": 38,
+              "description": "**CPU < 80%**",
+              "colorMappings": [
+                {
+                  "type": "value",
+                  "options": {
+                    "Pass": {
+                      "color": "green",
+                      "index": 0
+                    },
+                    "Fail": {
+                      "color": "red",
+                      "index": 1
+                    }
+                  }
+                }
+              ]
+            },
+            "visualization": "singleValue"
+          },
+          "location": "main",
+          "styles": {
+            "hideTitle": true,
+            "backgroundColor": "",
+            "hideHorizontalBar": false,
+            "titleSize": 14
+          },
+          "parent": ""
+        },
+        {
+          "id": "83155024-e7c8-46b5-a5ea-a735507062de",
+          "name": "Memory Usage",
+          "position": {
+            "x": 15,
+            "y": 3
+          },
+          "dimensions": {
+            "width": 3,
+            "height": 3
+          },
+          "type": "aql-query-widget",
+          "inputs": {
+            "expression": "let data =`analytics:/Devices/*/versioned-data/hardware/meminfo/memoryUsage`\nlet data = data | map(merge(_value) | fields(\"usedMemoryPercent\"))\nlet highMemory = 0\n\nfor device, deviceData in data {\n    if dictHasKey(_Tags, device) {\n        if dictHasKey(deviceData, \"usedMemoryPercent\") {\n            let memoryUsage = deviceData[\"usedMemoryPercent\"]\n            if memoryUsage > 70 {\n                let highMemory = highMemory + 1\n            }\n        }\n    }\n}\nif highMemory > 0 {\n    let allGood = \"Fail\"\n} else {\n    let allGood = \"Pass\"\n}\nallGood",
+            "graphConfig": {
+              "fontSize": 38,
+              "colorMappings": [
+                {
+                  "type": "value",
+                  "options": {
+                    "Pass": {
+                      "color": "green",
+                      "index": 0
+                    },
+                    "Fail": {
+                      "color": "red",
+                      "index": 1
+                    }
+                  }
+                }
+              ],
+              "description": "**Memory < 70%**"
+            },
+            "visualization": "singleValue"
+          },
+          "location": "main",
+          "styles": {
+            "hideTitle": true,
+            "backgroundColor": "",
+            "hideHorizontalBar": false,
+            "titleSize": 14
+          },
+          "parent": ""
+        },
+        {
+          "id": "0ba389a3-2271-4eca-ba57-392ec4138dc6",
+          "name": "Optic Temp",
+          "position": {
+            "x": 3,
+            "y": 3
+          },
+          "dimensions": {
+            "width": 3,
+            "height": 3
+          },
+          "type": "aql-query-widget",
+          "inputs": {
+            "expression": "let xcvrTempData = `analytics:/Devices/*/versioned-data/interfaces/data/*/aggregate/hardware/xcvr/15m` | recmap(2, merge(_value)) \nlet opticOverTemp = 0\n\nfor device, interfaces in xcvrTempData {\n    if dictHasKey(_Tags, device) {\n        for interface, intData in interfaces {\n            if dictHasKey(intData, \"temperature\") {\n                let xcvrTemp = intData[\"temperature\"][\"avg\"]\n                if num(xcvrTemp) >= 60 {\n                    let opticOverTemp = opticOverTemp + 1\n                }\n            }\n        }\n    }\n}\nif opticOverTemp > 0 {\n    let allGood = \"Fail\"\n} else {\n    let allGood = \"Pass\"\n}\nallGood",
+            "graphConfig": {
+              "description": "**Optic Temp < 60C**",
+              "fontSize": 38,
+              "colorMappings": [
+                {
+                  "type": "value",
+                  "options": {
+                    "Pass": {
+                      "color": "green",
+                      "index": 0
+                    },
+                    "Fail": {
+                      "color": "red",
+                      "index": 1
+                    }
+                  }
+                }
+              ]
+            },
+            "visualization": "singleValue"
+          },
+          "location": "main",
+          "styles": {
+            "hideTitle": true,
+            "backgroundColor": "",
+            "hideHorizontalBar": false,
+            "titleSize": 14
+          },
+          "parent": ""
+        },
+        {
+          "id": "1899f911-8406-4cfd-8207-6a1b7aea5baf",
+          "name": "In Errors",
+          "position": {
+            "x": 15,
+            "y": 6
+          },
+          "dimensions": {
+            "width": 3,
+            "height": 3
+          },
+          "type": "aql-query-widget",
+          "inputs": {
+            "expression": "let devIntData = `analytics:/Devices/*/versioned-data/interfaces/data/*/aggregate/rates/15m`\nlet inErrorsHigh = 0\n\nfor device, intData in devIntData {\n    if dictHasKey(_Tags, device) {\n        for interface, data in intData {\n            let data = merge(data)\n            if dictHasKey(data, \"inErrors\") {\n                let inErrors = data[\"inErrors\"][\"avg\"]\n                if inErrors >= 0.7 {\n                    let inErrorsHigh = inErrorsHigh + 1\n                }\n            }\n        }\n    }\n}\nif inErrorsHigh > 0 {\n    let allGood = \"Fail\"\n} else {\n    let allGood = \"Pass\"\n}\nallGood",
+            "graphConfig": {
+              "description": "**In Errors: 15m Avg**",
+              "fontSize": 38,
+              "colorMappings": [
+                {
+                  "type": "value",
+                  "options": {
+                    "Pass": {
+                      "color": "green",
+                      "index": 0
+                    },
+                    "Fail": {
+                      "color": "red",
+                      "index": 1
+                    }
+                  }
+                }
+              ],
+              "linkUrl": ""
+            },
+            "visualization": "singleValue"
+          },
+          "location": "main",
+          "styles": {
+            "hideTitle": true,
+            "backgroundColor": "",
+            "hideHorizontalBar": false,
+            "titleSize": 14
+          },
+          "parent": ""
+        },
+        {
+          "id": "69188103-43bb-4ff3-aadf-579835734652",
+          "name": "CRC Errors",
+          "position": {
+            "x": 12,
+            "y": 6
+          },
+          "dimensions": {
+            "width": 3,
+            "height": 3
+          },
+          "type": "aql-query-widget",
+          "inputs": {
+            "expression": "let devIntData = `analytics:/Devices/*/versioned-data/interfaces/data/*/aggregate/rates/15m`\nlet intFcsErrors = 0\n\nfor device, intData in devIntData {\n    if dictHasKey(_Tags, device) {\n        for interface, data in intData {\n            let data = merge(data)\n            if dictHasKey(data, \"fcsErrors\") {\n                let fcsErrors = data[\"fcsErrors\"][\"avg\"]\n                if fcsErrors >= 0.7 {\n                    let intFcsErrors = intFcsErrors + 1\n                }\n            }\n        }\n    }\n}\nif intFcsErrors > 0 {\n    let allGood = \"Fail\"\n} else {\n    let allGood = \"Pass\"\n}\nallGood",
+            "graphConfig": {
+              "fontSize": 38,
+              "colorMappings": [
+                {
+                  "type": "value",
+                  "options": {
+                    "Pass": {
+                      "color": "green",
+                      "index": 0
+                    },
+                    "Fail": {
+                      "color": "red",
+                      "index": 1
+                    }
+                  }
+                }
+              ],
+              "description": "**CRC: 15m Avg**"
+            },
+            "visualization": "singleValue"
+          },
+          "location": "main",
+          "styles": {
+            "hideTitle": true,
+            "backgroundColor": "",
+            "hideHorizontalBar": false,
+            "titleSize": 14
+          },
+          "parent": ""
+        },
+        {
+          "id": "4d8a3afb-8d49-4daf-9721-35b352968084",
+          "name": "",
+          "position": {
+            "x": 18,
+            "y": 0
+          },
+          "dimensions": {
+            "width": 6,
+            "height": 9
+          },
+          "type": "metrics-widget-aggregate",
+          "inputs": {
+            "components": [],
+            "isTokenSearchEnabled": true,
+            "metricKeys": [
+              "DEVICE_EOS_VERSION"
+            ],
+            "metricSource": "devices",
+            "selectedCustomTags": [
+              "Tags"
+            ],
+            "tags": "",
+            "viewType": "metric",
+            "limits": {}
+          },
+          "location": "main",
+          "styles": {
+            "hideTitle": true,
+            "backgroundColor": "",
+            "hideHorizontalBar": false,
+            "titleSize": 14
+          },
+          "parent": ""
+        },
+        {
+          "id": "9d1c3ab1-2fa9-4d59-b251-861c277b3990",
+          "name": "CRC and In Errors",
+          "position": {
+            "x": 13,
+            "y": 9
+          },
+          "dimensions": {
+            "width": 11,
+            "height": 11
+          },
+          "type": "aql-query-widget",
+          "inputs": {
+            "expression": "# Create dict to hold all the processed data\nlet output = newDict()\n# CRC Errors\nlet devIntData = `analytics:/Devices/*/versioned-data/interfaces/data/*/aggregate/rates/15m`\n\nfor device, intData in devIntData {\n    if dictHasKey(_Tags, device) {\n        let intListFcs = \"\"\n        if !dictHasKey(output, device) {\n            output[device] = newDict()\n        }\n        for interface, data in intData {\n            let data = merge(data)\n            if dictHasKey(data, \"fcsErrors\") {\n                let fcsErrors = data[\"fcsErrors\"][\"avg\"]\n                if fcsErrors >= 0.7 {\n                    if length(str(fcsErrors)) > 4 {\n                        let fcsErrors = strCut(str(fcsErrors), 0, 4)\n                    }\n                    if intListFcs == \"\" {\n                        let intListFcs = interface + \" (\" + str(fcsErrors) + \")\"\n                    } else {\n                        let intListFcs = intListFcs + \", \" + interface + \" (\" + str(fcsErrors) + \")\"\n                    }\n                }\n            }\n        }\n        if intListFcs == \"\" {\n            output[device][\"CRC Errors\"] = \"None\"\n        } else {\n            output[device][\"CRC Errors\"] = intListFcs\n        }\n    }\n}\n\n# In Errors\nlet devIntData = `analytics:/Devices/*/versioned-data/interfaces/data/*/aggregate/rates/15m`\n\nfor device, intData in devIntData {\n    if dictHasKey(_Tags, device) {\n        let intListErrors = \"\"\n        if !dictHasKey(output, device) {\n            output[device] = newDict()\n        }\n        for interface, data in intData {\n            let data = merge(data)\n            if dictHasKey(data, \"inErrors\") {\n                let inErrors = data[\"inErrors\"][\"avg\"]\n                if inErrors >= 0.7 {\n                    if length(str(inErrors)) > 4 {\n                        let inErrors = strCut(str(inErrors), 0, 4)\n                    }\n                    if intListErrors == \"\" {\n                        let intListErrors = interface + \" (\" + str(inErrors) + \")\"\n                    } else {\n                        let intListErrors = intListErrors + \", \" + interface + \" (\" + str(inErrors) + \")\"\n                    }\n                }\n            }\n        }\n        if intListErrors == \"\" {\n            output[device][\"In Errors\"] = \"None\"\n        } else {\n            output[device][\"In Errors\"] = intListErrors\n        }\n    }\n}\n\noutput",
+            "graphConfig": {
+              "columns": {
+                "key": {
+                  "mapToHostname": true,
+                  "columnTitle": "Hostname"
+                },
+                "In Errors": {
+                  "colorMappings": [
+                    {
+                      "type": "regex",
+                      "options": {
+                        "^(?!None).*": {
+                          "color": "red",
+                          "index": 1
+                        }
+                      }
+                    },
+                    {
+                      "type": "value",
+                      "options": {
+                        "None": {
+                          "color": "green",
+                          "index": 0
+                        }
+                      }
+                    }
+                  ]
+                },
+                "CRC Errors": {
+                  "colorMappings": [
+                    {
+                      "type": "regex",
+                      "options": {
+                        "^(?!None).*": {
+                          "color": "red",
+                          "index": 1
+                        }
+                      }
+                    },
+                    {
+                      "type": "value",
+                      "options": {
+                        "None": {
+                          "color": "green",
+                          "index": 0
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "visualization": "table"
+          },
+          "location": "main",
+          "styles": {
+            "hideTitle": true,
+            "backgroundColor": "",
+            "hideHorizontalBar": false,
+            "titleSize": 14
+          },
+          "parent": ""
+        },
+        {
+          "id": "e3f0a1e4-effc-41b9-a1c9-cc8f894ace31",
+          "name": "Fan Sensors / Power Supplies / Temp sensors",
+          "position": {
+            "x": 11,
+            "y": 45
+          },
+          "dimensions": {
+            "width": 13,
+            "height": 11
+          },
+          "type": "aql-query-widget",
+          "inputs": {
+            "expression": "### Create dict to hold all the processed data\nlet output = newDict()\n\n### Power Supplies\nlet powerSupply = `*:/Sysdb/environment/archer/power/status/powerSupply/*`\nlet resultPS = powerSupply | where(dictHasKey(powerSupply, _key) == true) | recmap(2, (merge(_value)[\"state\"][\"Name\"]))\n\nfor device, deviceValue in resultPS {\n    if dictHasKey(_Tags, device) {\n        if !dictHasKey(output, device) {\n            output[device] = newDict()\n        }\n        let powerSupplyNotGood = \"\"\n        for powerSupplyKey, powerSupplyValue in deviceValue {\n            if powerSupplyValue != \"ok\" {\n                if powerSupplyNotGood == \"\" {\n                    let powerSupplyNotGood = powerSupplyKey + \" (\" + powerSupplyValue + \")\"\n                } else {\n                    let powerSupplyNotGood = powerSupplyNotGood + \", \" + powerSupplyKey + \" (\" + powerSupplyValue + \")\"\n                }\n            }\n        }\n        if powerSupplyNotGood == \"\" {\n            output[device][\"Power Supplies\"] = \"ok\"\n        } else {\n            output[device][\"Power Supplies\"] = powerSupplyNotGood\n        }\n    }\n}\n\n### Temp Sensors\nlet temperature = `*:/Sysdb/environment/archer/temperature/status/cell/1/*`\nlet resultTempStats = temperature | where(dictHasKey(temperature, _key) == true) | recmap(2, (merge(_value)[\"alertRaised\"]))\n\nfor device, deviceValue  in resultTempStats {\n    if dictHasKey(_Tags, device) {\n        if !dictHasKey(output, device) {\n            output[device] = newDict()\n        }\n        let tempSensorNotGood = \"\"\n        for sensorKey, sensorValue in deviceValue {\n            if sensorValue != false {\n                if tempSensorNotGood == \"\" {\n                    let tempSensorNotGood = sensorKey + \" (\" + sensorValue + \")\"\n                } else {\n                    let tempSensorNotGood = tempSensorNotGood + \", \" + sensorKey + \" (\" + sensorValue + \")\"\n                }\n            }\n        }\n        if tempSensorNotGood == \"\" {\n            output[device][\"Temp Sensors\"] = \"ok\"\n        } else {\n            output[device][\"Temp Sensors\"] = tempSensorNotGood\n        }\n    }\n}\noutput",
+            "graphConfig": {
+              "columns": {
+                "key": {
+                  "mapToHostname": true,
+                  "columnTitle": "Hostname"
+                },
+                "Power Supplies": {
+                  "colorMappings": [
+                    {
+                      "type": "regex",
+                      "options": {
+                        "^(?!ok).*": {
+                          "color": "red",
+                          "index": 1
+                        }
+                      }
+                    },
+                    {
+                      "type": "value",
+                      "options": {
+                        "ok": {
+                          "color": "green",
+                          "index": 0
+                        }
+                      }
+                    }
+                  ]
+                },
+                "Temp Sensors": {
+                  "colorMappings": [
+                    {
+                      "type": "regex",
+                      "options": {
+                        "^(?!ok).*": {
+                          "color": "red",
+                          "index": 1
+                        }
+                      }
+                    },
+                    {
+                      "type": "value",
+                      "options": {
+                        "ok": {
+                          "color": "green",
+                          "index": 0
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "visualization": "table"
+          },
+          "location": "main",
+          "styles": {
+            "hideTitle": true,
+            "backgroundColor": "",
+            "hideHorizontalBar": false,
+            "titleSize": 14
+          },
+          "parent": ""
+        },
+        {
+          "id": "9949e82b-5b8f-4434-9bb0-8d420004c162",
+          "name": "",
+          "position": {
+            "x": 0,
+            "y": 20
+          },
+          "dimensions": {
+            "width": 24,
+            "height": 12
+          },
+          "type": "metrics-widget-table",
+          "inputs": {
+            "defaultSort": {
+              "order": 1
+            },
+            "components": [],
+            "isTokenSearchEnabled": true,
+            "metricKeys": [
+              "BGP_ESTABLISHED_PEER_COUNT_DEFAULT_VRF",
+              "BGP_UNESTABLISHED_PEER_COUNT_DEFAULT_VRF",
+              "DEVICE_CPU",
+              "DEVICE_AMBIENT_TEMPERATURE",
+              "DEVICE_MEMORY_USAGE_PERCENTAGE",
+              "DEVICE_STREAMING_ACTIVITY"
+            ],
+            "metricSource": "devices",
+            "selectedCustomTags": [
+              "Tags"
+            ],
+            "tags": "",
+            "viewType": "metric"
+          },
+          "location": "main",
+          "styles": {
+            "hideTitle": true,
+            "backgroundColor": "",
+            "hideHorizontalBar": false,
+            "titleSize": 14
+          },
+          "parent": ""
+        },
+        {
+          "id": "7c8750e8-5290-4aa4-a124-985e8029b16b",
+          "name": "",
+          "position": {
+            "x": 0,
+            "y": 0
+          },
+          "dimensions": {
+            "width": 24,
+            "height": 2
+          },
+          "type": "tag-query-widget",
+          "inputs": {
+            "autoFocus": true,
+            "inputName": "Tags",
+            "inputSource": "devices",
+            "defaultValue": "device:*"
+          },
+          "location": "inputs",
+          "parent": ""
+        }
+      ],
+      "lastUpdated": 1717514866042,
+      "lastUpdatedBy": "aolsson"
+    }
+  ]
+}
