@@ -1,3 +1,5 @@
+banner motd
+<%
 # this function uses the mako context to output a formatted string
 #  for cvp to process the generated configuration it's important
 #  that the string be newLine terminated.  rather than requiring
@@ -15,3 +17,7 @@ def output(outStr: str, indent: int=2, level: int=0, flush: bool=True):
     context.write(f'{outStr.rjust((indent*level)+len(outStr))}')
     if flush:
         context.write("\n")
+
+######## our code goes here
+%>
+EOF
