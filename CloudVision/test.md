@@ -29,8 +29,7 @@ Let’s start by configuring the token for Compliance Updates so that the items 
 
 2. In the “**Authentication Token**” box, enter the following token 
 
-    ```
-4893c46ab1f074b733d48ddf2b60458f
+    ```4893c46ab1f074b733d48ddf2b60458f
 
 
 
