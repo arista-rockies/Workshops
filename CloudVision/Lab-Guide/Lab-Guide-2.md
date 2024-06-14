@@ -19,10 +19,7 @@ Let’s start by configuring the token for Compliance Updates so that the items 
 
 
 
-<p id="gdcalert1" ><span style="color: red; font-weight: bold">>>>>>  gd2md-html alert: inline image link here (to images/image1.png). Store image on your image server and adjust path/filename/extension if necessary. </span><br>(<a href="#">Back to top</a>)(<a href="#gdcalert2">Next alert</a>)<br><span style="color: red; font-weight: bold">>>>>> </span></p>
-
-
-![alt_text]([CloudVision/Lab-Guide/Images/Lab2-1.png](https://github.com/arista-rockies/Workshops/blob/7b5245dd452d8361f496928e58c43a59eefa0205/CloudVision/Lab-Guide/Images/Lab2-1.png) "image_tooltip")
+![alt_text](Images/Lab2-1.png) "image_tooltip")
 
 
 
