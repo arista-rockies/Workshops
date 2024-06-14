@@ -39,6 +39,11 @@ Let’s start by configuring the token for Compliance Updates so that the items 
 > We can use this format for the NOTE section!
 
 
+
+> [!WARNING]
+> DON'T BREAK YOUR LABS!!!
+>
+> 
 <p id="gdcalert2" ><span style="color: red; font-weight: bold">>>>>>  gd2md-html alert: inline image link here (to images/image2.png). Store image on your image server and adjust path/filename/extension if necessary. </span><br>(<a href="#">Back to top</a>)(<a href="#gdcalert3">Next alert</a>)<br><span style="color: red; font-weight: bold">>>>>> </span></p>
 
 
