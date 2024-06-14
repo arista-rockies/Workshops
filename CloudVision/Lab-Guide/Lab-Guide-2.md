@@ -19,7 +19,7 @@ Let’s start by configuring the token for Compliance Updates so that the items 
 
 
 
-![alt_text](Images/Lab2-1.png) "image_tooltip")
+![alt_text](Images/Lab2-1.png)
 
 
 
