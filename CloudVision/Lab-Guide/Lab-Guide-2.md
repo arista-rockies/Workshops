@@ -1296,9 +1296,9 @@ cmdResponse = ctx.runDeviceCmds(clearCountersCmds)
 
 21. Now that the counters are cleared let’s create another log entry stating that the counters have been successfully cleared.  To do that, let’s skip another line and add the following content to lines 33 - 34:
 
-    ```
+    ```sh
 # Create log entry
-ctx.alog(f'Counters for Ethernet{interface} Sucessfully Cleared')
+ctx.alog(f"Counters for Ethernet{interface} Sucessfully Cleared")
 ```
 
 
