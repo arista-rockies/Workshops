@@ -18,6 +18,7 @@ Let’s start by configuring the token for Compliance Updates so that the items 
 1. Navigate to **Settings** > **Compliance Updates** (Settings is the gear icon in the bottom left corner).
 
 
+<img src="Images/Lab2-1.png" width="200"/>
 
 ![alt_text](Images/Lab2-1.png)
 
