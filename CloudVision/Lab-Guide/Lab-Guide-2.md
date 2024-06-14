@@ -35,11 +35,10 @@ Let’s start by configuring the token for Compliance Updates so that the items 
 4. Select “**Save**” to save the Token.
 
 > [!NOTE]
-> I want the readers to read it carefully as it contains many important docs.
+> DON'T BREAK YOUR LABS!!!
 
 > [!TIP]
-> We can use this format for the NOTE section!
-
+> DON'T BREAK YOUR LABS!!!
 
 
 > [!WARNING]
@@ -47,11 +46,11 @@ Let’s start by configuring the token for Compliance Updates so that the items 
 
 
 > [!CAUTION]
-> Don't execute the code without commenting the test cases.
+> DON'T BREAK YOUR LABS!!!
 
 
 > [!IMPORTANT]  
-> Read the contribution guideline before adding a pull request.
+> DON'T BREAK YOUR LABS!!!
 
 
 <p id="gdcalert2" ><span style="color: red; font-weight: bold">>>>>>  gd2md-html alert: inline image link here (to images/image2.png). Store image on your image server and adjust path/filename/extension if necessary. </span><br>(<a href="#">Back to top</a>)(<a href="#gdcalert3">Next alert</a>)<br><span style="color: red; font-weight: bold">>>>>> </span></p>
