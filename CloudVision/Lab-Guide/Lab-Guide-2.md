@@ -20,12 +20,11 @@ Let’s start by configuring the token for Compliance Updates so that the items 
 
 <img src="Images/Lab2-1.png" width="800"/>
 
-![alt_text](Images/Lab2-1.png)
 
 
 
 
-2. In the “**Authentication Token**” box, enter the following token 
+1. In the “**Authentication Token**” box, enter the following token 
 
     ```sh
    4893c46ab1f074b733d48ddf2b60458f
