@@ -12,7 +12,7 @@
 ```sh
 4893c46ab1f074b733d48ddf2b60458f
 ```
--- Insert Image -->
+<!-- Insert Image -->
 <img src="Images/Lab2-1.png" width="800"/>
 
 > [!NOTE]
