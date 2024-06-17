@@ -7,7 +7,7 @@
 
 
 <p align="center">
-  <img img src="Images/cloudvision-logo.png" width="800" />
+  <img img src="Images/cloudvision-logo.png" width="100" />
 </p>
 
 
