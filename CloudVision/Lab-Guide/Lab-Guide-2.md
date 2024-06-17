@@ -23,7 +23,6 @@ Let’s start by configuring the token for Compliance Updates so that the items 
 
 
 
-
 1. In the “**Authentication Token**” box, enter the following token 
 
     ```sh
