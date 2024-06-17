@@ -44,7 +44,7 @@ Let’s start by configuring the token for Compliance Updates so that the items 
 > DON'T BREAK YOUR LABS!!!
 
 
-> [!CAUTION]test
+> [!CAUTION][!WARNING][!CAUTION]
 > DON'T BREAK YOUR LABS!!!
 
 
