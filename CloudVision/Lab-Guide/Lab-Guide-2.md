@@ -18,7 +18,7 @@ Let’s start by configuring the token for Compliance Updates so that the items 
 1. Navigate to **Settings** > **Compliance Updates** (Settings is the gear icon in the bottom left corner).
 
 
-<img src="Images/Lab2-1.png" width="800"/>
+<img src="Images/Lab2-1.png"/>
 
 
 
@@ -32,24 +32,6 @@ Let’s start by configuring the token for Compliance Updates so that the items 
 
 
 4. Select “**Save**” to save the Token.
-
-> [!NOTE]
-> DON'T BREAK YOUR LABS!!!
-
-> [!TIP]
-> DON'T BREAK YOUR LABS!!!
-
-
-> [!WARNING]
-> DON'T BREAK YOUR LABS!!!
-
-
-> [!CAUTION]
-> DON'T BREAK YOUR LABS!!!
-
-
-> [!IMPORTANT]  
-> DON'T BREAK YOUR LABS!!!
 
 
 <p id="gdcalert2" ><span style="color: red; font-weight: bold">>>>>>  gd2md-html alert: inline image link here (to images/image2.png). Store image on your image server and adjust path/filename/extension if necessary. </span><br>(<a href="#">Back to top</a>)(<a href="#gdcalert3">Next alert</a>)<br><span style="color: red; font-weight: bold">>>>>> </span></p>
