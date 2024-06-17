@@ -20,20 +20,32 @@
 <!-- Insert Image -->
 <img src="Images/Lab2-1.png"/>
 
+<br>
+
+## Insert Note  
 > [!NOTE]
 > ENTER NOTE TEXT HERE!!!
 
+<br>
+
+## Insert Tip
 > [!TIP]
 > ENTER TIP TEXT HERE!!!
 
+<br>
 
+## Insert Warning
 > [!WARNING]
 > ENTER WARNING TEXT HERE!!!
 
+<br>
 
+## Insert Caution
 > [!CAUTION]
 > ENTER CAUTION TEXT HERE!!!
 
+<br>
 
+## Insert Important
 > [!IMPORTANT]  
 > ENTER IMPORTANT TEXT HERE!!!
