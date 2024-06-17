@@ -7,7 +7,7 @@
 </p>
 
 <!-- title only -->
-<h1 align="center"> CloudVision Mastery Workshop Lab Guide </h1>
+<h1 align="center"> CloudVision Mastery Workshop : Table of Contents </h1>
 
 
 1. [Example](#example)
