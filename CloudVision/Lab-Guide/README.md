@@ -5,6 +5,10 @@
 <!-- title only -->
 <h1 align="center"> CloudVision Mastery Workshop Lab Guide </h1>
 
+<h1 align="center"> 
+  <img img src="Images/cloudvision-logo.png" width="200" />
+  CloudVision Mastery Workshop Lab Guide
+</h1>
 
 <p align="center">
   <img img src="Images/cloudvision-logo.png" width="200" />
