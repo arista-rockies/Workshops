@@ -9,9 +9,11 @@
 <!-- title only -->
 <h1 align="center"> CloudVision Mastery Workshop Lab Guide </h1>
 
+<!-- Insert Code Block with Copy Functionality -->
 ```sh
 4893c46ab1f074b733d48ddf2b60458f
 ```
+
 <!-- Insert Image -->
 <img src="Images/Lab2-1.png"/>
 
