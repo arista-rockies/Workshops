@@ -1,4 +1,3 @@
-<img src="Images/2560px-Arista-networks-logo.svg.png" width="800"/>
 <p align="center">
   <img img src="Images/2560px-Arista-networks-logo.svg.png" width="800" />
 </p>
