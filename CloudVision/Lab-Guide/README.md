@@ -9,16 +9,6 @@
 <!-- title only -->
 <h1 align="center"> CloudVision Mastery Workshop Lab Guide </h1>
 
-<!-- <h1 align="center"> 
-  <img img src="Images/cloudvision-logo.png" width="200" />
-   CloudVision Mastery Workshop Lab Guide
-</h1>-->
-
-<!-- <p align="center">
-  <img img src="Images/cloudvision-logo.png" width="200" />
-</p>-->
-
-
 
 1. [Example](#example)
 2. [LAB-2 : CloudVision Operations Lab Guide](https://github.com/arista-rockies/Workshops/blob/main/CloudVision/Lab-Guide/Lab-Guide-2.md)
