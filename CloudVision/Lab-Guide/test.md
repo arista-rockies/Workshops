@@ -5,7 +5,4 @@
 4. [Fourth Example](#fourth-examplehttpwwwfourthexamplecom)
 
 
-## Example
-## Example2
-## Third Example
-## [Fourth Example](http://www.fourthexample.com) 
+
