@@ -1,6 +1,7 @@
 <p align="center">
   <img img src="Images/2560px-Arista-networks-logo.svg.png" width="800" />
 </p>
+
 <!-- title only -->
 <h1 align="center"> CloudVision Mastery Workshop Lab Guide </h1>
 
