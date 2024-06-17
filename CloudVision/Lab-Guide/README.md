@@ -1,6 +1,8 @@
 <img src="Images/2560px-Arista-networks-logo.svg.png" width="800"/>
 
-<h1 style="text-align: center;">CloudVision Mastery Workshop Lab Guide</h1>
+<!-- title only -->
+<h1 align="center"> CloudVision Mastery Workshop Lab Guide </h1>
+
 
 # Lab Guide : Table of Contents
 1. [Example](#example)
