@@ -7,7 +7,7 @@
 
 <h1 align="center"> 
   <img img src="Images/cloudvision-logo.png" width="200" />
-  CloudVision Mastery Workshop Lab Guide
+   Mastery Workshop Lab Guide
 </h1>
 
 <p align="center">
