@@ -1,5 +1,5 @@
 <p align="center">
-  <img img src="Images/2560px-Arista-networks-logo.svg.png" width="800" />
+  <img img src="Images/Arista-Logo.png" width="800" />
 </p>
 
 <p align="center">
