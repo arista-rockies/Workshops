@@ -1,10 +1,14 @@
-# Campus C-01 AGNI Lab Guide EAP-TLS Wireless Policy
+# Campus C-01 AGNI Lab Guide 
+## EAP-TLS Wireless Policy
+
 ![image1](images/CVCUE_logo.png) 
 ![image2](images/AGNI_logo.png)
 
+---
 
-#### This Lab Guide:
-Campus/2026_Campus_Workshop/C-01/Rockies Campus C-01 AGNI Lab Guide - EAP-TLS Wireless Policy
+This Lab Guide:
+
+https://github.com/arista-rockies/Workshops/blob/main/Campus/2026_Campus_Workshop/C-01/2026_Campus_C-01_AGNI_Lab_Guide-EAP-TLS_Wireless_Policy.md
 
 ---
 
@@ -12,6 +16,8 @@ Campus/2026_Campus_Workshop/C-01/Rockies Campus C-01 AGNI Lab Guide - EAP-TLS Wi
 
 [Full Lab Topology](#full-lab-topology)  
 [POD Topology](#pod-topology)  
+
+---
 
 **NAC Lab #1 - Create EAP-TLS Wireless Policy**  
 1. [CloudVision Cognitive Unified Edge CV-CUE Access](#1-cloudvision-cognitive-unified-edge-cv-cue-access)  
