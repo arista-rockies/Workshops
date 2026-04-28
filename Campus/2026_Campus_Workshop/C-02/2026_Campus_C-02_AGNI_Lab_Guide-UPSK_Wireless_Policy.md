@@ -68,6 +68,8 @@
 
 ![image12](images/image12.png)
 
+**NOTE**: For WPA2 and WPA/WPA2 Mixed Mode, UPSK Identity Lookup is auto-enabled. For WPA3 and WPA3 Transition Mode, you cannot enable UPSK Identity Lookup.  
+
 **NOTE**: For more information on UPSK click here: https://arista.my.site.com/AristaCommunity/s/article/Unique-PSKs
 
 9. Next, Click on the **Access Control** tab.  Under **RADIUS Settings**, select **RadSec** and then **AGNI** for the Authentication and Accounting Servers, and select **Send DHCP Options and HTTP User Agent**.
@@ -187,20 +189,37 @@ In this section you will create a local user and enroll the MAC of your device.
 
 ![image41](images/image41.png)
 
-6. Next, connect your client to **ATD-##-UPSK** using your **UPSK Passphrase**.
+6. Next, since we are using WPA3 Transition Mode with UPSK, we need to add your personal device to your Managed Clients database via the AGNI Self-Service Portal.
 
-7. Click on **Monitoring - Sessions** and validate your device connection.
+7. Go to, Configuration - System - Self-service Portal. 
 
-![image42](images/image42.png)
+![image41a](images/image41a.png) 
+
+8. Click on Self-service Portal in the upper right corner to copy the Portal link to the clipboard.
+
+![image41b](images/image41b.png)
+
+9. Open another browser tab and paste the Portal link on the browser URL Address bar to access the Self-Service Portal.  
+
+![image41c](images/image41c.png)
+
+10. Sign in to the Self-Service Portal with your username and password that you created earlier.
+
+![image41d](images/image41d.png)
+
+11. Once you are in the Self-Service Portal, click on Add or Import Clients, add your client device MAC Address and Description, and click Register.
+
+![image41e](images/image41e.png)
+
+12. Your client will be shown in the Managed Clients table.
+
+![image41f](images/image41f.png)
+
+13. Now connect your client to **ATD-##-UPSK** using your **UPSK Passphrase**.
+
+14. Click on **Monitoring - Sessions** and select your UPSK Session and validate your device connection.
+
 ![image43](images/image43.png)
-
-8. Next, validate your device by clicking on **User** and then **Users.  Select your user**.
-
-![image44](images/image44.png)
-
-9. Click on **Show Clients**
-
-![image46](images/image46.png)
 
 **LAB SECTION COMPLETE**
 
@@ -216,13 +235,12 @@ In this section, you will simulate your device as an IoT device.
 
 ![image47](images/image47.png)
 ![image48](images/image48.png)
-![image49](images/image49.png)
 
-2. Next, you will **add your client device as an IoT device in a Client Group.**
+3. Next, you will **add your client device as an IoT device in a Client Group.**
 
 First, we will need to create the Client Group.
 
-3. In **AGNI**, under **Identity**, click on **Client Groupsv and then **+ Add**.
+4. In **AGNI**, under **Identity**, click on **Client Groups** and then **+ Add**.
 
 ![image50](images/image50.png)
 ![image51](images/image51.png)
@@ -231,55 +249,38 @@ First, we will need to create the Client Group.
 - Description: **Corp Approved Devices**  
 - User Association: **Not user associated**  
 
-4. **Enable the Group UPSK.  Copy the UPSK Passphrase**
+5. **Enable the Group UPSK.  Copy the UPSK Passphrase**
 
-5. Then click on **Add Group**
+6. Then click on **Add Group**
 
 ![image52](images/image52.png)
 ![image53](images/image53.png)
 
-6. Next, connect your client to **ATD-##-UPSK** using the Client Group UPSK Passphrase.
+7. Next, add your device as a Not User Associated local Client.
 
-7. Click on Sessions and validate your device connection.
+8. In AGNI, go to Identity - Client - Clients.
 
-![image54](images/image54.png)
+![image53a](images/image53a.png)
+
+9. Select + Add or Import in the upper right corner.
+
+![image53b](images/image53b.png)
+
+10. Select the Corp Approved Devices, add your client MAC Address and Description, and select Add Client. 
+
+**NOTE: Makes sure to set your device MAC Addresses that is not randomized when configuring your Client.**
+
+![image53c](images/image53c.png)
+
+11. Verify your Client details in the client table.
+
+![image53d](images/image53d.png)
+
+Next, connect your client to **ATD-##-UPSK** using the Client Group UPSK Passphrase.
+
+12. Click on **Monitoring - Sessions** and select your **UPSK Session** and validate your device connection.
+
 ![image55](images/image55.png)
-
-8. Next **Click on your Client**.
-
-![image56](images/image56.png))
-![image57](images/image57.png)
-
-**Notice your Client Group.**  Here you have the option to change the Client Group your device belongs to.
-
-![image58](images/image58.png)
-
-9. Next, delete your device from the **Client Group - Corp Approved Devices.**
-
-![image59](images/image59.png)
-![image60](images/image60.png)
-
-10. Next, under Identity, click on **Clients** and then **+ Add Client**.
-
-![image61](images/image61.png)
-![image62](images/image62.png)
-
-11. Select the Client Group: **Corp Approved Devices**
-
-12. Add in the **MAC Address of your test device** like your phone that is not randomized.
-
-13. Then select **Add Client**
-
-![image63](images/image63.png)
-
-**You should see your Client was added to the Group.**
-
-![image64](images/image64.png)
-
-14. **Validate and Verify your connection using the Client Group UPSK Passphrase.**
-
-![image65](images/image65.png)
-![image66](images/image66.png)
 
 **LAB GUIDE COMPLETE**
 --- 
