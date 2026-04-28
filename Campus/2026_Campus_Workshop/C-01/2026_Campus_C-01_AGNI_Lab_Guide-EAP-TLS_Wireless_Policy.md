@@ -15,10 +15,11 @@
 1. [Full Lab Topology](#1-full-lab-topology)  
 2. [POD Topology](#2-pod-topology)  
 3. [CloudVision Cognitive Unified Edge CV-CUE Access](#3-cloudvision-cognitive-unified-edge-cv-cue-access)  
-4. [Create an EAP-TLS SSID](#4-create-an-eap-tls-ssid)  
-5. [CloudVision AGNI Access](#5-cloudvision-agni-access)  
-6. [Create AGNI Networks & Segments for the EAP-TLS Wireless Policy](#6-create-agni-networks--segments-for-the-eap-tls-wireless-policy) 
-7. [Additional Information](#7-additional-information)
+4. [Turn Off the PSK SSID](#4-turn-off-the-psk-ssid)
+5. [Create an EAP-TLS SSID](#5-create-an-eap-tls-ssid)  
+6. [CloudVision AGNI Access](#6-cloudvision-agni-access)  
+7. [Create AGNI Networks & Segments for the EAP-TLS Wireless Policy](#7-create-agni-networks--segments-for-the-eap-tls-wireless-policy) 
+8. [Additional Information](#8-additional-information)
    -  [Setting up RadSec with a TPM AP Certificate](#setting-up-radsec-with-a-tpm-ap-certificate)  
    -  [Setting up RadSec with a Custom AP Certificate](#setting-up-radsec-with-a-custom-ap-certificate)  
 
@@ -72,7 +73,21 @@
 
 ---
 
-## 4. Create an EAP-TLS SSID
+## 4. Turn Off the PSK SSID 
+
+**NOTE: Prior to creating the EAP-TLS SSID, we need to Turn Off the ATD-##-PSK SSID created in Lab B-1.** 
+
+1. In CV-CUE, select Locations - Corp. Go to Configure - WiFi and Turn Off the EAP-##-PSK SSID by clicking ON in the SSID Profile. 
+
+![image6a](images/image6a.png) 
+
+2. Select Confirm.
+
+![image6b](images/image6b.png) 
+
+**NOTE: Power cycle the Raspberry Pi once the PSK SSID is Turned Off.**
+
+## 5. Create an EAP-TLS SSID
 
 - The **Configure** section of CV-CUE is broken into several parts, including **WiFi**, **Alerts**,**WIPS**, etc.  **Alerts** is where syslog and other alert related settings are configured, and **WIPS** is where the policies are configured for the WIPS sensor.
 
@@ -162,7 +177,7 @@
 
 ---
 
-## 5. CloudVision AGNI Access
+## 6. CloudVision AGNI Access
 #### Launchpad ####
 1. Return to the **LaunchPad**, and select the **AGNI - Trial** tile.
 
@@ -172,7 +187,7 @@
 
 ---
 
-## 6. Create AGNI Networks & Segments for the EAP-TLS Wireless Policy
+## 7. Create AGNI Networks & Segments for the EAP-TLS Wireless Policy
 
 1. Click on **Networks** and select **+ Add**
 
@@ -273,7 +288,7 @@ certificates are not bound to any user but set to machine identity.
 
 ---
 
-## 7. Additional Information
+## 8. Additional Information
 
 ### Setting up RadSec with a TPM AP Certificate
 
