@@ -256,7 +256,7 @@ First, we will need to create the Client Group.
 ![image52](images/image52.png)
 ![image53](images/image53.png)
 
-7. Next, add your device as a Not User Associated local Client.
+7. Next, add your device as a local Client.
 
 8. In AGNI, go to Identity - Client - Clients.
 
@@ -275,6 +275,18 @@ First, we will need to create the Client Group.
 11. Verify your Client details in the client table.
 
 ![image53d](images/image53d.png)
+
+12. Next, we'll add another Condition in the **Wireless-UPSK Segments Policy** to ensure only clients in the Corp Approved Devices Group match this policy to gain access to the network. 
+
+13. Go to **AGNI - Access Control - Segments**, and select the **Pencil icon** in **Wireless-UPSK** to edit the policy. 
+
+![image53e](images/image53e.png)
+
+14. Select **Add Condition** in the **Conditions Windows** and add **Client:Group | is | Corp Approved Devices**.
+
+15. Select **Update Segment**.
+
+![image54](images/image54.png)
 
 Next, connect your client to **ATD-##-UPSK** using the Client Group UPSK Passphrase.
 
