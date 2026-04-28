@@ -209,6 +209,8 @@ In this section you will create a local user and enroll the MAC of your device.
 
 11. Once you are in the Self-Service Portal, click on Add or Import Clients, add your client device MAC Address and Description, and click Register.
 
+**NOTE: Makes sure to set your device MAC Addresses that is not randomized when configuring your Client.**
+
 ![image41e](images/image41e.png)
 
 12. Your client will be shown in the Managed Clients table.
