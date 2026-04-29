@@ -105,7 +105,7 @@ This lab will help you create 2 port profiles and apply them to interfaces in yo
     - Enabled: **Yes**
     - Mode: **Active**
     - MLAG: **Yes**
-    - LACTP Fallback Mode: **Individual**
+    - LACP Fallback Mode: **Individual**
 
 *The Wireless Access Point has the capability to run a port channel but is not currently configured as such. We will use LACP fallback so we may provision the Access Point with its current configuration*
 
