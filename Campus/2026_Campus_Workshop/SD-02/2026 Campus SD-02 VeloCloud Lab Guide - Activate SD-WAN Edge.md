@@ -11,6 +11,8 @@
 ## Table of Contents
 1. [Full Lab Topoology](#1-full-lab-topology)
 2. [POD Topology](#2-pod-topology)
+3. [Access VeloCloud Orchestrator](#3-access-velocloud-orchestrator)
+4. [Activate your VeloCloud Edge](#4-activate-your-velocloud-edge)
 
 ---
 
@@ -26,39 +28,98 @@
 
 ---
 
-- Access the VeloCloud Orchestrator (VCO) at: https://veco12-kiad1.velocloud.net/ui/login
-- Enter the username and password provided and click Login
-- You will come to a Network Overview page.
-- At the top of this screen, you have 4 main functions:
-    - Monitor contains views that allow you to high level environment wide status as well as detailed status of individual edges and WAN links.
-    - Configure is where you define the configuration of your WAN with Profiles and Edges.
-    - Diagnostics allows you to get real-time information about the state of your SD-WAN edges for diagnostics purposes.
-    - Service Settings contains some environment-wide settings related to Alerts, Notifications and Licensing.
-- Select the Configure section and if necessary click on Edges in the left column.
-- All the Pods in the Workshop have one VeloCloud Edge (VCE) and they are all part of the same Enterprise on the VCO. Please be aware that modifications to VCEs other than your assigned Pod will effect other participants.
+## 3. Access VeloCloud Orchestrator
+
+1. Go to the Arista Ignition GUI via: https://ignition.campus-atd.net/
+- Enter the 6 digit Access Code found on the Pod Handout Worksheet
+- Click. ![Submit Passcode](images/ignition_submit.png)
+
+![ignition1](images/Ignition1.png)
+
+2. Click the **VeloCloud Orchestrator** tile
+
+![ignition_vco](images/ignition_vco.png)
+
+3. Enter the VeloCloud Orchestrator credentials provided in the Pod Handout Worksheet
+- Click. ![Submit Login](images/vco_login.png)
+
+![VCO Login Page](images/vco_login_page.png)
+
+4. You will now be logged into VeloCloud Orchestrator (VCO)
+
+![VCO Dashboard](images/vco_dashboard.png)
 
 ---
 
-- We are now going to activate your edge using the built-in Wi-Fi on the VCE.
-- Select your Edge from the list.
-- Click the Overview screen.
-- Click Send Activation Email
-- Find the link in the template email.
-- Do not click it yet.
-- There is a Wi-Fi network 
-- Before clicking the link, connect to the Wifi network named "velocloud-XXX" where XXX is the last 3 digits of the serial number on your VCE. The password is "vcsecret".
-- Once you are connected to that SSID, open the link from the "Activation Email" screen.
-- The edge will activate and you will see the following screen.
+## 4. Activate your VeloCloud Edge
 
---
+In this lab, you will take the configuration that was defined in the last lab and apply it to a VeloCloud Edge device.
 
-- Once activation is complete, return to the VCO.
-- Click on the Monitor screen.
-- Click Edges
-- If you don't see the status of Connected next to your Edge Name, click on Events on the left menu.
-- You can filter to just your Edge by using "Edge Name" "is" "campus-vce##"
-- You want to look for the following events:
-    - Received Edge activation
-    - Activated
-    - Online
-    - Link alive
+1. Login to VeloCloud Orchestrator, then click on the **Configure** tab.
+
+![VCO Configure Tab](images/vco-configure-tab.png)
+
+2. Nagivate to the **Edges** menu and select your Edge (**campus-vce\#\#**)
+
+![VCO Select Edge](images/vco-select-edge.png)
+
+3. Navigate to **Overview** and select the **SEND ACTIVATION EMAIL** button.
+
+![VCO Send Activation](images/vco-send-activation.png)
+
+4. This screen allows you to send an email to an installer with instructions and a link for activating the edge. We will not actually send the email but you will need the URL provided in the Email so scroll down and find the link but do not click it yet.
+
+![VCO Activation Link](images/vco-activation-link.png)
+
+5. When unactivated, the VeloCloud Edge 710 will create a Wifi SSD that can be used for Activation. Please connect to that SSID using the details that below,
+
+   - SSID: **velocloud-###** (### is the last 3 digits of the serial number for your edge. See the label on your edge.)
+   - Password: **vcsecret**
+
+6. Open the Activation Email link in your Web Browser. The VeloCloud Edge should connect to the VeloCloud Orchestrator and activate.
+
+![VCE Edge Activation](images/vce-edge-activation.png)
+
+7. Navigate back to the VeloCloud Orechstrator and click on the **Monitor** tab.
+
+![VCE Monitor Tab](images/vco-monitor-tab.png)
+
+8. Navigate to the **Edges** menu option and you should see your Edge (**campus-vce##**) listed with a Status of **Connected** and **2** Links.
+
+![VCO Monitor Edges](images/vco-monitor-edges.png)
+
+9. Select your Edge (**campus-vce##**). You should see both Links that you created with the following details:
+   - Link Status is **Stable**
+   - Throughput (up and down) is shown
+   - Bandwidth was detected
+   - Latency (up and down) is shown
+   - Jitter (up and down) is shown
+
+![VCO Monitor Edge Links](images/vco-edge-links.png)
+
+10. To troubleshoot the activation process, you can look at the event logs by navigating to the **Events** menu option.
+
+![VCO Select Events](images/vco-select-events.png)
+
+11. There are a lot of events. You should filter the events by **Edge Name**.
+    - Click ![Filter Button](images/filter-button.png)
+    - Select **Edge Name**
+    - Select **is**
+    - Select **campus-vce\#\#**
+    - Click **Apply**
+
+![VCO Edge Name Filter](images/vco-edge-name-filter.png)
+
+12. Some interesting events for your activation are:
+    - **Received Edge activation** - The Edge contacted the VCO with the Activation Key
+    - **Activated** - The edge finished the activation process
+    - **Online** - The edge finished any necessary upgrade, reboot and configuration steps and has connected to the VeloCloud Orchestrator
+    - **Link alive** - The WAN link is up and can reach the VeloCloud Gateway
+
+![VCO Edge Events](images/vco-edge-events.png)
+
+**Congratulations, your VeloCloud Edge is now Configured and Online!**
+
+**LAB GUIDE COMPLETE**
+
+---

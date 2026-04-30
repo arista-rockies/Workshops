@@ -133,3 +133,9 @@ In this lab, you will be configuring a new SD-WAN edge. You will use an existing
 10. Verify that the profile has enabled the Cloud VPN and has your Edge configured to use **campus-vce00** as a Hub by navigating to **Device > VPN Services > Cloud VPN**
 
 ![VCO Cloud VPN](images/vco-cloud-vpn.png)
+
+**Congratulations, your VeloCloud Edge is now configured and ready to be Activated**
+
+**LAB GUIDE COMPLETE**
+
+---
