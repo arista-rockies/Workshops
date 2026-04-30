@@ -185,9 +185,9 @@ Next, create 2 floors called “**1st Floor”** and “**2nd Floor”**.  Right
 
 ![](images/CreatingFloorsImage1.png)
 
-**\*Note:**  It’s also possible to add multiple floors at once using the “**Add Multiple Folders/Floors**” menu option:  
+**\*Note:**  It’s also possible to add multiple floors at once using the “**Add Multiple Folders/Floors**” menu option.  Please tab and use * when creating a Floor:  
 
-![](images/image30.png)    ![](images/image31.png)
+![](images/image30.png)    ![](images/B1Location.png)
 
 **Important:**  
 **For this workshop event, we will be reducing WiFi Radio channel width and transmit power levels to avoid interference with the hosting facility.**
