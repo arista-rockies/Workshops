@@ -121,36 +121,38 @@ In this lab you will be configuring the switches through CloudVision. Today you 
 
 ![Change Control](images/review-change-control.png)
 
-12. This will bring us to the Change Control that was created by the workspace submission. In this step we will be utilizing a Change Control Templates.
+<!-- 12. This will bring us to the Change Control that was created by the workspace submission. In this step we will be utilizing a Change Control Templates.
      - Click **Select a Template**
      - From the available dropdown select **Leaf Provisioning**.*(This template will add a 60 second delay before pushing configuration to leaf1a to ensure leaf1b gets the proposed configuration first)*
      - Select **Apply Template**.
 
-*A change control template provides the ability to create a configurable structure for repeatable change control operations*
+*A change control template provides the ability to create a configurable structure for repeatable change control operations* -->
 
-![Change Control Template](images/change-control-template.png)
+12. This will bring us to the Change Control that was created by the workspace submission. Notice the 2 Change Control Stages indicating that the 2 devices configurations are included in this change.
 
-![Change Control Template](images/change-control-template2.png)
+![Change Control](images/change-control.png)
 
-13. The template selected will update the Change Control Stages into 2 sections. The first section will begin the configuration on the new Leaf immediately. The second section will delay pushing the configuration changes for 60 seconds, then configure leaf1a. You can expand all change control stages by selecting the 2 arrows facing away from each
 
-![Change Control Stages](images/change-control-stages.png)
+<!-- 13. The template selected will update the Change Control Stages into 2 sections. The first section will begin the configuration on the new Leaf immediately. The second section will delay pushing the configuration changes for 60 seconds, then configure leaf1a. You can expand all change control stages by selecting the 2 arrows facing away from each
 
-14. Select **Review and Approve**
+![Change Control Stages](images/change-control-stages.png) -->
+
+13. Select **Review and Approve**
 
 ![Review and Approve](images/review-and-approve.png)
 
-15. Up until this point, we have not made any changes to the actual running configuration of the devices. You can take some time to once again review the proposed configuration changes then select **Approve and Execute**.
+14. Up until this point, we have not made any changes to the actual running configuration of the devices. You can take some time to once again review the proposed configuration changes then select **Approve and Execute**.
 
 *If Approve and Execute is not present select the Slider next to Execute Immediately.*
 
 ![Approve and Execute](images/approve-and-execute.png)
 
-16. The change control will execute and apply all the proposed configuration changes to the devices. The newly added device will be reloaded as it exits Zero Touch Provisioning (ZTP) mode and boots up with the designed configuration. You can review the Change Control logs by selecting Logs in the change control window.
+15. The change control will execute and apply all the proposed configuration changes to the devices. The newly added device will be reloaded as it exits Zero Touch Provisioning (ZTP) mode and boots up with the designed configuration. You can review the Change Control logs by selecting Logs in the change control window.
 
 ![Change Control Logs](images/change-control-logs.png)
 
 17. Upon the completion of the Change Control we have deployed the configuration and provisioned leaf1b.
 
+![Change Control Complete](images/change-control-complete.png)
 
 **LAB GUIDE COMPLETE**

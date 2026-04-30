@@ -1,5 +1,14 @@
 path: []
 inputs:
+  advancedFabricSettings:
+    inbandZtp:
+      inbandZtpInterfaces:
+        devices:
+          - interfaces: Ethernet15-16
+            tagQuery:
+              tags:
+                query: device:{leaf1}
+      interfaceZtpMethod: access
   campus:
     - inputs:
         campusDetails:

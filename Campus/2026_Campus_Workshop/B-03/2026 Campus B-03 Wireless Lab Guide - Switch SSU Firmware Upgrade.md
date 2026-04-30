@@ -197,6 +197,8 @@ Request timeout for icmp_seq 591
 
 We just observed how Arista SSU allows network connected devices to continue to operate on the network even while an EOS firmware update occurs on the connected switch.
 
+Please feel free to reconnect e14 on leaf1a before proceeding.
+
 **LAB GUIDE COMPLETE**
 
 
