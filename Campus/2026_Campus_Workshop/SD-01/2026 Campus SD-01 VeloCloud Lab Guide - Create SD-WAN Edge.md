@@ -1,7 +1,6 @@
 # Campus SD-01
 ## Create SD-WAN Edge
-
-<!-- TODO: Add Images -->
+![VeloCloud](images/velo_logo.png)
 
 ---
 
@@ -65,7 +64,7 @@ In this lab, you will be configuring a new SD-WAN edge. You will use an existing
 ![VCO Add Edge](images/vco-add-edge.png)
 
 3. Enter the Required details to Provision an Edge using the details below,
-   - Name: **campus-vce\#\#**
+   - Name: **campus-vce##**
    - Model: **Edge 710**
    - Profile: **Workshop-Branch**
    - License: **POC | 10 Gbps || North America, Europe Middle East and Africa, Asia Pacific and Latin America | 60 Months**
@@ -81,8 +80,10 @@ In this lab, you will be configuring a new SD-WAN edge. You will use an existing
 
    - Select Interfaces: **GE1** and **GE2**
    - Clear the warning box using the **X**
+   ![VCO LAG1 Config 1](images/vco-lag1-config-1.png)
    - LAG Interface Settings
      - Disable **Enable WAN Link**
+    ![VCO LAG1 Config 2](images/vco-lag1-config-2.png) 
    - IPv4 Settings
      - Addressing Type: **Static**
      - IP Address: **10.0.1\#\#.1**
@@ -93,8 +94,7 @@ In this lab, you will be configuring a new SD-WAN edge. You will use an existing
      - Type: **RELAY**
      - Relay Agnet IP(s): **100.64.0.1**
    - Select **SAVE**
-
-![VCO LAG1 Config](images/vco-lag1-config.png)
+   ![VCO LAG1 Config 3](images/vco-lag1-config-3.png)
 
 6. Next we are going to configure our WAN links. All the edges in our Workshop environment are connected to two simulated Private WAN networks. This requires that we explicitly define thw WAN networks. Interfaces GE3 and GE4 are the interfaces connected to our WANs and they have already been configured by the Profile to use DHCP for IP addressing. Navigate to **Device > Connectivity > Interface > WAN Link Configuration** and select **+ ADD USER DEFINED WAN LINK**.
 
@@ -105,26 +105,26 @@ In this lab, you will be configuring a new SD-WAN edge. You will use an existing
    - Link Type: **Private**
    - Name: **isp1**
    - Enable **SD-WAN Service Reachable**
+   ![VCO Add Link 1 - 1](images/vco-wan1-1.png)
    - Interfaces: **GE3**
    - View advanced settings
      - Private Network Name: **Use existing Private Network Name**
      - Existing Private Network Name: **WAN 1**
    - Select **ADD LINK**
-
-![VCO Add Link 1](images/vco-wan1.png)
+   ![VCO Add Link 1 - 2](images/vco-wan1-2.png)
 
 8. Select **+ADD USER DEFINED WAN LINK** again and create a second link with the parameters below,
 
    - Link Type: **Private**
    - Name: **isp2**
    - Enable **SD-WAN Service Reachable**
+   ![VCO Add Link 2 - 1](images/vco-wan2-1.png)
    - Interfaces: **GE4**
    - View advanced settings
      - Private Network Name: **Use existing Private Network Name**
      - Existing Private Network Name: **WAN 2**
    - Select **ADD LINK**
-
-![VCO Add Link 2](images/vco-wan2.png)
+   ![VCO Add Link 2 - 2](images/vco-wan2-2.png)
 
 9. Now that we have made the necessary LAN and WAN configurations, please click **SAVE CHANGES** to commit the changes.
 
