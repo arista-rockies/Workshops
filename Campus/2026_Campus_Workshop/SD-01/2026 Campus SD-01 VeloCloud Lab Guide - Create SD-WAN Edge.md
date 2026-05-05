@@ -90,11 +90,22 @@ In this lab, you will be configuring a new SD-WAN edge. You will use an existing
      - CIDR Prefix: **25**
      - Enable **Advertise**
      - Disable **NAT Direct Traffic**
+     ![VCO LAG1 Config 4](images/vco-lag1-config-4.png)
+   <!--
    - IPv4 DHCP Server
      - Type: **RELAY**
      - Relay Agnet IP(s): **100.64.0.1**
    - Select **SAVE**
-   ![VCO LAG1 Config 3](images/vco-lag1-config-3.png)
+   ![VCO LAG1 Config 3](images/vco-lag1-config-3.png)-->
+   - IPv4 DHCP Server
+     - Type: **ACTIVATED**
+     - DHCP start: **10.0.1\#\#.10**
+     - Num Addresses: **20**
+     - Options
+       - Option: **Boot File Name (67)**, Value: **http://10.0.96.20:8000/bootstrap.py**
+       - Option: **DNS Server (6)**, Value: **100.64.0.1**
+    - Select **SAVE**
+    ![VCO LAG1 Config 5](images/vco-lag1-config-5.png)
 
 6. Next we are going to configure our WAN links. All the edges in our Workshop environment are connected to two simulated Private WAN networks. This requires that we explicitly define thw WAN networks. Interfaces GE3 and GE4 are the interfaces connected to our WANs and they have already been configured by the Profile to use DHCP for IP addressing. Navigate to **Device > Connectivity > Interface > WAN Link Configuration** and select **+ ADD USER DEFINED WAN LINK**.
 
