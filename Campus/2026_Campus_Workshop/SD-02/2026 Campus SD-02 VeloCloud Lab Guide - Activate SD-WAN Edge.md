@@ -1,7 +1,6 @@
 # Campus SD-02
 ## Activate SD-WAN Edge
-
-<!-- TODO: Add Images -->
+![VeloCloud](images/velo_logo.png)
 
 ---
 
@@ -78,17 +77,15 @@ In this lab, you will take the configuration that was defined in the last lab an
 
 6. Open the Activation Email link in your Web Browser. The VeloCloud Edge should connect to the VeloCloud Orchestrator and activate.
 
+<!-- TODO: Edge Activation Image -->
 ![VCE Edge Activation](images/vce-edge-activation.png)
 
-7. Navigate back to the VeloCloud Orechstrator and click on the **Monitor** tab.
+9. Navigate back tot he VeloCloud Orechestrator and click on the **Monitor** table and then navigate to the **Edges** menu option. You should see your Edge (**campus-vce##**) listed with a Status of **Connected** and **2** Links.
 
-![VCE Monitor Tab](images/vco-monitor-tab.png)
-
-8. Navigate to the **Edges** menu option and you should see your Edge (**campus-vce##**) listed with a Status of **Connected** and **2** Links.
-
+<!-- TODO: Update image to show 2 links -->
 ![VCO Monitor Edges](images/vco-monitor-edges.png)
 
-9. Select your Edge (**campus-vce##**). You should see both Links that you created with the following details:
+10. Select your Edge (**campus-vce##**). You should see both Links that you created with the following details:
    - Link Status is **Stable**
    - Throughput (up and down) is shown
    - Bandwidth was detected
@@ -97,11 +94,11 @@ In this lab, you will take the configuration that was defined in the last lab an
 
 ![VCO Monitor Edge Links](images/vco-edge-links.png)
 
-10. To troubleshoot the activation process, you can look at the event logs by navigating to the **Events** menu option.
+11. To troubleshoot the activation process, you can look at the event logs by navigating to the **Events** menu option.
 
 ![VCO Select Events](images/vco-select-events.png)
 
-11. There are a lot of events. You should filter the events by **Edge Name**.
+12. There are a lot of events. You should filter the events by **Edge Name**.
     - Click ![Filter Button](images/filter-button.png)
     - Select **Edge Name**
     - Select **is**
@@ -110,7 +107,7 @@ In this lab, you will take the configuration that was defined in the last lab an
 
 ![VCO Edge Name Filter](images/vco-edge-name-filter.png)
 
-12. Some interesting events for your activation are:
+13. Some interesting events for your activation are:
     - **Received Edge activation** - The Edge contacted the VCO with the Activation Key
     - **Activated** - The edge finished the activation process
     - **Online** - The edge finished any necessary upgrade, reboot and configuration steps and has connected to the VeloCloud Orchestrator
