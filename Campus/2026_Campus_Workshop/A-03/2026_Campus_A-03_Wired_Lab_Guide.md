@@ -204,10 +204,59 @@ Let’s roll back the change control we used to add a VLAN via Studios.
 
 ![Rollback Completed](images/rollback-completed.png)
 
+*You have now successfully added a VLAN through Studios and then rolled back that change across all switches.*
+
+A rollback of a change control does not change the CloudVision Designed Configuration. Currently your devices will show as out of compliance. 
+
+Let's update the Studio so that current running configuration matches the designed configuration.
+
+7. Select **Provisioning**, then **Studios**
+
+ ![Provisioning Studios](images/provisioning-studios.png)
+
+8. Create a new Workspace 
+     - Select the **+** on the Workspace bar on the bottom of the page
+     - name the workspace  “<remove-vlan2##>” where ## is your pod number. Examples:
+
+        Pod 1 = VLAN 201  
+        Pod 2 = VLAN 202  
+        …  
+        Pod 13 = VLAN 213  
+        etc.
+
+![Campus Fabric Studio](images/studio-remove-vlan1.png)
+
+9. Once the workspace is created, select **Campus Fabric (L2/L3/EVPN)** studio. 
+
+![Campus Fabric Studio](images/campus-fabric-studio.png)
+
+10. Within the **Campus Services (Non-VXLAN)** select the **Campus:Workshop expand arrow** on the right
+
+![Campus Fabric Studio](images/campus-services-expand.png)
+
+11. Within the Campus: Workshop section, click the Campus-Pod: **IT-Bldg name** or the **expand arrow** on th
+
+![Campus Fabric Studio](images/campus-pod-expand.png)
+
+12. Locate the **VLANs** section. Click the **Trash Can** icon next to VLAN **2[POD#]**
+
+![Campus Fabric Studio](images/studio-remove-vlan2.png)
+
+13. Select the **Clipboard Icon** in your Workspace Island bar to review your workspace.
+
+![Campus Fabric Studio](images/studio-remove-vlan3.png)
+
+14. Because we have already removed **VLAN 2[POD#]** from the running configuration, there should be no proposed changes to the network. Select **Submit Workspace**
+
+![Campus Fabric Studio](images/studio-remove-vlan4.png)
+
+15. Since no changes are occurring there is no change control created. Select **Exit Workspace**
+
+![Campus Fabric Studio](images/studio-remove-vlan5.png)
+
+*Now your running configuration and CloudVision's Designed configuration are aligned*
+
 **LAB SECTION COMPLETE**
-
-You have now successfully added a VLAN through Studios and then rolled back that change across all switches.
-
 ---
 
 ## 6. Dashboards (Built-in and Custom)
