@@ -107,7 +107,7 @@ In this lab, you will be configuring a new SD-WAN edge. You will use an existing
     - Select **SAVE**
     ![VCO LAG1 Config 5](images/vco-lag1-config-5.png)
 
-6. Next we are going to configure our WAN links. All the edges in our Workshop environment are connected to two simulated Private WAN networks. This requires that we explicitly define thw WAN networks. Interfaces GE3 and GE4 are the interfaces connected to our WANs and they have already been configured by the Profile to use DHCP for IP addressing. Navigate to **Device > Connectivity > Interface > WAN Link Configuration** and select **+ ADD USER DEFINED WAN LINK**.
+6. Next we are going to configure our WAN links. All the edges in our Workshop environment are connected to two simulated Private WAN networks. This requires that we explicitly define the WAN networks. Interfaces GE3 and GE4 are the interfaces connected to our WANs and they have already been configured by the Profile to use DHCP for IP addressing. Navigate to **Device > Connectivity > Interface > WAN Link Configuration** and select **+ ADD USER DEFINED WAN LINK**.
 
 ![VCO Add User Defined WAN Link](images/vco-add-wan.png)
 
