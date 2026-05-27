@@ -1,4 +1,5 @@
 import csv, json, yaml, base64
+from cvprac.cvp_client import CvpClient, json_decoder
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import HTMLResponse, PlainTextResponse, FileResponse, Response
 from modules.agni import AgniClient
@@ -49,20 +50,20 @@ async def getSWI(request: Request, sn, eosVersion):
 async def pod113(request: Request):
     # Headers({'host': '10.0.96.20:8000', 'accept': '*/*', 'x-arista-systemmac': '2c:dd:e9:f6:f9:9b', 'x-arista-modelname': 'CCS-710P-16P', 'x-arista-serial': 'WTW23490441', 'x-arista-hardwareversion': '11.04', 'x-arista-tpmapi': '2.0', 'x-arista-tpmfwversion': '1.512', 'x-arista-secureztp': 'True', 'x-arista-softwareversion': '4.32.5.1M', 'x-arista-architecture': 'i386'})
     device = globalInventory[request.headers["x-arista-serial"]]
+    token = tokens[str(device["pod"])]
 
-    enrollmentToken = ""
-    with open(f'enrollmentTokens/1{device["pod"]:0>2}.tok', 'r') as f:
-        enrollmentToken = f.read().strip()
+    cvpRacClient = CvpClient()
+    cvpRacClient.connect(nodes=[token["cv"]["server"]], username='', password='', is_cvaas=True, api_token=token["cv"]["key1"])
+    enrollmentToken = cvpRacClient.api.create_enroll_token(duration="900s")
 
     fname = f'EOS-{device["Software Version"]}.swi'
     vals = {
             "desiredEOSVersion": fname if request.headers["x-arista-softwareversion"] != device["Software Version"] else "",
-            "enrollmentToken": enrollmentToken
+            "enrollmentToken": enrollmentToken["enrollmentToken"]["token"]
     }
 
     # when a switch requests the bootstrap, we need to make sure it gets onboarded
     #  into agni
-    token = tokens[str(device["pod"])]
     agniClient = AgniClient(token)
     nadGroupID = agniClient._getNadGroup("Switches")
 
