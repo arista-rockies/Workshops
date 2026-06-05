@@ -39,6 +39,7 @@ class pgfCVClient():
         config.parser.add_argument('-allCleanup', default=False, action='store_true', help='cleanup everything')
         config.parser.add_argument('-thirdParty', default='', help='comma delimited list of 3rd party devices to configure')
         config.parser.add_argument('-cvTest', default=False, action='store_true', help='dev code')
+        config.parser.add_argument('-cvAddAdmins', default='', nargs='+', help='space separated email address of new admin users')
 
     def __init__(self, token):
         self.token = token
@@ -574,6 +575,31 @@ class pgfCVClient():
             ptrData = {bundleKey: Path(keys=["changecontrol", "actionBundle", "v1", bundleKey])}
             publish(client, 'cvp', pathElts[:-1], ptrData)
 
+    async def doAdminUsers(self):
+        print(f"{config.currentPod} - doAdminUsers")
+        url = f'{self.baseURL}/cvpservice/user/addUser.do'
+
+        for user in config.args.cvAddAdmins:
+            userJson = {
+                'roles': ["network-admin"],
+                'user': {
+                    'description': "",
+                    'contactNumber': "",
+                    'userType': "SSO",
+                    'userStatus': "Enabled",
+                    'currentStatus': "",
+                    'addedByUser': "pfelt",
+                    'profile': "",
+                    'alternateLoginType': "RESTRICTED",
+                    'userId': user,
+                    'firstName': user,
+                    'lastName': user,
+                    'email': user
+                }
+            }
+            resp = requests.post(url, json=userJson, verify=False, timeout=300, headers={'Authorization': f"Bearer {self.tok}"})
+            resp.raise_for_status()
+
     async def doPackage(self, package):
         print(f"{config.currentPod} - doPackage")
         with open(package, "rb") as file:
@@ -619,6 +645,10 @@ class pgfCVClient():
         expectCC = True
 
         if config.args.cvTest:
+            return
+
+        if config.args.cvAddAdmins:
+            await self.doAdminUsers()
             return
 
         if config.args.addPackages:
