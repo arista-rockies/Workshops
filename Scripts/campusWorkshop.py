@@ -110,16 +110,20 @@ async def main():
         config.currentPod = pod
         token = tokens.get(config.currentPod, {})
 
-        cvClient = pgfCVClient(token)
-        await cvClient.execute()
+        if 'cv' in token:
+            cvClient = pgfCVClient(token)
+            await cvClient.execute()
 
-        cueClient = CueClient(token)
-        cueClient.execute()
+        if 'cue' in token:
+            cueClient = CueClient(token)
+            cueClient.execute()
 
-        agniClient = AgniClient(token)
-        agniClient.execute()
+        if 'agni' in token:
+            agniClient = AgniClient(token)
+            agniClient.execute()
 
-        veloClient = VeloClient(token)
-        veloClient.execute()
+        if 'velo' in token:
+            veloClient = VeloClient(token)
+            veloClient.execute()
 
 asyncio.run(main())
