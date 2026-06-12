@@ -136,7 +136,7 @@ class pgfCVClient():
             if d["hostname"] != f"campus-pod{config.currentPod:0>2}-leaf1a":
                 continue
 
-            newDevice = pgf.pgfDevice(device["serialNumber"], device["modelName"], device["systemMacAddress"], d["hostname"], self.tok)
+            newDevice = pgf.pgfDevice(device["serialNumber"], device["modelName"], device["systemMacAddress"], d["hostname"], self.tok, self.token["cv"])
             newDevice.fetchInterfaces()
 
             deviceList[device["serialNumber"]] = newDevice
@@ -455,8 +455,8 @@ class pgfCVClient():
         leaf1a = self.findDeviceByName(deviceInventory, f"campus-pod{config.currentPod:0>2}-leaf1a")
         leaf1bStageUUID = str(uuid.uuid4())
         leaf1b = self.findDeviceByName(deviceInventory, f"campus-pod{config.currentPod:0>2}-leaf1b")
-        leaf1cStageUUID = str(uuid.uuid4())
-        leaf1c = self.findDeviceByName(deviceInventory, f"campus-pod{config.currentPod:0>2}-leaf1c")
+        #leaf1cStageUUID = str(uuid.uuid4())
+        #leaf1c = self.findDeviceByName(deviceInventory, f"campus-pod{config.currentPod:0>2}-leaf1c")
 
         ccID = str(uuid.uuid4())
         vals = {
@@ -464,10 +464,10 @@ class pgfCVClient():
             "rootID": str(uuid.uuid4()),
             "leaf1aStage": str(uuid.uuid4()),
             "leaf1bStage": str(uuid.uuid4()),
-            "leaf1cStage": str(uuid.uuid4()),
+            #"leaf1cStage": str(uuid.uuid4()),
             "leaf1aSN": leaf1a["sn"],
             "leaf1bSN": leaf1b["sn"],
-            "leaf1cSN": leaf1c["sn"]
+            #"leaf1cSN": leaf1c["sn"]
         }
         cc = json.loads(newCC.format(**vals))
 
@@ -535,7 +535,7 @@ class pgfCVClient():
         if path not in list(ccPtrs.keys()):
             pathElts = ["changecontrol"]
             ptrData = {path: Path(keys=["changecontrol", path])}
-            publish(client, 'cvp', pathEts, ptrData)
+            publish(client, 'cvp', pathElts, ptrData)
         ccVersions = getCcPathVersions(client, path)
         if ccVersions == {}:
             pathElts = ["changecontrol", path]
@@ -625,6 +625,32 @@ class pgfCVClient():
             url = f'{self.baseURL}/api/resources/dashboard/v1/DashboardConfig'
             resp = requests.delete(url, params=params, timeout=300, headers={'Authorization': f'Bearer {self.tok}'})
 
+    async def doOAuthConfig(self):
+        url = f'{self.baseURL}/api/resources/identityprovider/v1/OAuthConfig'
+        resp = requests.get(f'{url}/all', verify=False, timeout=300, headers={'Authorization': f'Bearer {self.tok}'})
+        resp.raise_for_status()
+        oAuthProviders = resp.json()
+        print(oAuthProviders)
+        permittedDomains = oAuthProviders.get("result", {}).get("value", {})
+        permittedDomains["permittedEmailDomains"] = {"values": ["arista.com","gmail.com"]}
+
+        params = {
+            "key.providerId": "google"
+        }
+
+        data = {
+            "key": {
+                "providerId": "google"
+            },
+            "permittedEmailDomains":{"values":["arista.com", "gmail.com"]}
+        }
+
+        resp = requests.post(f'{url}', data=json.dumps(data), verify=False, timeout=300, headers={'Authorization': f'Bearer {self.tok}'})
+        resp.raise_for_status()
+        print(resp)
+        print(resp.text)
+        
+
     async def studios(self):
         # first get all the devices in the inventory
         deviceInventory = config.globalInventory[int(config.currentPod)]
@@ -645,6 +671,10 @@ class pgfCVClient():
         expectCC = True
 
         if config.args.cvTest:
+            print(json.dumps(deviceInventory))
+            return
+
+            await self.doOAuthConfig(deviceInventory)
             return
 
         if config.args.cvAddAdmins:

@@ -41,13 +41,14 @@ class pgfDevice():
     _hostname: str
     _interfaces: dict
 
-    def __init__(self, sn: str, model: str, mac: str, hostname: str, tok: str):
+    def __init__(self, sn: str, model: str, mac: str, hostname: str, tok: str, token: dict[str]):
         self._sn = sn
         self._model = model
         self._mac = mac
         self._hostname = hostname
         self._interfaces = {}
         self.tok = tok
+        self.token = token
 
     def __str__(self):
         res = {
@@ -73,7 +74,7 @@ class pgfDevice():
         fp.write(self.tok)
         fp.flush()
 
-        with GRPCClient('www.arista.io', token=fp.name) as client:
+        with GRPCClient(self.token["server"], token=fp.name) as client:
             path = ["Sysdb", "interface", "status", "all", "intfStatus"]
             query = [ create_query([(path, [])], self._sn) ]
             for batch in client.get(query):
