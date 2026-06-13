@@ -101,6 +101,8 @@ class CueClient():
     def _doDeleteLocations(self):
         print(f"{config.currentPod} - cue/deleteLocations")
         locations = self._doReq(reqType='GET', subsystem='locations')
+        if not locations:
+            return
         for location in locations.get("children", []):
             if location["id"]["id"] > 0:
                 data = location["id"]
@@ -116,6 +118,8 @@ class CueClient():
     def _doRenameAPs(self):
         print(f"{config.currentPod} - cue/renameAPs")
         aps = self._doReq(reqType='GET', subsystem='manageddevices/aps')
+        if not aps:
+            return
         for ap in aps.get("managedDevices", []):
             data = {
                 "name": f'Arista_{ap["macaddress"][-8:]}',
@@ -129,6 +133,8 @@ class CueClient():
     def _doDeleteGMPortals(self):
         print(f"{config.currentPod} - cue/delete GM Portals and users")
         portals = self._doReq(reqType='GET', service="gm", subsystem='portals')
+        if not portals:
+            return
         for portal in portals.get('data', {}).get('portal', []):
             if portal['is_default'] == 1:
                 continue
@@ -155,12 +161,16 @@ class CueClient():
 
     def _doDeleteSSIDs(self, doDelete=True):
         def _doLocationCache(l):
+            if not l:
+                return
             locationCache[l["id"]["id"]] = l["name"]
             for child in l.get("children", []):
                 _doLocationCache(child)
 
         locationCache = {}
         _doLocationCache(self._doReq(reqType='GET', subsystem='locations'))
+        if not locationCache:
+            return
 
         params = {
                 "fetchSubTreeTemplates": True
