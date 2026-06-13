@@ -10,7 +10,6 @@ other requirements must be met for these scripts to function properly.  these st
 * create `tokenConfig.yml` which contains all api tokens
 * create the `p12` directory which contains `radsec_ca_certificate.pem` for agni in it
 * create the `images` directory which contains the requisite swi images
-* create the `enrollmentTokens` directory which contains valid enrollment tokens named `100+podNum.tok`
 
 lastly you must enable the systemd service and start the bootstrap server
 
