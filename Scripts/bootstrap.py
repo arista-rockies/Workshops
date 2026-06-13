@@ -40,7 +40,8 @@ async def getP12(request: Request, sn):
 @app.get('/swi/{sn}/{eosVersion}', response_class=FileResponse)
 async def getSWI(request: Request, sn, eosVersion):
     device = globalInventory[sn]
-    fname = f'EOS-{device["Software Version"]}.swi'
+    arch = "" if device["headers"]["x-arista-architecture"] == "i386" else "64"
+    fname = f'EOS{arch}-{device["Software Version"]}.swi'
     if fname != eosVersion:
         raise HTTPException(status_code=404, detail="wrong version")
 
@@ -56,7 +57,8 @@ async def pod113(request: Request):
     cvpRacClient.connect(nodes=[token["cv"]["server"]], username='', password='', is_cvaas=True, api_token=token["cv"]["key1"])
     enrollmentToken = cvpRacClient.api.create_enroll_token(duration="900s")
 
-    fname = f'EOS-{device["Software Version"]}.swi'
+    arch = "" if request.headers["x-arista-architecture"] == "i386" else "64"
+    fname = f'EOS{arch}-{device["Software Version"]}.swi'
     vals = {
             "desiredEOSVersion": fname if request.headers["x-arista-softwareversion"] != device["Software Version"] else "",
             "enrollmentToken": enrollmentToken["enrollmentToken"]["token"]
@@ -74,6 +76,7 @@ async def pod113(request: Request):
         "sn": device['Serial Number']
     }
     device["agni"] = agniClient.onboardSwitch(data, nadGroupID)
+    device["headers"] = request.headers
     with open(f'files/bootstrap.txt', 'r') as f:
         return f.read().format(**vals)
 
