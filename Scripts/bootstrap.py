@@ -62,9 +62,9 @@ async def pod113(request: Request):
     enrollmentToken = cvpRacClient.api.create_enroll_token(duration="900s")
 
     arch = ""
-    if device["headers"]["x-arista-architecture"] == "i686":
+    if request.headers["x-arista-architecture"] == "i686":
         arch = "64"
-    elif device["headers"]["x-arista-architecture"] == "aarch64":
+    elif request.headers["x-arista-architecture"] == "aarch64":
         arch = "arm"
     fname = f'EOS{arch}-{device["Software Version"]}.swi'
     vals = {
