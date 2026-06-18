@@ -40,7 +40,11 @@ async def getP12(request: Request, sn):
 @app.get('/swi/{sn}/{eosVersion}', response_class=FileResponse)
 async def getSWI(request: Request, sn, eosVersion):
     device = globalInventory[sn]
-    arch = "" if device["headers"]["x-arista-architecture"] == "i386" else "64"
+    arch = ""
+    if device["headers"]["x-arista-architecture"] == "i686":
+        arch = "64"
+    elif device["headers"]["x-arista-architecture"] == "aarch64":
+        arch = "arm"
     fname = f'EOS{arch}-{device["Software Version"]}.swi'
     if fname != eosVersion:
         raise HTTPException(status_code=404, detail="wrong version")
@@ -57,7 +61,11 @@ async def pod113(request: Request):
     cvpRacClient.connect(nodes=[token["cv"]["server"]], username='', password='', is_cvaas=True, api_token=token["cv"]["key1"])
     enrollmentToken = cvpRacClient.api.create_enroll_token(duration="900s")
 
-    arch = "" if request.headers["x-arista-architecture"] == "i386" else "64"
+    arch = ""
+    if device["headers"]["x-arista-architecture"] == "i686":
+        arch = "64"
+    elif device["headers"]["x-arista-architecture"] == "aarch64":
+        arch = "arm"
     fname = f'EOS{arch}-{device["Software Version"]}.swi'
     vals = {
             "desiredEOSVersion": fname if request.headers["x-arista-softwareversion"] != device["Software Version"] else "",
