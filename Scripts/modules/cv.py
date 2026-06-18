@@ -133,6 +133,8 @@ class pgfCVClient():
 
         for device in devices:
             d = self.findDeviceBySerial(deviceInventory, device["serialNumber"])
+            if not d:
+                continue
             if d["hostname"] != f"campus-pod{config.currentPod:0>2}-leaf1a":
                 continue
 
