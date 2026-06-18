@@ -29,7 +29,7 @@ async def getP12(request: Request, sn):
     token = tokens[str(device["pod"])]
     agniClient = AgniClient(token)
 
-    nad = agniClient._getNadByMac(device['Mac address'])
+    nad = agniClient._getNadByMac(device['Mac address'].lower())
     cert = agniClient._generateRadsecCert(nad["id"])
 
     #cert = io.StringIO(device["agni"]["certificate"])
