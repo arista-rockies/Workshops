@@ -146,7 +146,7 @@ class pgfCVClient():
             # because the topology api is currently broken, we need to hardcode the links
             #   this is specific out our workshop layout an is hardcoded
             #newDevice.addPeer("Ethernet1", "pimac", "eth0")
-            newDevice.addPeer("Ethernet13", "d4:e5:c9:06:2f:0b", "Ge1")
+            newDevice.addPeer("Ethernet9", "d4:e5:c9:06:2f:0b", "Ge1")
             #newDevice.addPeer("Ethernet14",
             #newDevice.addPeer("Ethernet15",
             #newDevice.addPeer("Ethernet16",
