@@ -59,11 +59,11 @@ In this lab you will be configuring the switches through CloudVision. Today you 
 
 ![Network Hierarchy](images/network-hierarchy-tree.png)
 
-3. Within the **IDF1** view select **Add Device** to begin the device provisioning guided workflow.
+3. Within the **IDF1** view, select **Add Device** to begin the device provisioning guided workflow.
 
 ![Add Device](images/add-device.png)
 
-4. There should be a sinble device shown. 
+4. There should be a single device shown. 
    - Select the **Radial Button** next to the device
    - Select **Confirm Selection**
 
@@ -95,10 +95,10 @@ In this lab you will be configuring the switches through CloudVision. Today you 
 #SECTION NO LONGER RELIVENT IN THE WALKTHROUGH
 *(Although not part of the lab today, this next section of the workflow allows us to set the leaf we are currently provisioning to also provide Zero Touch Provisioning workflow to switches that are downstream from this new Leaf.)*
 --->
-6. At this point you should see in your **Workspace Island Toolbar** a spinning circle indicating that CloudVision is building the configuration for the new switch. 
+6. A new workspace is being generated. This may take a few sconds. After the workspace is generated in your **Workspace Island Toolbar** you should see a spinning circle indicating that CloudVision is building the configuration for the new switch. 
 
-   - Once the configuration has been built, the toolbar will show the number of proposed changes lines. 
-   - Select the **Clipboard** icon within the Worskapce Island Toolbar to review the Workspace.
+   - Once the configuration has been built, the toolbar will show the number of proposed configuration lines changed. 
+   - Select the **Clipboard** icon within the Workspace Island Toolbar to review the Workspace.
 
 ![Workspace Build](images/add-device4.png)
 
