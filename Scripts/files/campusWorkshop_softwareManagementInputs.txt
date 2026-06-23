@@ -4,7 +4,7 @@ inputs:
     - inputs:
         softwareGroup:
           extensionsCollection: []
-          imageName: EOS-4.34.4M.swi
+          imageName: EOSarm-4.35.4M.swi
           streamingAgentName: null
       tags:
         query: device:{leaf1}

@@ -4,7 +4,7 @@ inputs:
     inbandZtp:
       inbandZtpInterfaces:
         devices:
-          - interfaces: Ethernet15-16
+          - interfaces: Ethernet11-12
             tagQuery:
               tags:
                 query: device:{leaf1}
