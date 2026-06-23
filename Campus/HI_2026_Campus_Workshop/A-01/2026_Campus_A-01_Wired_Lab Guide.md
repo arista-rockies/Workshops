@@ -63,6 +63,14 @@ In this lab you will be configuring the switches through CloudVision. Today you 
 
 ![Add Device](images/add-device.png)
 
+4. There should be a sinble device shown. 
+   - Select the **Radial Button** next to the device
+   - Select **Confirm Selection**
+
+![Add Device](images/add-device2.png)
+<!---
+#OLD STYLE Keeping for now
+
 4. The Deployment Details should be pre-populated. Verify the value in each section (provided below),
 
    -  Deployment Type: **Access Pod**
@@ -73,23 +81,29 @@ In this lab you will be configuring the switches through CloudVision. Today you 
    -  Select **Continue**
 
 ![Deployment Details](images/deployment-details.png)
+--->
 
-
-5. Locate the new device being added under **Role Assignment**. 
+5. Locate the new device being added. 
 
    -  Update the hostname from **sw-[IP_ADDRESS]** to **campus-pod[POD#]-leaf1b**  
    -   Under Role select **Leaf** 
-   -  Select **Continue**
+   -  Select **Add Devicee**
 
 
-![Role Assignment](images/role-assignment.png)
-
+![Add Device](images/add-device3.png)
+<!--- 
+#SECTION NO LONGER RELIVENT IN THE WALKTHROUGH
 *(Although not part of the lab today, this next section of the workflow allows us to set the leaf we are currently provisioning to also provide Zero Touch Provisioning workflow to switches that are downstream from this new Leaf.)*
+--->
+6. At this point you should see in your **Workspace Island Toolbar** a spinning circle indicating that CloudVision is building the configuration for the new switch. 
 
-6. Select **Continue**
+   - Once the configuration has been built, the toolbar will show the number of proposed changes lines. 
+   - Select the **Clipboard** icon within the Worskapce Island Toolbar to review the Workspace.
 
-![Continue](images/hierarchy-deploy-ztp-option.png)
+![Workspace Build](images/add-device4.png)
 
+<!-- 
+#OLD
 7. Select **Build Workspace**
 
 *The inputs provided in the guided workflow will be used to generate inputs within CloudVision Studios. (This may take up to 1 minute)*
@@ -104,22 +118,23 @@ In this lab you will be configuring the switches through CloudVision. Today you 
     - Select **Review Workspace**
 
 ![Review Workspace](images/review-workspace.png)
+-->
 
-9. This will bring you into the Workspace that was generated from the guided workflow. You should see 2 devices (leaf1a and your newly added switch) shown under Proposed Configuration.
+7. This will bring you into the Workspace that was generated from the guided workflow. You should see 2 devices (leaf1a and your newly added switch) shown under Proposed Configuration.
 
     - Take some time to review the proposed configuration.
     - leaf1a - Check for the creation of a new port-channel and mlag configuration.
     - leaf1b - Complete provisioned switch configuration
 
-![Review Workspace](images/review-workspace2.png)
+![Review Workspace](images/add-device5.png)
 
-10. After taking some time to review the workspace select **Submit Workspace**.
+8. After taking some time to review the workspace select **Submit Workspace**.
 
-![Submit Workspace](images/submit-workspace.png)
+![Submit Workspace](images/add-device6.png)
 
-11. Select **View Change Control**.
+9. Select **View Change Control**.
 
-![Change Control](images/review-change-control.png)
+![View Change Control](images/add-device7.png)
 
 <!-- 12. This will bring us to the Change Control that was created by the workspace submission. In this step we will be utilizing a Change Control Templates.
      - Click **Select a Template**
@@ -128,9 +143,9 @@ In this lab you will be configuring the switches through CloudVision. Today you 
 
 *A change control template provides the ability to create a configurable structure for repeatable change control operations* -->
 
-12. This will bring us to the Change Control that was created by the workspace submission. Notice the 2 Change Control Stages indicating that the 2 devices configurations are included in this change.
+10. This will bring us to the Change Control that was created by the workspace submission. Notice the 2 Change Control Stages indicating that the 2 devices configurations are included in this change.
 
-![Change Control](images/change-control.png)
+![Change Stages](images/add-device8.png)
 
 
 <!-- 13. The template selected will update the Change Control Stages into 2 sections. The first section will begin the configuration on the new Leaf immediately. The second section will delay pushing the configuration changes for 60 seconds, then configure leaf1a. You can expand all change control stages by selecting the 2 arrows facing away from each
@@ -139,20 +154,20 @@ In this lab you will be configuring the switches through CloudVision. Today you 
 
 13. Select **Review and Approve**
 
-![Review and Approve](images/review-and-approve.png)
+![Review and Approve](images/add-device9.png)
 
 14. Up until this point, we have not made any changes to the actual running configuration of the devices. You can take some time to once again review the proposed configuration changes then select **Approve and Execute**.
 
 *If Approve and Execute is not present select the Slider next to Execute Immediately.*
 
-![Approve and Execute](images/approve-and-execute.png)
+![Execute Change](images/add-device10.png)
 
-15. The change control will execute and apply all the proposed configuration changes to the devices. The newly added device will be reloaded as it exits Zero Touch Provisioning (ZTP) mode and boots up with the designed configuration. You can review the Change Control logs by selecting Logs in the change control window.
+15. The change control will execute and apply all the proposed configuration changes to the devices. The newly added device will be reloaded as it exits Zero Touch Provisioning (ZTP) mode and boots up with the designed configuration (This will take a few minutes). You can review the Change Control logs by selecting Logs in the change control window.
 
-![Change Control Logs](images/change-control-logs.png)
+![Change Logs](images/add-device11.png)
 
 17. Upon the completion of the Change Control we have deployed the configuration and provisioned leaf1b.
 
-![Change Control Complete](images/change-control-complete.png)
+![Change Complete](images/add-device12.png)
 
 **LAB GUIDE COMPLETE**
