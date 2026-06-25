@@ -170,13 +170,13 @@ When creating these **Interface Profiles** any field that is not explicity ident
 
 29. Select **Submit Workspace** to save the proposed interface profile.
 
-*Note at this time no configuration changes are being made. You have only configured that InterfaceProfiles that we will use in the next next section to configure our interfaces*
+*Note at this time no configuration changes are being made. You have only configured that Interface Profiles that we will use in the next next section to configure our interfaces*
 
 ![Interface Profile Quick Actions](images/submit-profile-configuration4.png)
 
 20. Select **Exit Workspace**
 
-![Interface Profile Quick Actions](images/submit-profile-configuration4.png)
+![Interface Profile Quick Actions](images/submit-profile-configuration5.png)
 
 **LAB SECTION COMPLETE**
 
@@ -193,72 +193,63 @@ Assign the configured interface profiles to the switches access ports
       - **IT-Bldg**  
       - **IDF1**
 
-![Hierarchy Navigation](images/hierarchy-navigation.png)
+![Hierarchy Navigation](images/assign-profile-1.png)
 
 2. Select the **Front Panel** tab
 
-![Hierarchy Front Panel](images/quick-action1.png)
+![Hierarchy Front Panel](images/assign-profile-2.png)
 
-3. Select **Ethernet1** on **leaf1b**
-    - Select **Configure**
+3. Select **Ethernet1** on **leaf1b**. Additional options will now be available on the right of the screen.
+    - Under **Inferace Configuration** select **Configure**
 
-![Set Interface Profiles](images/quick-action2.png)
+![Set Interface Profiles](images/assign-profile-3.png)
 
 4. A new **Interface Configuration** section should be available where you selected Configure. 
     - Profile: **Wired-RasPi**
     - Select **Save**
 
-![Set Interface Profiles](images/quick-action3.png)
+![Set Interface Profiles](images/assign-profile-4.png)
 
 
 
-5. De-Select **Ethernet1** on **leaf1b** and Select **Ethernet14** on **leaf1a**
+5. A new workspace has been generated.
+    -  De-Select **Ethernet1** on **leaf1b**  
+    - Select **Ethernet10** on **leaf1a** and **leaf1b**
     - Select **Configure**
 
-![Set Interface Profiles](images/set-profile1.png)
+![Set Interface Profiles](images/assign-profile-5.png)
 
 6. A new **Interface Configuration** section should be available where you selected Configure. 
     - Profile: **Wireless-Access-Point**
     - Select **Save**
 
-![Set Interface Profiles](images/set-profile2.png)
+![Set Interface Profiles](images/assign-profile-6.png)
 
-7. De-Select **Ethernet14** on **leaf1a** and Select **Ethernet14** on **leaf1b**
-    - Select **Configure**
+9.  Select the **Clipboard Icon** on you Worskspace Island Tool Bar
 
-![Set Interface Profiles](images/set-profile3.png)
-
-8. A new **Interface Configuration** section should be available where you selected Configure. 
-    - Profile: **Wired-Access-Poin**
-    - Select **Save**
-
-![Set Interface Profiles](images/set-profile4.png)
-
-9. Towards the bottom center of your screen you should see a black bar. Select the **Clipboard Icon**
-
-![Set Interface Profiles](images/set-profile5.png)
+![Set Interface Profiles](images/assign-profile-7.png)
 
 10. This will bring you to the Workspace Review Page.
     -  Review the proposed changes 
     -  Select **Submit Workspace**
 
-![Set Interface Profiles](images/set-profile6.png)
+![Set Interface Profiles](images/assign-profile-8.png)
 
 11. Select **View Change Control**
 
-![Set Wired Profile](images/set-profile7.png)
+![Set Wired Profile](images/assign-profile-9.png)
 
 12. This will bring you to the Change Control. 
      - Select **Review and Approve**
 
-![Set Wired Profile](images/set-profile8.png)
+![Set Wired Profile](images/assign-profile-10.png)
 
 13. Review the proposed changes and select **Approve and Execute**
 
-![Set Wired Profile](images/set-profile9.png)
+![Set Wired Profile](images/assign-profile-11.png)
 
 14. Once the Change Control completes, that switches now have the interface profiles active in their configuration.
 
-![Set Wired Profile](images/set-profile10.png)
+![Set Wired Profile](images/assign-profile-12.png)
 
 **LAB GUIDE COMPLETE**
