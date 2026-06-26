@@ -214,7 +214,7 @@ Assign the configured interface profiles to the switches access ports
 
 5. A new workspace has been generated.
     -  De-Select **Ethernet1** on **leaf1b**  
-    - Select **Ethernet10** on **leaf1a** and **leaf1b**
+    - Select **Ethernet2** on **leaf1a** and **leaf1b**
     - Select **Configure**
 
 ![Set Interface Profiles](images/assign-profile-5.png)
