@@ -355,7 +355,7 @@ Dashboards are an important way to visualize commonly requested information. Thi
 
 10. Additional Dashboard Tile
     - Under the available metrics scroll down and locate **Bitrate In** and **Bitrate Out**
-    - Under Dataset select **Ethernet13** on both **leaf1a and leaf1b**. Ensure between each interface you include a **|** or an **OR** so that both interface will be displayed.
+    - Under Dataset select **Ethernet9** on both **leaf1a and leaf1b**. Ensure between each interface you include a **|** or an **OR** so that both interface will be displayed.
 
 ![Metrics Configure](images/metrics-configure5.png)
 
