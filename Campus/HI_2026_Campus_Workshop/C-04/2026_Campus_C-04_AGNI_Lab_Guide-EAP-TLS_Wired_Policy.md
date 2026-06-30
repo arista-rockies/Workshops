@@ -227,9 +227,21 @@ Your Conditions should now look like this.
 
 ![image43](images/image43.png)
 
-14. Next, **unplug and plug your Raspberry Pi into port 1** on the switch and click on **Sessions** to see if your ATD Raspberry Pi has a connection via the Wired connection.  
+14. Next, either **unplug and plug your Raspberry Pi into port 1 on Leaf1b** or perform the **Interface Diagnostic Quick Action from the Network Heirarchy**, then click on **Sessions** to see if your ATD Raspberry Pi has a connection via the Wired connection.
 
 **Note: The Client Certificate has already been applied to the Raspberry Pi.**
+
+15. To perform Interface Diagnostics on port 1 of Leaf1b, go to **Network Heirarchy**, select **IDF1**, select **Front Panel** view, select **port 1 on Leaf1b**, then elect **View Interfsce Details**.
+
+![image43a](images/image43a.png)
+
+16. From the **Interface Overview UI** for Ethernet 1, select **Interfac Diagnostics** in the upper right corner.
+
+![image43b](images/image43b.png)
+
+17. Next, selet **Interface Cycle**, select method **Administratively**, and **Run Diagnostics**. This will Administratively shutdown the interface and bring it back up to trigger the wired authentication from the Raspberry Pi.
+
+![image43c](images/image43c.png)
 
 **LAB SECTION COMPLETED**
 
