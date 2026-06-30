@@ -231,11 +231,11 @@ Your Conditions should now look like this.
 
 **Note: The Client Certificate has already been applied to the Raspberry Pi.**
 
-15. To perform Interface Diagnostics on port 1 of Leaf1b, go to **Network Heirarchy**, select **IDF1**, select **Front Panel** view, select **port 1 on Leaf1b**, then elect **View Interfsce Details**.
+15. To perform **Interface Diagnostics on port 1 of Leaf1b**, go to **Network Heirarchy**, select **IDF1**, select **Front Panel** view, select **port 1 on Leaf1b**, then select **View Interface Details** for Ethernet 1.
 
 ![image43a](images/image43a.png)
 
-16. From the **Interface Overview UI** for Ethernet 1, select **Interfac Diagnostics** in the upper right corner.
+16. From the **Interface Overview UI** for Ethernet 1, select **Interface Diagnostics** in the upper right corner.
 
 ![image43b](images/image43b.png)
 
