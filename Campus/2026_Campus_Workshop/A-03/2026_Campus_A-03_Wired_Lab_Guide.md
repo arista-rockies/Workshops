@@ -101,7 +101,7 @@ Adding a VLAN is a common provisioning task. Let’s use the existing Campus Fab
 
 ![Expand New VLAN](images/expand-new-vlan.png)
 
-9. Createing a new VLAN
+9. Creating a new VLAN
      * For the purpose of this lab we will create an L2 VLAN. Select **L2 Only** 
      * Add a **name** for your VLAN with **no spaces** 
 
