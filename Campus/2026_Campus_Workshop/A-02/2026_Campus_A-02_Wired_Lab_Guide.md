@@ -124,7 +124,7 @@ This lab will help you create 2 port profiles and apply them to interfaces in yo
 ![Profile Quick Action](images/hier-port-profile2.png)
 
 11. Under the **General** Section
-    - Description: **Wired-RasPi**
+    - Name: **Wired-RasPi**
     - Enabled: **Yes**  
 
 ![Interface Profile Quick Actions](images/wired-profile-configuration2.png)
