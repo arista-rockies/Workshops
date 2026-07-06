@@ -87,7 +87,7 @@ In this lab you will be configuring the switches through CloudVision. Today you 
 
    -  Update the hostname from **sw-[IP_ADDRESS]** to **campus-pod[POD#]-leaf1b**  
    -   Under Role select **Leaf** 
-   -  Select **Add Devicee**
+   -  Select **Continue**
 
 
 ![Add Device](images/add-device3.png)
