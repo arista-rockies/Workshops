@@ -119,7 +119,7 @@ When creating these **Interface Profiles** any field that is not explicity ident
 ![Profile Quick Action](images/wired-port-profile1.png)
 
 11. Under the **General** Section
-    - Description: **Wired-RasPi**
+    - Name: **Wired-RasPi**
     - Enabled: **Yes**  
 
 ![Interface Profile Quick Actions](images/wired-port-profile2.png)
@@ -168,13 +168,13 @@ When creating these **Interface Profiles** any field that is not explicity ident
 
 ![Interface Profile Quick Actions](images/submit-profile-configuration3.png)
 
-29. Select **Submit Workspace** to save the proposed interface profile.
+20. Select **Submit Workspace** to save the proposed interface profile.
 
 *Note at this time no configuration changes are being made. You have only configured that Interface Profiles that we will use in the next next section to configure our interfaces*
 
 ![Interface Profile Quick Actions](images/submit-profile-configuration4.png)
 
-20. Select **Exit Workspace**
+21. Select **Exit Workspace**
 
 ![Interface Profile Quick Actions](images/submit-profile-configuration5.png)
 
