@@ -167,6 +167,8 @@ class CueClient():
             for child in l.get("children", []):
                 _doLocationCache(child)
 
+        print(f"{config.currentPod} - cue/deleteSSIDs")
+
         locationCache = {}
         _doLocationCache(self._doReq(reqType='GET', subsystem='locations'))
         if not locationCache:
