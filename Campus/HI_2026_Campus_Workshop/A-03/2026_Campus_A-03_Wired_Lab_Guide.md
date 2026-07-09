@@ -520,7 +520,7 @@ In this section we will show you how to customize the notifications that can be 
 ![Rule Device Selection](images/rule-device-selection.png)
 
 8. Select **+ Event Type** 
-    - Select Events **Change Control Created, Change Control Executed, Change Control Failed, Device Designed Configuration Changed, Change Control Succeeded, Device Clock Out of Sync, and Device Stopped Streamining** feel free to add additional event types
+    - Select Events **Change Control Created, Change Control Executed, Change Control Failed, Device Designed Configuration Changed, Change Control Succeeded, Device Clock Out of Sync, and Device Experiencing Streamining Issues** feel free to add additional event types
     - Under the dropdown for Receiver Select **SendGrid for Campus Workshop**
 
 ![Add Event Type](images/add-event-type.png)
@@ -532,7 +532,7 @@ In this section we will show you how to customize the notifications that can be 
 10. Now test your new receiver and rule.
 
     - Select **Status** on the left navigation pane
-    - Under Event Type locate **Device Stopped Streaming** in the dropdown
+    - Under Event Type locate **Device Experiencing Streamining Issues** in the dropdown
     - Under Devic select **Leaf1a** from the dropdown
     - Select **Send Test Notification**
 
