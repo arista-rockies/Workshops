@@ -9,10 +9,13 @@ app = FastAPI()
 # let's load up the inventory so we know what we are doing:
 
 globalInventory = {}
-with open("2026CampusWorkshopHardware.csv", "r") as f:
-    for device in csv.DictReader(f):
-        globalInventory[device["Serial Number"]] = device
-        device["pod"] = int(device["CVaaS and CV-CUE Pod Assignment"][-2:])
+try:
+    with open("2026CampusWorkshopHardware.csv", "r") as f:
+        for device in csv.DictReader(f):
+            globalInventory[device["Serial Number"]] = device
+            device["pod"] = int(device["CVaaS and CV-CUE Pod Assignment"][-2:])
+except FileNotFoundError:
+    pass
 
 # we need to load and parse the token file
 with open("tokenConfig.yml", "r") as f:
@@ -52,9 +55,20 @@ async def getSWI(request: Request, sn, eosVersion):
     return FileResponse(path=f'images/{fname}', filename=fname)
 
 @app.get('/bootstrap.py', response_class=PlainTextResponse)
-async def pod113(request: Request):
+async def bootstrap(request: Request):
     # Headers({'host': '10.0.96.20:8000', 'accept': '*/*', 'x-arista-systemmac': '2c:dd:e9:f6:f9:9b', 'x-arista-modelname': 'CCS-710P-16P', 'x-arista-serial': 'WTW23490441', 'x-arista-hardwareversion': '11.04', 'x-arista-tpmapi': '2.0', 'x-arista-tpmfwversion': '1.512', 'x-arista-secureztp': 'True', 'x-arista-softwareversion': '4.32.5.1M', 'x-arista-architecture': 'i386'})
-    device = globalInventory[request.headers["x-arista-serial"]]
+    device = globalInventory.get(request.headers["x-arista-serial"], None)
+    if not device:
+        # we didn't find this in the global inventory.  maybe we can parse the info we want out of the serial itself?
+        #  we'll bet on the SN starting with P## and try that.  this is, by far, not a robust way to do this:
+        sn = request.headers["x-arista-serial"]
+        device = {
+            "pod": sn[1:sn.find("-")],
+            "Software Version": request.headers["x-arista-softwareversion"],
+            "Mac address": request.headers["x-arista-systemmac"],
+            "Hostname": sn,
+            "Serial Number": sn
+        }
     token = tokens[str(device["pod"])]
 
     cvpRacClient = CvpClient()
@@ -69,25 +83,29 @@ async def pod113(request: Request):
     fname = f'EOS{arch}-{device["Software Version"]}.swi'
     vals = {
             "desiredEOSVersion": fname if request.headers["x-arista-softwareversion"] != device["Software Version"] else "",
-            "enrollmentToken": enrollmentToken["enrollmentToken"]["token"]
+            "enrollmentToken": enrollmentToken["enrollmentToken"]["token"],
+            "doAGNI": "True" if "agni" in token else False,
+            "cvAddr": token["cv"]["server"]
     }
 
     # when a switch requests the bootstrap, we need to make sure it gets onboarded
     #  into agni
-    agniClient = AgniClient(token)
-    nadGroupID = agniClient._getNadGroup("Switches")
+    if "agni" in token:
+        agniClient = AgniClient(token)
+        nadGroupID = agniClient._getNadGroup("Switches")
 
-    data = {
-        "ip": "",
-        "mac": device['Mac address'],
-        "hostname": device['Hostname'],
-        "sn": device['Serial Number']
-    }
-    device["agni"] = agniClient.onboardSwitch(data, nadGroupID)
-    device["headers"] = request.headers
+        data = {
+            "ip": "",
+            "mac": device['Mac address'],
+            "hostname": device['Hostname'],
+            "sn": device['Serial Number']
+        }
+        device["agni"] = agniClient.onboardSwitch(data, nadGroupID)
+        device["headers"] = request.headers
+
     with open(f'files/bootstrap.txt', 'r') as f:
         return f.read().format(**vals)
 
-    #print(request.headers) 
+    #print(request.headers)
     #print(request.url)
     raise HTTPException(status_code=503, detail="terminating")

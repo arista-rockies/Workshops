@@ -6,5 +6,6 @@ nmcli
 paramiko
 selenium
 uvicorn
-fastapi
+fastapi[standard]
 watchfiles
+paramiko

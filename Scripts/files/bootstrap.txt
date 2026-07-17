@@ -18,6 +18,7 @@ import time
 ######## this is stuff set by our bootstrap server
 desiredEOSVersion = "{desiredEOSVersion}"
 enrollmentToken = "{enrollmentToken}"
+doAGNI = {doAGNI}
 
 ##############  USER INPUT  ##############
 # Note: If you are saving the file on windows, please make sure to use linux (LF) as newline.
@@ -35,7 +36,7 @@ enrollmentToken = "{enrollmentToken}"
 # Japan: "www.cv-prod-apnortheast-1.arista.io"
 # Australia: "www.cv-prod-ausoutheast-1.arista.io"
 # United Kingdon: "www.cv-prod-uk-1.arista.io"
-cvAddr = "www.arista.io"
+cvAddr = "{cvAddr}"
 
 # this variable should be set to the entirety of the uri for the p12 download, *without* the trailing file
 # in this case, .p12 files are placed in the root of the webserver
@@ -639,7 +640,8 @@ if __name__ == "__main__":
       configureAndRestartNTP(ntpServer)
 
    setupPOE()
-   getAGNICert()
+   if doAGNI:
+      getAGNICert()
    if desiredEOSVersion:
       getInstallImage()
 

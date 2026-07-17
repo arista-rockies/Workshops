@@ -1,0 +1,428 @@
+from modules import config
+import requests, argparse, json, yaml, time, paramiko, socks, urllib
+from requests.packages.urllib3.exceptions import InsecureRequestWarning
+
+requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
+
+class actException(Exception):
+    pass
+
+class actConnectException(actException):
+    pass
+
+class actOptionsExeption(actException):
+    pass
+
+class ActClient():
+    def configure():
+        config.parser.add_argument('-actProxy', default=None, help='Set a socks proxy. defaults to None')
+        config.parser.add_argument('-actStartLab', action='store_true', default=False, help='start specified labs')
+        config.parser.add_argument('-actStopLab', action='store_true', default=False, help='stop specified labs')
+        config.parser.add_argument('-actUndeployLab', action='store_true', default=False, help='undeploy specified pods')
+        config.parser.add_argument('-actUpdateTopology', action='store_true', default=False, help='update the topology')
+        config.parser.add_argument('-actDeployLab', action='store_true', default=False, help='deploy and start the topology')
+        config.parser.add_argument('-actGetLab', action='store_true', default=False, help='print bootstrap ips')
+        config.parser.add_argument('-actSetupLinux', action='store_true', default=False, help='configure bootstrap')
+            
+    def __init__(self, token):
+        self.token = token
+        self.apiKey = token["act"]["key"]
+        self.baseURL = f'https://{token["act"]["server"]}'
+
+        if config.args.actProxy:
+            self.proxies = { "http": f"socks5://{config.args.actProxy}", "https": f"socks5://{config.args.actProxy}" }
+        else:
+            self.proxies = None
+
+        self.headers = {}
+        self.connected = False
+        self.topologies = None
+        self.labs = None
+
+        self.connect()
+        labs = self.getLabs(nameFilter="cv-workshop-pod")
+
+    def _findByName(self, lst, name):
+        for i in lst:
+            if i["name"] == name:
+                return i
+
+        return False
+
+    def execute(self):
+        if config.args.actStartLab:
+            self.doStartLab()
+            return
+        if config.args.actStopLab:
+            self.doStopLab()
+            return
+        if config.args.actUndeployLab:
+            self.doUndeployLab()
+            return
+        if config.args.actUpdateTopology:
+            self.doUpdateTopology()
+            return
+        if config.args.actDeployLab:
+            self.doDeployAndStart()
+            return
+        if config.args.actGetLab:
+            self.doGetLab()
+            return
+        if config.args.actSetupLinux:
+            self.doSetupLinux()
+            return
+
+    def connect(self):
+        if 'Authorization' not in self.headers:
+            self._getToken()
+
+        self.connected = True
+
+    def _getToken(self):
+        key = { "api_key": self.apiKey }
+        url = f'{self.baseURL}/rest/v1/auth/login'
+        resp = requests.post(url, proxies=self.proxies, json=key)
+        try:
+            resp.raise_for_status()
+        except Exception as e:
+            print(resp.text)
+            print(e)
+            raise actConnectException("Not connected, please call the connect method first")
+
+        self.apiKey = resp.json()
+        self.headers["Authorization"] = f"Bearer {self.apiKey['token']}"
+
+    def _executeRequest(self, requestType='GET', url=None, data=None, timeout=None):
+        if not self.connected:
+            raise actConnectException("Not connected, please call the connect method first")
+
+        if not url:
+            raise actOptionsExeption("Invalid data for request")
+
+        url = f'{self.baseURL}{url}'
+        resp = requests.request(requestType, url, json=data, proxies=self.proxies, headers=self.headers, timeout=timeout)
+        resp.raise_for_status()
+
+        return resp.json()
+
+    ############# Topologies calls
+    def getTopologies(self, nameFilter=None):
+        params = []
+        params.append("offset=0")
+        params.append("pageSize=100000")
+        
+        url = f'/rest/v1/topologies?{"&".join(params)}'
+        resp = self._executeRequest(url=url)
+
+        if nameFilter == None:
+            self.topologies = resp
+            return resp
+
+        # there is probably a better way of filering here......
+        result = []
+        for topology in resp["result"]:
+            if nameFilter in topology["name"]:
+                result.append(topology)
+
+        self.topologies = result
+        return result
+
+    def getTopology(self, id):
+        url = f'/rest/v1/topologies/{id}'
+        resp = self._executeRequest(url=url)
+
+        #FIXME what do we do if there isn't a topology at that id?
+        return resp
+
+    def deleteTopology(self, id):
+        url = f'/rest/v1/topologies/{id}'
+        resp = self._executeRequest(requestType='DELETE', url=url)
+
+        return resp
+
+    def getTopologyByName(self, name):
+        return self._findByName(self.topologies["result"], name)
+
+    def updateTopology(self, id, name, newTopology=None):
+        url = f'/rest/v1/topologies/{id}'
+
+        data = { "id": id, "name": name }
+        if newTopology:
+            data["file"] = newTopology
+
+        resp = self._executeRequest(requestType='PATCH', url=url, data=data)
+
+
+        return resp
+
+    def createTopology(self, name, newTopology=None):
+        url = f'/rest/v1/topologies'
+
+        data = { "name": name, "description": name, "diagram_path": "" }
+        if newTopology:
+            data["file"] = newTopology
+
+        try:
+            resp = self._executeRequest(requestType='POST', url=url, data=data)
+        except Exception as e:
+            print("error on create topo")
+            print(e)
+
+        return resp
+
+    ############# operations calls
+    def getOperation(self, id):
+        url = f'/rest/v1/operations/{id}'
+        resp = self._executeRequest(requestType='GET', url=url)
+
+        return resp
+
+    def waitOnOperation(self, id, sleep=10, timeout=None, statusChar=None, debug=False):
+        while True:
+            op = self.getOperation(id)
+            if debug:
+                print(op)
+
+            if op["status"] != "Pending" or timeout == 0:
+                if statusChar:
+                    print("")
+                return op
+                break
+
+            time.sleep(sleep)
+            if timeout != None:
+                timeout -= 1
+
+            if statusChar:
+                print(statusChar, end="", flush=True)
+
+
+    ############# Labs calls
+    def getLabs(self, nameFilter=None):
+        params = []
+        params.append("offset=0")
+        params.append("limit=1000")
+        
+        if nameFilter:
+            params.append(f"name={nameFilter}")
+
+        url = f'/rest/v1/labs?{"&".join(params)}'
+        resp = self._executeRequest(url=url)
+
+        self.labs = resp["result"]
+        return self.labs
+
+        labs = []
+        for lab in resp["result"]:
+            if nameFilter in lab["name"]:
+                labs.append(lab)
+
+        self.labs = labs
+        return labs
+
+    def getLabByID(self, id):
+        url = f'/rest/v1/labs/{id}'
+        resp = self._executeRequest(url=url)
+
+        #FIXME what do we do if there isn't a lab at that id?
+        return resp
+
+    def getLabByName(self, name):
+        return self._findByName(self.labs, name)
+
+    def deleteLab(self, id):
+        url = f'/rest/v1/labs/{id}'
+        resp = self._executeRequest(requestType='DELETE', url=url)
+
+        return resp
+
+    def startLab(self, id):
+        url = f'/rest/v1/labs/{id}/start'
+        resp = self._executeRequest(requestType='POST', url=url)
+
+        return resp
+
+    def stopLab(self, id):
+        url = f'/rest/v1/labs/{id}/stop'
+        resp = self._executeRequest(requestType='POST', url=url)
+
+        #FIXME does this function return anything?
+
+    def deployLab(self, id, timeout=None):
+        url = f'/rest/v1/labs/{id}/deploy'
+        resp = self._executeRequest(requestType='POST', url=url, timeout=timeout)
+
+        return resp
+
+    def undeployLab(self, id):
+        url = f'/rest/v1/labs/{id}/undeploy'
+        resp = self._executeRequest(requestType='POST', url=url)
+
+    def createLab(self, name):
+        url = f'/rest/v1/labs'
+
+        data = { "name": name, "description": name, "topology_definition": f'{name}.yml' }
+        resp = self._executeRequest(requestType='POST', url=url, data=data)
+
+        return resp
+
+    def doStopLab(self):
+        print(f"{config.currentPod} - doStopLab")
+
+        name = f"cv-workshop-pod{config.currentPod}"
+        lab = self.getLabByName(name)
+        if lab["state"] == 2:
+            self.stopLab(lab["id"])
+
+    def doStartLab(self):
+        print(f"{config.currentPod} - doStartLab")
+        name = f"cv-workshop-pod{config.currentPod}"
+        lab = self.getLabByName(name)
+        if lab["state"] == 4:
+            res = self.startLab(lab["id"])
+
+    def doUndeployLab(self):
+        print(f"{config.currentPod} - doUndeployLab")
+        name = f"cv-workshop-pod{config.currentPod}"
+        lab = self.getLabByName(name)
+        self.undeployLab(lab["id"])
+
+    def doDeployAndStart(self):
+        try:
+            s = ""
+            with open("files/actTopology.yml", "r") as f:
+                s = f.read()
+        except:
+            print("  could not deploy and start, terminating")
+            return
+
+        # make sure we have the update topologies
+        self.getTopologies()
+
+        print(f"{config.currentPod} - doDeployAndStart ")
+        name = f'cv-workshop-pod{config.currentPod}'
+
+        lab = self.getLabByName(name)
+        if lab:
+            print(f"  deleting lab {name}", end="", flush=True)
+            resp = self.deleteLab(lab["id"])
+            resp = self.waitOnOperation(resp["id"], sleep=10, timeout=None, statusChar=".")
+
+        topology = self.getTopologyByName(name)
+        if topology:
+            print(f"  deleting topology {name}", end="", flush=True)
+            resp = self.deleteTopology(topology["id"])
+            resp = self.waitOnOperation(resp["id"], sleep=10, timeout=None, statusChar=".")
+
+        newTopology = yaml.safe_load(s.replace("###", f"{config.currentPod:02}"))
+        try:
+            print(f"  creating topology {name}", end="", flush=True)
+            resp = self.createTopology(name, newTopology)
+            resp = self.waitOnOperation(resp["id"], sleep=10, timeout=None, statusChar=".")
+        except Exception as e:
+            print(e)
+            print("!")
+            return None
+
+        # now we instantiate the lab
+        print(f"  creating lab {name}", end="", flush=True)
+        resp = self.createLab(name)
+        resp = self.waitOnOperation(resp["id"], sleep=10, timeout=None, statusChar=",")
+        labID = resp["result"]["id"]
+
+        print(f"  deploying lab {name}", end="", flush=True)
+        resp = self.deployLab(labID)
+        resp = self.waitOnOperation(resp["id"], sleep=10, timeout=None, statusChar='!')
+
+    def doUpdateTopology(self):
+        try:
+            s = ""
+            with open("files/actTopology.yml", "r") as f:
+                s = f.read()
+        except:
+            print("  could not update topology, terminating")
+            return
+
+        topologies = self.getTopologies()
+        name = f'cv-workshop-pod{config.currentPod}'
+        topology = self._findByName(topologies["result"], name)
+
+        if not topology:
+            print(f"did not find topology {name}, continuing")
+            return
+
+        print(f"{config.currentPod} - doUpdateTopology ")
+
+        newTopology = yaml.safe_load(s.replace("###", str(pod)))
+        try:
+
+            print(f"  updating topology ", end="", flush=True)
+            resp = self.updateTopology(topology["id"], topology["name"], newTopology)
+
+            self.waitOnOperation(resp["id"], sleep=10, timeout=None, statusChar=".")
+            print("")
+        except Exception as e:
+            print(e)
+            print("!")
+            return
+
+    def doGetLab(self):
+        print(f"{config.currentPod} - doGetLab ")
+        name = f'cv-workshop-pod{config.currentPod}'
+        lab = self.getLabByName(name)
+        lab = self.getLabByID(lab['id'])
+        # i want to print out the ip of the bootstrap boxes
+        for dev in lab['devices']['generic']:
+            if 'bootstrap' in dev['hostname']:
+                print(f"{dev['hostname']}: {dev['internal_ip']}")
+
+    def doSetupLinux(self):
+        print(f"{config.currentPod} - doSetupLinux ")
+        name = f'cv-workshop-pod{config.currentPod}'
+        # not sure why getLabByName doesn't return devices but getLabByID does
+        lab = self.getLabByName(name)
+        l = self.getLabByID(lab["id"])
+        # i know the bootstrap box is a generic
+        for host in l["devices"]["generic"]:
+            if "bootstrap" in host["hostname"]:
+                sshUser = "administrator"
+                sshPassword = self.token["act"]["sshPassword"]
+
+                # https://stackoverflow.com/questions/47441351/using-paramiko-with-socks-proxy
+                if self.proxies:
+                    s = urllib.parse.urlsplit(self.proxies["http"])
+                    sock = socks.socksocket()
+                    sock.set_proxy(
+                        proxy_type=socks.SOCKS5,
+                        addr=s.hostname,
+                        port=s.port
+                    )
+                    sock.connect((host["internal_ip"], 22))
+                else:
+                    sock = None
+
+                pmClient = paramiko.SSHClient()
+                pmClient.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+                pmClient.connect(host["internal_ip"], 22, sshUser, sshPassword, sock=sock)
+                scp = pmClient.open_sftp()
+                scp.put('tokenConfig.yml', '/home/administrator/tokenConfig.yml')
+                scp.put('setupACTGateway.sh', '/home/administrator/setupACTGateway.sh')
+                scp.chmod('/home/administrator/setupACTGateway.sh', 0o700)
+
+                pmClient.exec_command("sudo setenforce Permissive")
+                stdin, stdout, stderr = pmClient.exec_command("sudo -S /home/administrator/setupACTGateway.sh", get_pty=True)
+
+                # if we don't read the redirects then the con will terminate and stop the script
+                for line in iter(stdout.readline, ""):
+                    print(line, end="")
+
+                pmClient.close()
+
+                #output = stdout.read().decode('utf-8')
+                #error = stderr.read().decode('utf-8')
+
+                #print(output)
+                #print("--")
+                #print(error)
+
+

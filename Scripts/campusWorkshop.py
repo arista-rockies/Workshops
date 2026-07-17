@@ -21,6 +21,10 @@ apiToken:
         "tenant": "rockies-training-00"
         "key1": "serviceAccountToken1"
         "key2": "serviceAccountToken2"
+      "act":
+        "server": "ce.act.arista.com"
+        "key": "actKey"
+        "sshPassword": ""
   "1":
       "name": "pod 1"
       "cv":
@@ -41,6 +45,11 @@ apiToken:
         "tenant": "Rockies Workshop"
         "key": "velokey"
         "url": "https://veloVCO.com"
+        "sshPassword": "formatStringOfPassword"
+      "act":
+        "server": "ce.act.arista.com"
+        "key": "actKey"
+        "sshPassword": ""
 """
 import os, argparse, yaml, asyncio, csv, requests, json
 
@@ -59,6 +68,9 @@ pgfCVClient.configure()
 
 from modules.velo import VeloClient
 VeloClient.configure()
+
+from modules.act import ActClient
+ActClient.configure()
 
 from modules.pgf import pgfDevice
 
@@ -109,6 +121,10 @@ async def main():
     for pod in config.apiTokens:
         config.currentPod = pod
         token = tokens.get(config.currentPod, {})
+
+        if 'act' in token:
+            actClient = ActClient(token)
+            actClient.execute()
 
         if 'cv' in token:
             cvClient = pgfCVClient(token)

@@ -1,0 +1,203 @@
+veos:
+  # Define the global vEOS node parameters
+  username: cvpadmin
+  password: testeroni
+  version: 4.34.5M
+
+generic:
+  version: rocky-8-10
+  username: administrator
+  password: testeroni
+
+nodes:
+  - bootstrap###:
+      ip_addr: 192.168.0.1/22
+      node_type: generic
+
+  - P###-CampusA-Spine1:
+      ip_addr: 192.168.1.30/22
+      device_model: 7050SX3-48YC8
+      system_mac_address: 00:1c:73:00:01:30
+      serial_number: P###-CampusA-Spine1
+      node_type: veos
+      ztp: true
+
+  - P###-CampusA-Spine2:
+      ip_addr: 192.168.1.31/22
+      device_model: 7050SX3-48YC8
+      system_mac_address: 00:1c:73:00:01:31
+      serial_number: P###-CampusA-Spine2
+      node_type: veos
+      ztp: true
+
+  - P###-CampusA-Leaf1A:
+      ip_addr: 192.168.1.32/22
+      device_model: 720XP-24Y6
+      system_mac_address: 00:1c:73:00:01:32
+      serial_number: P###-CampusA-Leaf1A
+      node_type: veos
+      ztp: true
+
+  - P###-CampusA-Leaf1B:
+      ip_addr: 192.168.1.33/22
+      device_model: 720XP-24Y6
+      system_mac_address: 00:1c:73:00:01:33
+      serial_number: P###-CampusA-Leaf1B
+      node_type: veos
+      ztp: true
+
+  - P###-CampusA-Leaf1-1:
+      ip_addr: 192.168.1.34/22
+      device_model: 720XP-24Y6
+      system_mac_address: 00:1c:73:00:01:34
+      serial_number: P###-CampusA-Leaf1-1
+      node_type: veos
+      ztp: true
+
+  - P###-CampusA-Leaf1-2:
+      ip_addr: 192.168.1.35/22
+      device_model: 720XP-24Y6
+      system_mac_address: 00:1c:73:00:01:35
+      serial_number: P###-CampusA-Leaf1-2
+      node_type: veos
+      ztp: true
+
+  - P###-CampusA-Host1:
+      ip_addr: 192.168.1.36/22
+      device_model: 720XP-24Y6
+      system_mac_address: 00:1c:73:00:01:36
+      serial_number: P###-CampusA-Host1
+      node_type: veos
+      ztp: true
+
+  #--------------
+  - P###-CampusB-Spine1:
+      ip_addr: 192.168.2.30/22
+      device_model: 7050SX3-48YC8
+      system_mac_address: 00:1c:73:00:02:30
+      serial_number: P###-CampusB-Spine1
+      node_type: veos
+      ztp: true
+
+  - P###-CampusB-Spine2:
+      ip_addr: 192.168.2.31/22
+      device_model: 7050SX3-48YC8
+      system_mac_address: 00:1c:73:00:02:31
+      serial_number: P###-CampusB-Spine2
+      node_type: veos
+      ztp: true
+
+  - P###-CampusB-Leaf1A:
+      ip_addr: 192.168.2.32/22
+      device_model: 720XP-24Y6
+      system_mac_address: 00:1c:73:00:02:32
+      serial_number: P###-CampusB-Leaf1A
+      node_type: veos
+      ztp: true
+
+  - P###-CampusB-Leaf1B:
+      ip_addr: 192.168.2.33/22
+      device_model: 720XP-24Y6
+      system_mac_address: 00:1c:73:00:02:33
+      serial_number: P###-CampusB-Leaf1B
+      node_type: veos
+      ztp: true
+
+  - P###-CampusB-Leaf1-1:
+      ip_addr: 192.168.2.34/22
+      device_model: 720XP-24Y6
+      system_mac_address: 00:1c:73:00:02:34
+      serial_number: P###-CampusB-Leaf1-1
+      node_type: veos
+      ztp: true
+
+  - P###-CampusB-Leaf1-2:
+      ip_addr: 192.168.2.35/22
+      device_model: 720XP-24Y6
+      system_mac_address: 00:1c:73:00:02:35
+      serial_number: P###-CampusB-Leaf1-2
+      node_type: veos
+      ztp: true
+
+  - P###-CampusB-Host1:
+      ip_addr: 192.168.2.36/22
+      device_model: 720XP-24Y6
+      system_mac_address: 00:1c:73:00:02:36
+      serial_number: P###-CampusB-Host1
+      node_type: veos
+      ztp: true
+
+links:
+  - connection:
+    - P###-CampusA-Spine1:Ethernet1
+    - P###-CampusA-Leaf1A:Ethernet1
+  - connection:
+    - P###-CampusA-Spine1:Ethernet2
+    - P###-CampusA-Leaf1B:Ethernet1
+  - connection:
+    - P###-CampusA-Spine2:Ethernet1
+    - P###-CampusA-Leaf1A:Ethernet2
+  - connection:
+    - P###-CampusA-Spine2:Ethernet2
+    - P###-CampusA-Leaf1B:Ethernet2
+  - connection:
+    - P###-CampusA-Leaf1A:Ethernet3
+    - P###-CampusA-Leaf1B:Ethernet3
+  - connection:
+    - P###-CampusA-Leaf1A:Ethernet4
+    - P###-CampusA-Leaf1B:Ethernet4
+  - connection:
+    - P###-CampusA-Leaf1A:Ethernet5
+    - P###-CampusA-Leaf1-1:Ethernet1
+  - connection:
+    - P###-CampusA-Leaf1B:Ethernet5
+    - P###-CampusA-Leaf1-1:Ethernet2
+  - connection:
+    - P###-CampusA-Leaf1A:Ethernet6
+    - P###-CampusA-Leaf1-2:Ethernet1
+  - connection:
+    - P###-CampusA-Leaf1B:Ethernet6
+    - P###-CampusA-Leaf1-2:Ethernet2
+  - connection:
+    - P###-CampusA-Leaf1A:Ethernet7
+    - P###-CampusA-Host1:Ethernet1
+  - connection:
+    - P###-CampusA-Leaf1B:Ethernet7
+    - P###-CampusA-Host1:Ethernet2
+
+  - connection:
+    - P###-CampusB-Spine1:Ethernet1
+    - P###-CampusB-Leaf1A:Ethernet1
+  - connection:
+    - P###-CampusB-Spine1:Ethernet2
+    - P###-CampusB-Leaf1B:Ethernet1
+  - connection:
+    - P###-CampusB-Spine2:Ethernet1
+    - P###-CampusB-Leaf1A:Ethernet2
+  - connection:
+    - P###-CampusB-Spine2:Ethernet2
+    - P###-CampusB-Leaf1B:Ethernet2
+  - connection:
+    - P###-CampusB-Leaf1A:Ethernet3
+    - P###-CampusB-Leaf1B:Ethernet3
+  - connection:
+    - P###-CampusB-Leaf1A:Ethernet4
+    - P###-CampusB-Leaf1B:Ethernet4
+  - connection:
+    - P###-CampusB-Leaf1A:Ethernet5
+    - P###-CampusB-Leaf1-1:Ethernet1
+  - connection:
+    - P###-CampusB-Leaf1B:Ethernet5
+    - P###-CampusB-Leaf1-1:Ethernet2
+  - connection:
+    - P###-CampusB-Leaf1A:Ethernet6
+    - P###-CampusB-Leaf1-2:Ethernet1
+  - connection:
+    - P###-CampusB-Leaf1B:Ethernet6
+    - P###-CampusB-Leaf1-2:Ethernet2
+  - connection:
+    - P###-CampusB-Leaf1A:Ethernet7
+    - P###-CampusB-Host1:Ethernet1
+  - connection:
+    - P###-CampusB-Leaf1B:Ethernet7
+    - P###-CampusB-Host1:Ethernet2
