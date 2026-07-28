@@ -1,12 +1,12 @@
-# CloudVision Lab 02
-## Static Configuration Studio
+# CloudVision Lab 06
+## Campus Fabric Studio
 ![CloudVision](images/CVP_logo.png)
 
 ## This Lab Guide:
 
 
 
-[CloudVision Workshop Lab Guide 02- Inventory and Topology ](NEEDLINK!!!!)
+[CloudVision Workshop Lab Guide 06- Inventory and Topology ](NEEDLINK!!!!)
 
 ---
 

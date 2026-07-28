@@ -6,7 +6,7 @@
 
 
 
-[CloudVision Workshop Lab Guide 01- Inventory and Topology ](NEEDLINK!!!!)
+[CloudVision Workshop Lab Guide 03- Inventory and Topology ](NEEDLINK!!!!)
 
 ---
 
