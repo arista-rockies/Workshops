@@ -1,6 +1,6 @@
 # CloudVision Lab 06
 ## Campus Fabric Studio
-![CloudVision](images/CVP_logo.png)
+![CloudVision](images/cv-logo.png)
 
 ## This Lab Guide:
 
