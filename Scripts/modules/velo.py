@@ -10,14 +10,25 @@ from modules import veloDataModel
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from nmcli._exception import NotExistException
+from modules.pgf import pgfAction
 
 # *very* basic velo client
 class VeloClient():
     def configure():
-        config.parser.add_argument('-veloCleanup', default=False, action='store_true', help='do velo cleanup steps')
-        config.parser.add_argument('-veloReconfigure', default=False, action='store_true', help='reconfigure the velo for lag')
-        config.parser.add_argument('-veloSetup', default=False, action='store_true', help='do velo setup steps')
-        config.parser.add_argument('-veloDump', default=False, action='store_true', help='do some test dumps')
+        def _addArgument(*args, **kwargs):
+            if kwargs.get('action', None) == 'store_true':
+                kwargs.pop('action')
+                kwargs["nargs"] = '?'
+                kwargs.setdefault("default", False)
+                kwargs.setdefault("const", True)
+
+            config.parser.add_argument(*args, action=pgfAction, module="velo", **kwargs)
+
+        _addArgument('-veloCleanup', default=False, action='store_true', help='do velo cleanup steps')
+        _addArgument('-veloReconfigure', default=False, action='store_true', help='reconfigure the velo for lag')
+        _addArgument('-veloSetup', default=False, action='store_true', help='do velo setup steps')
+        _addArgument('-veloDump', default=False, action='store_true', help='do some test dumps')
+        _addArgument('-veloTest', default=False, action='store_true', help='do velo test code')
 
     def __init__(self, token):
         if not (t:=token.get("velo", None)):
@@ -464,6 +475,9 @@ class VeloClient():
         self.provisionEdge()
 
     def execute(self):
+        if config.args.veloTest:
+            print("inside veloTest")
+
         if config.args.veloDump:
             self._getEdgeBySerial()
             print(f'{self.edge}')

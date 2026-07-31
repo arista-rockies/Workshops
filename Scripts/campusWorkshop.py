@@ -82,12 +82,10 @@ os.environ["GLOG_minloglevel"] = "2"
 config.parser.add_argument('-test', default=False, action='store_true', help='testing new code')
 config.parser.add_argument('-tokenFile', default="tokenConfig.yml", help="Contains the tokens we should use along with the defined pods")
 config.parser.add_argument('-pods', required=True, nargs='+', help='specify a space delimited list of pods to run against, by default all pods will be operated on')
+config.parser.add_argument('-i', default="2026CampusWorkshopHardware.csv", help="hardware inventory")
 
 async def main():
     config.args = config.parser.parse_args()
-    if config.args.allCleanup:
-        config.args.cleanup = True
-        config.args.cueCleanup = True
 
     with open(config.args.tokenFile, "r") as f:
         tokens = yaml.safe_load(f.read())["apiToken"]
@@ -95,26 +93,7 @@ async def main():
     for pod in config.args.pods:
         config.apiTokens[pod] = tokens[pod]
 
-    with open(config.args.i, "r") as f:
-        for device in csv.DictReader(f):
-            if device['Model'][0] not in ['A', 'V']:
-                continue
-
-
-            # rather than rewrite the code, i'm taking the lazy path
-            device["sn"] = device["Serial Number"]
-            device["mac"] = device["Mac address"]
-            device["hostname"] = device["Hostname"]
-
-            if device['Model'][0] == 'A':
-                podNum = int(device["CVaaS and CV-CUE Pod Assignment"][-2:])
-                p = config.globalInventory.setdefault(podNum, [])
-                p.append(device)
-            elif device['Model'][0] == 'V':
-                podNum = device["CVaaS and CV-CUE Pod Assignment"]
-                device["podNum"] = podNum
-
-                p = config.globalInventory.setdefault('velo', {})[podNum] = device
+    config.loadInventory()
 
     requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
@@ -122,24 +101,39 @@ async def main():
         config.currentPod = pod
         token = tokens.get(config.currentPod, {})
 
-        if 'act' in token:
-            actClient = ActClient(token)
-            actClient.execute()
+        if hasattr(config.args, 'act'):
+            if not 'act' in token:
+                print("no act token provided, but act actions requested.  skipping")
+            else:
+                actClient = ActClient(token)
+                actClient.execute()
 
-        if 'cv' in token:
-            cvClient = pgfCVClient(token)
-            await cvClient.execute()
+        if hasattr(config.args, 'agni'):
+            if not 'agni' in token:
+                print("no agni token provided, but agni actions requested.  skipping")
+            else:
+                agniClient = AgniClient(token)
+                agniClient.execute()
 
-        if 'cue' in token:
-            cueClient = CueClient(token)
-            cueClient.execute()
+        if hasattr(config.args, 'cue'):
+            if not 'cue' in token:
+                print("no cue token provided, but cue actions requested.  skipping")
+            else:
+                cueClient = CueClient(token)
+                cueClient.execute()
 
-        if 'agni' in token:
-            agniClient = AgniClient(token)
-            agniClient.execute()
+        if hasattr(config.args, 'cv'):
+            if not 'cv' in token:
+                print("no cv token provided, but cv actions requested.  skipping")
+            else:
+                cvClient = pgfCVClient(token)
+                await cvClient.execute()
 
-        if 'velo' in token:
-            veloClient = VeloClient(token)
-            veloClient.execute()
+        if hasattr(config.args, 'velo'):
+            if not 'velo' in token:
+                print("no velo token provided, but velo actions requested.  skipping")
+            else:
+                veloClient = VeloClient(token)
+                veloClient.execute()
 
 asyncio.run(main())

@@ -1,4 +1,5 @@
 #!/bin/bash
+set -euo pipefail
 
 # start with some cleanup and installing new required packages
 echo "starting yum steps `date`"
@@ -7,14 +8,22 @@ echo "starting yum steps `date`"
 #yum -y update
 yum -y install git kea wget iptables-services tcpdump iftop
 
-# these two lines make the rest of the current bootstrap work properly
-ip addr add 100.64.0.1/32 dev lo
-ip addr add 10.0.96.20/32 dev lo
+# this line makes the rest of the current bootstrap work properly
+nmcli connection add type dummy ifname dummy0 ipv4.method manual ipv4.addresses 10.0.96.20/32,100.64.0.1/32
 
 echo "setting up system daemons `date`"
 
 # re-configure ntp and restart it
 echo "allow 192.168.0.0/22" >> /etc/chrony.conf
+
+# find my hostname and convert it to an int
+HOSTNAME=`hostname`
+POD=$((${HOSTNAME: -2}+0))
+
+cat << EOF > /usr/local/etc/bootstrap.conf
+POD=$POD
+INVENTORY=act
+EOF
 
 cat <<EOF > /etc/systemd/system/bootstrap.service
 [Unit]
@@ -31,6 +40,7 @@ User=administrator
 SyslogIdentifier=bootstrap
 Restart=always
 RestartSec=30s
+EnvironmentFile=/usr/local/etc/bootstrap.conf
 
 [Install]
 WantedBy=default.target
@@ -66,6 +76,18 @@ cat <<EOF > /etc/kea/kea-dhcp4.conf
     "rebind-timer": 1800,
     "valid-lifetime": 3600,
 
+    # Arista;vEOS-lab;P19-CampusA-Leaf1-2
+    "client-classes": [
+        {
+            "name": "CampusB",
+            "test": "(substring(option[60].hex,26,1) == 'B') or (substring(option[60].hex,28,1) == 'Z')"
+        },
+        {
+            "name": "CampusA",
+            "test": "substring(option[60].hex,26,1) == 'A' and not member('CampusB')"
+        }
+    ],
+
     "option-data": [
         {
             "name": "domain-name-servers",
@@ -94,7 +116,16 @@ cat <<EOF > /etc/kea/kea-dhcp4.conf
     "subnet4": [
         {
             "subnet": "192.168.0.0/22",
-            "pools": [ { "pool": "192.168.1.0 - 192.168.2.254" } ],
+            "pools": [
+                {
+                    "pool": "192.168.1.100 - 192.168.1.120",
+                    "client-class": "CampusA"
+                },
+                {
+                    "pool": "192.168.2.100 - 192.168.2.120",
+                    "client-class": "CampusB"
+                }
+            ],
 
             "option-data": [
                 {
@@ -125,11 +156,21 @@ cat << EOF > /etc/sysctl.d/98-forwarding.conf
 net.ipv4.ip_forward = 1
 EOF
 
+# we need to fixup some of the act cruft so that we can make this work how we want
+sed -i.save 's/iptables -I FORWARD -i tun0 -j ACCEPT/#&/g' /sbin/act-network-create
+
+systemctl disable firewalld
+systemctl stop firewalld
+
+iptables -t nat -F POSTROUTING
 iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+
+iptables -F FORWARD
+iptables -I FORWARD -s 192.168.2.0/24 -j DROP
+
 /usr/libexec/iptables/iptables.init save
 
 systemctl daemon-reload
-systemctl disable firewalld
 systemctl enable kea-dhcp4 iptables bootstrap
 
 echo "disabling selinux `date`"

@@ -1,6 +1,9 @@
 from modules import config
 from modules import pgf
 import uuid, requests, time, yaml, tempfile
+from requests_toolbelt import MultipartEncoder
+from modules.pgf import pgfAction
+from os.path import basename
 
 #######
 from cvprac.cvp_client import CvpClient, json_decoder
@@ -29,17 +32,25 @@ from modules.sync_cc_templates import (
 
 class pgfCVClient():
     def configure():
-        config.parser.add_argument('-cvCleanup', default=False, action='store_true', help='do cleanup steps')
-        config.parser.add_argument('-cvSetup', default=False, action='store_true', help='do setup steps')
-        config.parser.add_argument('-i', default="2026CampusWorkshopHardware.csv", help="hardware inventory")
+        def _addArgument(*args, **kwargs):
+            if kwargs.get('action', None) == 'store_true':
+                kwargs.pop('action')
+                kwargs["nargs"] = '?'
+                kwargs.setdefault("default", False)
+                kwargs.setdefault("const", True)
 
-        config.parser.add_argument('-addPackages', default=False, action='store_true', help='this option is only required for alraedy provisioned pods and will add the required packages.  these steps are automatically done on pods as they are provisioned moving forward')
-        config.parser.add_argument('-addCCStuff', default=False, action='store_true', help='this option is only required for already provisioned pods and will add actionBundles and ccTemplates only.  these steps are automatically done on pods as they are provisioned moving forward')
-        config.parser.add_argument('-cleanupNotifiers', default=False, action='store_true', help='only cleanup the event system')
-        config.parser.add_argument('-allCleanup', default=False, action='store_true', help='cleanup everything')
-        config.parser.add_argument('-thirdParty', default='', help='comma delimited list of 3rd party devices to configure')
-        config.parser.add_argument('-cvTest', default=False, action='store_true', help='dev code')
-        config.parser.add_argument('-cvAddAdmins', default='', nargs='+', help='space separated email address of new admin users')
+            config.parser.add_argument(*args, action=pgfAction, module="cv", **kwargs)
+
+        _addArgument('-cvCleanup', default=False, action='store_true', help='do cleanup steps')
+        _addArgument('-cvSetup', default=False, action='store_true', help='do setup steps')
+
+        _addArgument('-cvCleanupNotifiers', default=False, action='store_true', help='only cleanup the event system')
+        _addArgument('-cvThirdParty', default='', help='comma delimited list of 3rd party devices to configure')
+        _addArgument('-cvTest', default=False, action='store_true', help='dev code')
+        _addArgument('-cvAddAdmins', default='', nargs='+', help='space separated list of email address of new admin users')
+        _addArgument('-cvAddImages', default='', nargs='+', help='space separated list of swi images to upload')
+        _addArgument('-cvAddPackages', default=False, action='store_true', help='this option is only required for alraedy provisioned pods and will add the required packages.  these steps are automatically done on pods as they are provisioned moving forward')
+        _addArgument('-cvAddCCStuff', default=False, action='store_true', help='this option is only required for already provisioned pods and will add actionBundles and ccTemplates only.  these steps are automatically done on pods as they are provisioned moving forward')
 
     def __init__(self, token):
         self.token = token
@@ -60,6 +71,7 @@ class pgfCVClient():
             if device["hostname"] == hostname:
                 return device
         return None
+
 
     async def scsCleanup(self, c, workspaceID):
         print(f"{config.currentPod} - scsCleanup")
@@ -372,7 +384,7 @@ class pgfCVClient():
         #  this is horrible code
         t = campusStudio["inputs"]["campus"][0]["inputs"]["campusDetails"]["campusPod"][0]["inputs"]["campusPodFacts"]["thirdPartyDevices"]
         cnt = 1
-        for device in config.args.thirdParty.split(','):
+        for device in config.args.cvThirdParty.split(','):
             t.append({
                 "hostname": f"campus-spine{cnt}",
                 "identifier": device,
@@ -577,6 +589,50 @@ class pgfCVClient():
             ptrData = {bundleKey: Path(keys=["changecontrol", "actionBundle", "v1", bundleKey])}
             publish(client, 'cvp', pathElts[:-1], ptrData)
 
+    async def doAddImages(self):
+        print(f"{config.currentPod} - doAddImages")
+        headers = {
+            'Authorization': f'Bearer {self.tok}',
+        }
+
+        existingImages = {}
+        url = f'{self.baseURL}/api/resources/softwaremanagement/v1/Repository/all'
+        resp = requests.get(url, verify=False, timeout=300, headers=headers)
+        images = json_decoder(resp.text)
+        for image in images:
+            existingImages[image.get("result", {}).get("value", {}).get("key", {}).get("name", "")] = True
+
+        url = f'{self.baseURL}/cvpservice/softwaremanagement/v1/uploads'
+        for filepath in config.args.cvAddImages:
+            filename = basename(filepath)
+            if filename in existingImages:
+                continue
+
+            print(f" uploading {filename}")
+
+            with open(filepath, "rb") as image:
+                fields = {
+                    "name": filename,
+                    "rebootRequired": "True",
+                    "file": (
+                        filename,
+                        image,
+                        'application/octet-stream',
+                        {
+                            "Content-Transfer-Encoding": 'binary'
+                        }
+                    )
+                }
+
+                m = MultipartEncoder(fields=fields)
+
+                headers['Content-Type'] = m.content_type
+                resp = requests.post(url, data=m, verify=False, timeout=300, headers=headers)
+                if resp.status_code in [ 200, 201, 409 ]:
+                    continue
+
+                resp.raise_for_status()
+
     async def doAdminUsers(self):
         print(f"{config.currentPod} - doAdminUsers")
         url = f'{self.baseURL}/cvpservice/user/addUser.do'
@@ -655,7 +711,9 @@ class pgfCVClient():
 
     async def studios(self):
         # first get all the devices in the inventory
-        deviceInventory = config.globalInventory[int(config.currentPod)]
+        deviceInventory = config.globalInventory.get(int(config.currentPod), -1)
+        #if deviceInventory == -1:
+            #return
 
         cvpRacClient = CvpClient()
         cvpRacClient.connect(nodes=[self.server], username='', password='', is_cvaas=True, api_token=self.tok)
@@ -673,27 +731,34 @@ class pgfCVClient():
         expectCC = True
 
         if config.args.cvTest:
-            print(json.dumps(deviceInventory))
+            print("connected")
+            return
+
+            await self.smsUploadImage("./files/images/act-vEOS-4.29.7M.swi")
             return
 
             await self.doOAuthConfig(deviceInventory)
+            return
+
+        if config.args.cvAddImages:
+            await self.doAddImages()
             return
 
         if config.args.cvAddAdmins:
             await self.doAdminUsers()
             return
 
-        if config.args.addPackages:
+        if config.args.cvAddPackages:
             await self.doPackage("files/sleep_0.2.0.tar")
             await self.doPackage("files/cv-workshop_1.0.0.tar")
             return
 
-        if config.args.addCCStuff:
+        if config.args.cvAddCCStuff:
             await self.doActionBundles(grpcClient)
             await self.doTemplates(grpcClient)
             return
 
-        if config.args.cleanupNotifiers:
+        if config.args.cvCleanupNotifiers:
             await self.notificationReceiverCleanup(c)
             return
 

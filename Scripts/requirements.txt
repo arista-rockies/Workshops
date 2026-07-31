@@ -9,3 +9,4 @@ uvicorn
 fastapi[standard]
 watchfiles
 paramiko
+requests_toolbelt

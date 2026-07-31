@@ -1,8 +1,22 @@
-import tempfile
+import tempfile, argparse
 from modules import config
 from cloudvision.Connector.grpc_client import GRPCClient, create_query
 
 import json
+
+# this is a convenience class to set a 3rd variable to true, allowing
+#  us to figure out if we have any options set for a given module.
+#  this makes spawning the clients smarter
+class pgfAction(argparse.Action):
+    def __init__(self, option_strings, dest, module=None, **kwargs):
+        if module == None:
+            raise ValueError("must specify a module")
+        super().__init__(option_strings, dest, **kwargs)
+        self.module = module
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        setattr(namespace, self.dest, values)
+        setattr(namespace, self.module, True)
 
 class pgfInterface():
     _name: str

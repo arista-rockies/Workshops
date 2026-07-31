@@ -2,13 +2,23 @@ from modules import config
 import requests, json, re
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
+from modules.pgf import pgfAction
 
 #TODO: need to move the url to the token file
 
 class AgniClient():
     def configure():
-        config.parser.add_argument('-agniCleanup', default=False, action='store_true', help='do agni cleanup steps')
-        config.parser.add_argument('-agniTest', default=False, action='store_true', help='test new agni code')
+        def _addArgument(*args, **kwargs):
+            if kwargs.get('action', None) == 'store_true':
+                kwargs.pop('action')
+                kwargs["nargs"] = '?'
+                kwargs.setdefault("default", False)
+                kwargs.setdefault("const", True)
+
+            config.parser.add_argument(*args, action=pgfAction, module="agni", **kwargs)
+
+        _addArgument('-agniCleanup', default=False, action='store_true', help='do agni cleanup steps')
+        _addArgument('-agniTest', default=False, action='store_true', help='test new agni code')
 
     def __init__(self, token):
         self.token = token
@@ -146,6 +156,7 @@ class AgniClient():
 
     def execute(self):
         if config.args.agniTest:
+            print("inside agniTest")
             return
 
         if config.args.agniCleanup:

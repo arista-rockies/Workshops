@@ -1,6 +1,7 @@
 from modules import config
 import requests, argparse, json, yaml, time, paramiko, socks, urllib
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
+from modules.pgf import pgfAction
 
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
@@ -15,14 +16,24 @@ class actOptionsExeption(actException):
 
 class ActClient():
     def configure():
-        config.parser.add_argument('-actProxy', default=None, help='Set a socks proxy. defaults to None')
-        config.parser.add_argument('-actStartLab', action='store_true', default=False, help='start specified labs')
-        config.parser.add_argument('-actStopLab', action='store_true', default=False, help='stop specified labs')
-        config.parser.add_argument('-actUndeployLab', action='store_true', default=False, help='undeploy specified pods')
-        config.parser.add_argument('-actUpdateTopology', action='store_true', default=False, help='update the topology')
-        config.parser.add_argument('-actDeployLab', action='store_true', default=False, help='deploy and start the topology')
-        config.parser.add_argument('-actGetLab', action='store_true', default=False, help='print bootstrap ips')
-        config.parser.add_argument('-actSetupLinux', action='store_true', default=False, help='configure bootstrap')
+        def _addArgument(*args, **kwargs):
+            if kwargs.get('action', None) == 'store_true':
+                kwargs.pop('action')
+                kwargs["nargs"] = '?'
+                kwargs.setdefault("default", False)
+                kwargs.setdefault("const", True)
+
+            config.parser.add_argument(*args, action=pgfAction, module="act", **kwargs) 
+
+        _addArgument('-actProxy', default=None, help='Set a socks proxy. defaults to None')
+        _addArgument('-actStartLab', action='store_true', default=False, help='start specified labs')
+        _addArgument('-actStopLab', action='store_true', default=False, help='stop specified labs')
+        _addArgument('-actUndeployLab', action='store_true', default=False, help='undeploy specified pods')
+        _addArgument('-actUpdateTopology', action='store_true', default=False, help='update the topology')
+        _addArgument('-actDeployLab', action='store_true', default=False, help='deploy and start the topology')
+        _addArgument('-actGetLab', action='store_true', default=False, help='print bootstrap ips')
+        _addArgument('-actSetupLinux', action='store_true', default=False, help='configure bootstrap')
+        _addArgument('-actTest', action='store_true', default=False)
             
     def __init__(self, token):
         self.token = token
@@ -50,6 +61,14 @@ class ActClient():
         return False
 
     def execute(self):
+        if config.args.actTest:
+            while True:
+                resp = self.waitOnOperation('84af49feafa945738a321a5533db650f', sleep=10, timeout=None, statusChar=".", debug=True)
+                print(resp)
+                time.sleep(1)
+
+
+
         if config.args.actStartLab:
             self.doStartLab()
             return
@@ -178,6 +197,8 @@ class ActClient():
         return resp
 
     def waitOnOperation(self, id, sleep=10, timeout=None, statusChar=None, debug=False):
+        if debug:
+            print(id)
         while True:
             op = self.getOperation(id)
             if debug:
@@ -314,7 +335,7 @@ class ActClient():
             resp = self.deleteTopology(topology["id"])
             resp = self.waitOnOperation(resp["id"], sleep=10, timeout=None, statusChar=".")
 
-        newTopology = yaml.safe_load(s.replace("###", f"{config.currentPod:02}"))
+        newTopology = yaml.safe_load(s.replace("###", f"{config.currentPod:0>2}"))
         try:
             print(f"  creating topology {name}", end="", flush=True)
             resp = self.createTopology(name, newTopology)
@@ -332,7 +353,7 @@ class ActClient():
 
         print(f"  deploying lab {name}", end="", flush=True)
         resp = self.deployLab(labID)
-        resp = self.waitOnOperation(resp["id"], sleep=10, timeout=None, statusChar='!')
+        resp = self.waitOnOperation(resp["id"], sleep=10, timeout=None, statusChar='!', debug=True)
 
     def doUpdateTopology(self):
         try:
@@ -370,6 +391,10 @@ class ActClient():
         print(f"{config.currentPod} - doGetLab ")
         name = f'cv-workshop-pod{config.currentPod}'
         lab = self.getLabByName(name)
+        if not lab:
+            print("could not find lab, skipping")
+            return
+
         lab = self.getLabByID(lab['id'])
         # i want to print out the ip of the bootstrap boxes
         for dev in lab['devices']['generic']:
@@ -401,9 +426,19 @@ class ActClient():
                 else:
                     sock = None
 
+                print(f"   connecting to {host['internal_ip']} via ssh")
                 pmClient = paramiko.SSHClient()
                 pmClient.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-                pmClient.connect(host["internal_ip"], 22, sshUser, sshPassword, sock=sock)
+                connected = False
+                while not connected:
+                    try:
+                        pmClient.connect(host["internal_ip"], 22, sshUser, sshPassword, sock=sock)
+                        connected = True
+                        print("   connected", flush=True, end="\n")
+                    except:
+                        print(".", flush=True, end="")
+                        time.sleep(1)
+
                 scp = pmClient.open_sftp()
                 scp.put('tokenConfig.yml', '/home/administrator/tokenConfig.yml')
                 scp.put('setupACTGateway.sh', '/home/administrator/setupACTGateway.sh')
