@@ -18,7 +18,7 @@ echo "allow 192.168.0.0/22" >> /etc/chrony.conf
 
 # find my hostname and convert it to an int
 HOSTNAME=`hostname`
-POD=$((${HOSTNAME: -2}+0))
+POD=$((10#${HOSTNAME: -2}+0))
 
 cat << EOF > /usr/local/etc/bootstrap.conf
 POD=$POD
