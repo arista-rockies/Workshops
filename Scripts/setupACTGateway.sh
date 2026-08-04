@@ -167,6 +167,7 @@ iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
 
 iptables -F FORWARD
 iptables -I FORWARD -s 192.168.2.0/24 -j DROP
+iptables -A FORWARD -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --set-mss 800
 
 /usr/libexec/iptables/iptables.init save
 

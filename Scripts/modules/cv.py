@@ -80,6 +80,10 @@ class pgfCVClient():
         rootContainers = await c.get_studio_inputs(studio_id='studio-static-configlet', workspace_id=workspaceID)
 
         # let's loop over the array of roots and delete them
+        if not rootContainers:
+            print("there doesn't seem to be any scs config, skipping")
+            return
+
         for containerID in rootContainers["configletAssignmentRoots"]:
             await c.delete_configlet_container(
                 workspace_id=workspaceID,
@@ -457,7 +461,83 @@ class pgfCVClient():
         print(workspaces)
         pass
 
-    async def unprovisionDevices(self, c, cvpRacClient, deviceInventory):
+    async def unprovisionDevicesCV(self, c, cvpRacClient, deviceInventory):
+        print(f"{config.currentPod} - unprovisionDevices")
+        #finishedCCID = "EdIgccX4e84nQanTqu731"
+        #finishedChangeControl = await c.get_change_control(change_control_id=finishedCCID)
+
+        with open("files/campusWorkshopDecomTemplate.txt", "r") as f:
+            newCC = f.read()
+
+        ccID = str(uuid.uuid4())
+        rootID = str(uuid.uuid4())
+
+        rootStage = {
+            "name": "Change 2024-08-09-13-25-12 Root",
+            "rows": {
+                "values": [
+                    {
+                        "values": [ ]
+                    }
+                ]
+            }
+        }
+
+        cc = {
+            "key": { "id": ccID },
+            "change": {
+                "name": "finished",
+                "rootStageId": rootID,
+                "stages": {
+                    "values": {
+                        rootID: rootStage
+                    }
+                },
+                "notes": ""
+            }
+        }
+
+        stages = {}
+        devices = cvpRacClient.api.get_inventory(provisioned=False)
+        for device in devices:
+            deviceStageID = str(uuid.uuid4())
+            stages[deviceStageID] = {
+                "name": "Enter ZTP",
+                "action": {
+                    "name": "enterZTP",
+                    "timeout": 120,
+                    "args": {
+                        "values": {
+                            "DeviceID": device["serialNumber"]
+                        }
+                    }
+                },
+                "rows": {}
+            }
+            rootStage["rows"]["values"][0]["values"].append(deviceStageID)
+        
+        cc["change"]["stages"]["values"].update(stages)
+
+        url = f'{self.baseURL}/api/resources/changecontrol/v1/ChangeControlConfig'
+        resp = requests.post(url, json=cc, verify=False, timeout=300, headers={'Authorization': f'Bearer {self.tok}'})
+        resp.raise_for_status()
+
+        # from here on out, let's reconnect with the second token
+        #  this allows for us to complete even if four-eyes is set
+        c = pyavd._cv.client.CVClient(self.server, token=self.tok2)
+        c._connect()
+        print("executing the ztp change control")
+        await self.executeChangeControl(c, ccID, wait=False)
+
+        print("sleeping for 2m to hopefully give ztp time to kick in")
+        time.sleep(120)
+
+        devices = cvpRacClient.api.get_inventory(provisioned=False)
+        for device in devices:
+            print(f"decomming {device['hostname']}")
+            cvpRacClient.api.device_decommissioning(device["serialNumber"], str(uuid.uuid4()))
+
+    async def unprovisionDevicesCampus(self, c, cvpRacClient, deviceInventory):
         print(f"{config.currentPod} - unprovisionDevices")
         #finishedCCID = "EdIgccX4e84nQanTqu731"
         #finishedChangeControl = await c.get_change_control(change_control_id=finishedCCID)
@@ -711,7 +791,7 @@ class pgfCVClient():
 
     async def studios(self):
         # first get all the devices in the inventory
-        deviceInventory = config.globalInventory.get(int(config.currentPod), -1)
+        deviceInventory = config.globalInventory.get(str(int(config.currentPod)), -1)
         #if deviceInventory == -1:
             #return
 
@@ -732,6 +812,7 @@ class pgfCVClient():
 
         if config.args.cvTest:
             print("connected")
+            await self.unprovisionDevicesCV(c, cvpRacClient, deviceInventory)
             return
 
             await self.smsUploadImage("./files/images/act-vEOS-4.29.7M.swi")
@@ -823,7 +904,10 @@ class pgfCVClient():
 
             if config.args.cvCleanup:
                 #await self.deleteDevices(cvpRacClient)
-                await self.unprovisionDevices(c, cvpRacClient, deviceInventory)
+                if config.args.type.lower() == 'campus':
+                    await self.unprovisionDevicesCampus(c, cvpRacClient, deviceInventory)
+                elif config.args.type.lower() == 'cv':
+                    await self.unprovisionDevicesCV(c, cvpRacClient, deviceInventory)
 
     async def execute(self):
         await self.studios()

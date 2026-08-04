@@ -396,6 +396,10 @@ class ActClient():
             return
 
         lab = self.getLabByID(lab['id'])
+        if not lab.get('devices', None):
+            print("could not find any devices.  has this lab deployed?")
+            return
+
         # i want to print out the ip of the bootstrap boxes
         for dev in lab['devices']['generic']:
             if 'bootstrap' in dev['hostname']:
@@ -407,6 +411,10 @@ class ActClient():
         # not sure why getLabByName doesn't return devices but getLabByID does
         lab = self.getLabByName(name)
         l = self.getLabByID(lab["id"])
+        if not l.get("devices", None):
+            print("could not find any devices in this lab.  has it finished being deployed?")
+            return
+
         # i know the bootstrap box is a generic
         for host in l["devices"]["generic"]:
             if "bootstrap" in host["hostname"]:

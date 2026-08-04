@@ -83,6 +83,7 @@ config.parser.add_argument('-test', default=False, action='store_true', help='te
 config.parser.add_argument('-tokenFile', default="tokenConfig.yml", help="Contains the tokens we should use along with the defined pods")
 config.parser.add_argument('-pods', required=True, nargs='+', help='specify a space delimited list of pods to run against, by default all pods will be operated on')
 config.parser.add_argument('-i', default="2026CampusWorkshopHardware.csv", help="hardware inventory")
+config.parser.add_argument('-type', default='campus', help='type of workshop.  can be campus or cv')
 
 async def main():
     config.args = config.parser.parse_args()
