@@ -2,7 +2,7 @@ veos:
   # Define the global vEOS node parameters
   username: cvpadmin
   password: testeroni
-  version: 4.34.5M
+  version: 4.35.4M
 
 generic:
   version: rocky-8-10
@@ -53,6 +53,7 @@ nodes:
       serial_number: P###-CampusA-Leaf1-1
       node_type: veos
       ztp: true
+      version: 4.34.5M
 
   - P###-CampusA-ZTR:
       ip_addr: 192.168.2.40/22
