@@ -162,15 +162,6 @@ sed -i.save 's/iptables -I FORWARD -i tun0 -j ACCEPT/#&/g' /sbin/act-network-cre
 systemctl disable firewalld
 systemctl stop firewalld
 
-iptables -t nat -F POSTROUTING
-iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
-
-iptables -F FORWARD
-iptables -I FORWARD -s 192.168.2.0/24 -j DROP
-iptables -A FORWARD -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --set-mss 800
-
-/usr/libexec/iptables/iptables.init save
-
 systemctl daemon-reload
 systemctl enable kea-dhcp4 iptables bootstrap
 
@@ -213,6 +204,15 @@ mv /home/administrator/tokenConfig.yml /home/administrator/Projects/Workshops/Sc
 
 echo "chowning `date`"
 chown -R administrator:administrator /home/administrator/
+
+# at this point we should be able to run the iptables stuff
+iptables -t nat -F POSTROUTING
+iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+
+iptables -F FORWARD
+iptables -A FORWARD -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --set-mss 800
+
+bash workshopIPTables.sh add
 
 echo "trying reboot `date`"
 /sbin/shutdown -r +1 rebooting in 1m

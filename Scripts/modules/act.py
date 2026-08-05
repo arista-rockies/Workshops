@@ -34,6 +34,8 @@ class ActClient():
         _addArgument('-actGetLab', action='store_true', default=False, help='print bootstrap ips')
         _addArgument('-actSetupLinux', action='store_true', default=False, help='configure bootstrap')
         _addArgument('-actTest', action='store_true', default=False)
+        _addArgument('-actAddBlock', action='store_true', default=False)
+        _addArgument('-actDelBlock', action='store_true', default=False)
             
     def __init__(self, token):
         self.token = token
@@ -67,7 +69,13 @@ class ActClient():
                 print(resp)
                 time.sleep(1)
 
+        if config.args.actAddBlock:
+            self.doAddIPTables()
+            return
 
+        if config.args.actDelBlock:
+            self.doDelIPTables()
+            return
 
         if config.args.actStartLab:
             self.doStartLab()
@@ -405,6 +413,61 @@ class ActClient():
             if 'bootstrap' in dev['hostname']:
                 print(f"{dev['hostname']}: {dev['internal_ip']}")
 
+    def _setupSSH(self, ip, sshUser, sshPassword):
+        # https://stackoverflow.com/questions/47441351/using-paramiko-with-socks-proxy
+        sock = None
+        if self.proxies:
+            s = urllib.parse.urlsplit(self.proxies["http"])
+            sock = socks.socksocket()
+            sock.set_proxy(
+                proxy_type=socks.SOCKS5,
+                addr=s.hostname,
+                port=s.port
+            )
+            sock.connect((ip, 22))
+
+        print(f"   connecting to {ip} via ssh")
+        pmClient = paramiko.SSHClient()
+        pmClient.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        connected = False
+        while not connected:
+            try:
+                pmClient.connect(ip, 22, sshUser, sshPassword, sock=sock)
+                connected = True
+                print("   connected", flush=True, end="\n")
+                return pmClient
+            except Exception as e:
+                print(".", flush=True, end="")
+                time.sleep(1)
+
+        raise Exception(f'could not connect to {ip}')
+
+    def _iptables(self, operation):
+        if operation in ["add", "del"]:
+            print(f"{config.currentPod} - {operation}IPTables")
+            name = f'cv-workshop-pod{config.currentPod}'
+            # not sure why getLabByName doesn't return devices but getLabByID does
+            lab = self.getLabByName(name)
+            l = self.getLabByID(lab["id"])
+            if not l.get("devices", None):
+                print("could not find any devices in this lab.  has it finished being deployed?")
+                return
+
+            # i know the bootstrap box is a generic
+            for host in l["devices"]["generic"]:
+                if "bootstrap" in host["hostname"]:
+                    sshUser = "administrator"
+                    sshPassword = self.token["act"]["sshPassword"]
+                    pmClient = self._setupSSH(host["internal_ip"], sshUser, sshPassword)
+
+                    pmClient.exec_command(f"sudo bash workshopIPTables.sh {operation}")
+
+    def doAddIPTables(self):
+        self._iptables("add")
+
+    def doDelIPTables(self):
+        self._iptables("del")
+
     def doSetupLinux(self):
         print(f"{config.currentPod} - doSetupLinux ")
         name = f'cv-workshop-pod{config.currentPod}'
@@ -420,37 +483,14 @@ class ActClient():
             if "bootstrap" in host["hostname"]:
                 sshUser = "administrator"
                 sshPassword = self.token["act"]["sshPassword"]
-
-                # https://stackoverflow.com/questions/47441351/using-paramiko-with-socks-proxy
-                if self.proxies:
-                    s = urllib.parse.urlsplit(self.proxies["http"])
-                    sock = socks.socksocket()
-                    sock.set_proxy(
-                        proxy_type=socks.SOCKS5,
-                        addr=s.hostname,
-                        port=s.port
-                    )
-                    sock.connect((host["internal_ip"], 22))
-                else:
-                    sock = None
-
-                print(f"   connecting to {host['internal_ip']} via ssh")
-                pmClient = paramiko.SSHClient()
-                pmClient.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-                connected = False
-                while not connected:
-                    try:
-                        pmClient.connect(host["internal_ip"], 22, sshUser, sshPassword, sock=sock)
-                        connected = True
-                        print("   connected", flush=True, end="\n")
-                    except:
-                        print(".", flush=True, end="")
-                        time.sleep(1)
+                pmClient = self._setupSSH(host["internal_ip"], sshUser, sshPassword)
 
                 scp = pmClient.open_sftp()
                 scp.put('tokenConfig.yml', '/home/administrator/tokenConfig.yml')
                 scp.put('setupACTGateway.sh', '/home/administrator/setupACTGateway.sh')
+                scp.put('workshopIPTables.sh', '/home/administrator/workshopIPTables.sh')
                 scp.chmod('/home/administrator/setupACTGateway.sh', 0o700)
+                scp.chmod('/home/administrator/workshopIPTables.sh', 0o700)
 
                 pmClient.exec_command("sudo setenforce Permissive")
                 stdin, stdout, stderr = pmClient.exec_command("sudo -S /home/administrator/setupACTGateway.sh", get_pty=True)
@@ -460,12 +500,5 @@ class ActClient():
                     print(line, end="")
 
                 pmClient.close()
-
-                #output = stdout.read().decode('utf-8')
-                #error = stderr.read().decode('utf-8')
-
-                #print(output)
-                #print("--")
-                #print(error)
 
 
