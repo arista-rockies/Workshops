@@ -2,8 +2,13 @@ from modules import config
 import requests, argparse, json, yaml, time, paramiko, socks, urllib
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from modules.pgf import pgfAction
+from enum import Enum
 
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
+
+class LabState(Enum):
+    RUNNING = 2
+    STOPPED = 4
 
 class actException(Exception):
     pass
@@ -300,14 +305,14 @@ class ActClient():
 
         name = f"cv-workshop-pod{config.currentPod}"
         lab = self.getLabByName(name)
-        if lab["state"] == 2:
+        if LabState(lab["state"]) == LabState.RUNNING:
             self.stopLab(lab["id"])
 
     def doStartLab(self):
         print(f"{config.currentPod} - doStartLab")
         name = f"cv-workshop-pod{config.currentPod}"
         lab = self.getLabByName(name)
-        if lab["state"] == 4:
+        if LabState(lab["state"]) == LabState.STOPPED:
             res = self.startLab(lab["id"])
 
     def doUndeployLab(self):
@@ -408,6 +413,7 @@ class ActClient():
             print("could not find any devices.  has this lab deployed?")
             return
 
+        print(LabState(lab["state"]))
         # i want to print out the ip of the bootstrap boxes
         for dev in lab['devices']['generic']:
             if 'bootstrap' in dev['hostname']:
