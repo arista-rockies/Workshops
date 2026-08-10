@@ -1,4 +1,4 @@
-import argparse, yaml
+import argparse, yaml, csv
 
 # not a huge fan, but i'm out of time
 def findDeviceBySerial(deviceInventory, sn):
