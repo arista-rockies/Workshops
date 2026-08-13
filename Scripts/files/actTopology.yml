@@ -55,14 +55,6 @@ nodes:
       ztp: true
       version: 4.34.5M
 
-  - P###-CampusA-ZTR:
-      ip_addr: 192.168.2.40/22
-      device_model: 720XP-24Y6
-      system_mac_address: 00:1c:73:###:02:40
-      serial_number: P###-CampusA-ZTR-
-      node_type: veos
-      ztp: true
-
   - P###-CampusA-Leaf2:
       ip_addr: 192.168.1.35/22
       device_model: 720XP-24Y6
@@ -128,6 +120,15 @@ nodes:
       node_type: veos
       ztp: true
 
+  - P###-CampusB-ZTR:
+      ip_addr: 192.168.2.40/22
+      device_model: 720XP-24Y6
+      system_mac_address: 00:1c:73:###:02:40
+      serial_number: P###-CampusB-ZTR
+      node_type: veos
+      ztp: true
+
+
   - P###-CampusB-Host1:
       ip_addr: 192.168.2.36/22
       device_model: 720XP-24Y6
@@ -168,14 +169,14 @@ links:
     - P###-CampusA-Spine2:Ethernet3
     - P###-CampusA-Leaf2:Ethernet2
   - connection:
-    - P###-CampusA-Leaf1A:Ethernet6
-    - P###-CampusA-Leaf1-1:Ethernet3
+    - P###-CampusA-Leaf1A:Ethernet5
+    - P###-CampusA-Leaf1-1:Ethernet1
   - connection:
-    - P###-CampusA-Leaf1B:Ethernet6
-    - P###-CampusA-Leaf1-1:Ethernet4
+    - P###-CampusA-Leaf1B:Ethernet5
+    - P###-CampusA-Leaf1-1:Ethernet2
   - connection:
-    - P###-CampusA-Leaf1-1:Ethernet8
-    - P###-CampusA-ZTR:Ethernet2
+    - P###-CampusA-Leaf1-1:Ethernet7
+    - P###-CampusA-Host1:Ethernet1
 
   - connection:
     - P###-CampusB-Spine1:Ethernet1
@@ -213,6 +214,12 @@ links:
   - connection:
     - P###-CampusB-Spine2:Ethernet3
     - P###-CampusB-Leaf2:Ethernet2
+  - connection:
+    - P###-CampusB-Spine1:Ethernet4
+    - P###-CampusB-ZTR:Ethernet1
+  - connection:
+    - P###-CampusB-Spine2:Ethernet4
+    - P###-CampusB-ZTR:Ethernet2
   - connection:
     - P###-CampusB-Leaf1-1:Ethernet7
     - P###-CampusB-Host1:Ethernet1
