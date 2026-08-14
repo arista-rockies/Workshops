@@ -22,6 +22,7 @@ apiToken:
         "key1": "serviceAccountToken1"
         "key2": "serviceAccountToken2"
       "act":
+        "resourceName": "formatString of lab resources:  eg: cv-workshop-pod{}"
         "server": "ce.act.arista.com"
         "key": "actKey"
         "sshPassword": ""
@@ -43,10 +44,14 @@ apiToken:
         "orgid": "agniOrgID"
       "velo":
         "tenant": "Rockies Workshop"
+        "keyid": ""
         "key": "velokey"
         "url": "https://veloVCO.com"
         "sshPassword": "formatStringOfPassword"
+        "enterpriseID": int
+        "enterpriseLogicalID": uuid4
       "act":
+        "resourceName": "formatString of lab resources:  eg: cv-workshop-pod{}"
         "server": "ce.act.arista.com"
         "key": "actKey"
         "sshPassword": ""
