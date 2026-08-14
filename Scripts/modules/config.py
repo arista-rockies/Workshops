@@ -15,6 +15,7 @@ def findDeviceByName(self, deviceInventory, hostname):
 
 def loadInventory():
     if args.i != "act":
+        print(f"loading non-act inventory {args.i}")
         with open(args.i, "r") as f:
             for device in csv.DictReader(f):
                 if device['Model'][0] not in ['A', 'V']:
@@ -27,7 +28,7 @@ def loadInventory():
                 device["software"] = device["Software Version"]
 
                 if device['Model'][0] == 'A':
-                    podNum = int(device["CVaaS and CV-CUE Pod Assignment"][-2:])
+                    podNum = device["CVaaS and CV-CUE Pod Assignment"][-2:]
                     device["pod"] = podNum
 
                     p = globalInventory.setdefault(podNum, [])
