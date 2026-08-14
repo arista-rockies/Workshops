@@ -56,9 +56,10 @@ class ActClient():
         self.connected = False
         self.topologies = None
         self.labs = None
+        self.resourceName = token["act"]["resourceName"]
 
         self.connect()
-        labs = self.getLabs(nameFilter="cv-workshop-pod")
+        labs = self.getLabs(nameFilter=self.resourceName.format("")) # our filter is a startsWith.  just string substitute empty
 
     def _findByName(self, lst, name):
         for i in lst:
@@ -303,21 +304,21 @@ class ActClient():
     def doStopLab(self):
         print(f"{config.currentPod} - doStopLab")
 
-        name = f"cv-workshop-pod{config.currentPod}"
+        name = self.resourceName.format(config.currentPod)
         lab = self.getLabByName(name)
         if LabState(lab["state"]) == LabState.RUNNING:
             self.stopLab(lab["id"])
 
     def doStartLab(self):
         print(f"{config.currentPod} - doStartLab")
-        name = f"cv-workshop-pod{config.currentPod}"
+        name = self.resourceName.format(config.currentPod)
         lab = self.getLabByName(name)
         if LabState(lab["state"]) == LabState.STOPPED:
             res = self.startLab(lab["id"])
 
     def doUndeployLab(self):
         print(f"{config.currentPod} - doUndeployLab")
-        name = f"cv-workshop-pod{config.currentPod}"
+        name = self.resourceName.format(config.currentPod)
         lab = self.getLabByName(name)
         self.undeployLab(lab["id"])
 
@@ -334,7 +335,7 @@ class ActClient():
         self.getTopologies()
 
         print(f"{config.currentPod} - doDeployAndStart ")
-        name = f'cv-workshop-pod{config.currentPod}'
+        name = self.resourceName.format(config.currentPod)
 
         lab = self.getLabByName(name)
         if lab:
@@ -378,7 +379,7 @@ class ActClient():
             return
 
         topologies = self.getTopologies()
-        name = f'cv-workshop-pod{config.currentPod}'
+        name = self.resourceName.format(config.currentPod)
         topology = self._findByName(topologies["result"], name)
 
         if not topology:
@@ -387,7 +388,7 @@ class ActClient():
 
         print(f"{config.currentPod} - doUpdateTopology ")
 
-        newTopology = yaml.safe_load(s.replace("###", str(pod)))
+        newTopology = yaml.safe_load(s.replace("###", f"{config.currentPod:0>2}"))
         try:
 
             print(f"  updating topology ", end="", flush=True)
@@ -402,7 +403,7 @@ class ActClient():
 
     def doGetLab(self):
         print(f"{config.currentPod} - doGetLab ")
-        name = f'cv-workshop-pod{config.currentPod}'
+        name = self.resourceName.format(config.currentPod)
         lab = self.getLabByName(name)
         if not lab:
             print("could not find lab, skipping")
@@ -451,7 +452,7 @@ class ActClient():
     def _iptables(self, operation):
         if operation in ["add", "del"]:
             print(f"{config.currentPod} - {operation}IPTables")
-            name = f'cv-workshop-pod{config.currentPod}'
+            name = self.resourceName.format(config.currentPod)
             # not sure why getLabByName doesn't return devices but getLabByID does
             lab = self.getLabByName(name)
             l = self.getLabByID(lab["id"])
@@ -476,7 +477,7 @@ class ActClient():
 
     def doSetupLinux(self):
         print(f"{config.currentPod} - doSetupLinux ")
-        name = f'cv-workshop-pod{config.currentPod}'
+        name = self.resourceName.format(config.currentPod)
         # not sure why getLabByName doesn't return devices but getLabByID does
         lab = self.getLabByName(name)
         l = self.getLabByID(lab["id"])
