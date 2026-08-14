@@ -39,8 +39,9 @@ class ActClient():
         _addArgument('-actGetLab', action='store_true', default=False, help='print bootstrap ips')
         _addArgument('-actSetupLinux', action='store_true', default=False, help='configure bootstrap')
         _addArgument('-actTest', action='store_true', default=False)
-        _addArgument('-actAddBlock', action='store_true', default=False)
-        _addArgument('-actDelBlock', action='store_true', default=False)
+        _addArgument('-actResetBlocks', action='store_true', default=False)
+        _addArgument('-actUnBlockCampusB', action='store_true', default=False)
+        _addArgument('-actUnBlockZTR', action='store_true', default=False)
             
     def __init__(self, token):
         self.token = token
@@ -75,12 +76,16 @@ class ActClient():
                 print(resp)
                 time.sleep(1)
 
-        if config.args.actAddBlock:
-            self.doAddIPTables()
+        if config.args.actResetBlocks:
+            self._iptables("reset")
             return
 
-        if config.args.actDelBlock:
-            self.doDelIPTables()
+        if config.args.actUnBlockCampusB:
+            self._iptables("unBlockCampusB")
+            return
+
+        if config.args.actUnblockZTR:
+            self._iptables("unBlockZTR")
             return
 
         if config.args.actStartLab:
@@ -450,7 +455,7 @@ class ActClient():
         raise Exception(f'could not connect to {ip}')
 
     def _iptables(self, operation):
-        if operation in ["add", "del"]:
+        if operation in ["reset", "blockAll", "unBlockAll", "unBlockCampusB", "unBlockZTR"]:
             print(f"{config.currentPod} - {operation}IPTables")
             name = self.resourceName.format(config.currentPod)
             # not sure why getLabByName doesn't return devices but getLabByID does
@@ -468,12 +473,6 @@ class ActClient():
                     pmClient = self._setupSSH(host["internal_ip"], sshUser, sshPassword)
 
                     pmClient.exec_command(f"sudo bash workshopIPTables.sh {operation}")
-
-    def doAddIPTables(self):
-        self._iptables("add")
-
-    def doDelIPTables(self):
-        self._iptables("del")
 
     def doSetupLinux(self):
         print(f"{config.currentPod} - doSetupLinux ")

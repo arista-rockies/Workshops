@@ -19,6 +19,7 @@ echo "allow 192.168.0.0/22" >> /etc/chrony.conf
 # find my hostname and convert it to an int
 HOSTNAME=`hostname`
 POD=$((10#${HOSTNAME: -2}+0))
+PODPAD=${HOSTNAME: -2}
 
 cat << EOF > /usr/local/etc/bootstrap.conf
 POD=$POD
@@ -80,7 +81,7 @@ cat <<EOF > /etc/kea/kea-dhcp4.conf
     "client-classes": [
         {
             "name": "CampusB",
-            "test": "(substring(option[60].hex,26,1) == 'B') or (substring(option[60].hex,28,1) == 'Z')"
+            "test": "(substring(option[60].hex,26,1) == 'B')"
         },
         {
             "name": "CampusA",
@@ -124,6 +125,16 @@ cat <<EOF > /etc/kea/kea-dhcp4.conf
                 {
                     "pool": "192.168.2.100 - 192.168.2.120",
                     "client-class": "CampusB"
+                }
+            ],
+            "reservations": [
+                {
+                    "client-id": "001c73${PODPAD}0235",
+                    "ip-address": "192.168.3.35"
+                },
+                {
+                    "client-id": "001c73${PODPAD}0240",
+                    "ip-address": "192.168.3.40"
                 }
             ],
 
@@ -181,6 +192,8 @@ sudo -i -u administrator bash << EOF
 	echo "cloning `date`"
 	git clone https://github.com/arista-rockies/Workshops
 
+	git checkout fatpeltscripting
+
 	echo "installing uv `date`"
 	# install uv as this is the easiest way to get a recent python
 	curl -LsSf https://astral.sh/uv/install.sh | sh
@@ -205,14 +218,28 @@ mv /home/administrator/tokenConfig.yml /home/administrator/Projects/Workshops/Sc
 echo "chowning `date`"
 chown -R administrator:administrator /home/administrator/
 
+# these values are hard set in the dhcp config higher up
+L2=192.168.3.35
+ZTR=192.168.3.40
+CAMPUSB=192.168.2.0/24
+
 # at this point we should be able to run the iptables stuff
 iptables -t nat -F POSTROUTING
 iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
 
+# set up some new chains to make rule changes easier and keep the order right
+iptables -N campusb
+iptables -N leaf2
+iptables -N ztr
+
 iptables -F FORWARD
+iptables -A FORWARD -s ${CAMPUSB} -j campusb
+iptables -A FORWARD -s ${L2} -j leaf2
+iptables -A FORWARD -s ${ZTR} -j ztr
+# make sure to clamp mss so TA won't have issues later
 iptables -A FORWARD -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --set-mss 800
 
-bash workshopIPTables.sh add
+bash workshopIPTables.sh reset
 
 echo "trying reboot `date`"
 /sbin/shutdown -r +1 rebooting in 1m
