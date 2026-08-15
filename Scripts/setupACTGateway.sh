@@ -192,6 +192,7 @@ sudo -i -u administrator bash << EOF
 	echo "cloning `date`"
 	git clone https://github.com/arista-rockies/Workshops
 
+        cd Workshops
 	git checkout fatpeltscripting
 
 	echo "installing uv `date`"
@@ -200,7 +201,7 @@ sudo -i -u administrator bash << EOF
 
 	# configure uv
 	echo "configuring uv `date`"
-	cd Workshops/Scripts
+	cd ~/Projects/Workshops/Scripts
 	uv python install 3.14.0
 	uv python pin 3.14.0
 	uv venv --clear

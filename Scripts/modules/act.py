@@ -84,7 +84,7 @@ class ActClient():
             self._iptables("unBlockCampusB")
             return
 
-        if config.args.actUnblockZTR:
+        if config.args.actUnBlockZTR:
             self._iptables("unBlockZTR")
             return
 
@@ -406,24 +406,28 @@ class ActClient():
             print("!")
             return
 
-    def doGetLab(self):
-        print(f"{config.currentPod} - doGetLab ")
+    def doGetLab(self, quiet=False):
+        if not quiet:
+            print(f"{config.currentPod} - doGetLab ")
+
         name = self.resourceName.format(config.currentPod)
         lab = self.getLabByName(name)
         if not lab:
             print("could not find lab, skipping")
-            return
+            return None
 
         lab = self.getLabByID(lab['id'])
         if not lab.get('devices', None):
-            print("could not find any devices.  has this lab deployed?")
-            return
+            if not quiet:
+                print("could not find any devices.  has this lab deployed?")
+            return None
 
         print(LabState(lab["state"]))
         # i want to print out the ip of the bootstrap boxes
         for dev in lab['devices']['generic']:
             if 'bootstrap' in dev['hostname']:
                 print(f"{dev['hostname']}: {dev['internal_ip']}")
+        return True
 
     def _setupSSH(self, ip, sshUser, sshPassword):
         # https://stackoverflow.com/questions/47441351/using-paramiko-with-socks-proxy
@@ -477,6 +481,13 @@ class ActClient():
     def doSetupLinux(self):
         print(f"{config.currentPod} - doSetupLinux ")
         name = self.resourceName.format(config.currentPod)
+
+        while not self.doGetLab(quiet=True):
+            print(".", flush=True, end="")
+            time.sleep(10)
+
+        print("", flush=True)
+
         # not sure why getLabByName doesn't return devices but getLabByID does
         lab = self.getLabByName(name)
         l = self.getLabByID(lab["id"])
