@@ -38,6 +38,7 @@ class ActClient():
         _addArgument('-actDeployLab', action='store_true', default=False, help='deploy and start the topology')
         _addArgument('-actGetLab', action='store_true', default=False, help='print bootstrap ips')
         _addArgument('-actSetupLinux', action='store_true', default=False, help='configure bootstrap')
+        _addArgument('-actUpdateLinux', action='store_true', default=False, help='configure bootstrap')
         _addArgument('-actTest', action='store_true', default=False)
         _addArgument('-actResetBlocks', action='store_true', default=False)
         _addArgument('-actUnBlockCampusB', action='store_true', default=False)
@@ -105,6 +106,9 @@ class ActClient():
             return
         if config.args.actGetLab:
             self.doGetLab()
+            return
+        if config.args.actUpdateLinux:
+            self.doUpdateLinux()
             return
         if config.args.actSetupLinux:
             self.doSetupLinux()
@@ -518,4 +522,34 @@ class ActClient():
 
                 pmClient.close()
 
+    def doUpdateLinux(self):
+        print(f"{config.currentPod} - doUpdateLinux ")
+        name = self.resourceName.format(config.currentPod)
 
+        while not self.doGetLab(quiet=True):
+            print(".", flush=True, end="")
+            time.sleep(10)
+
+        print("", flush=True)
+
+        # not sure why getLabByName doesn't return devices but getLabByID does
+        lab = self.getLabByName(name)
+        l = self.getLabByID(lab["id"])
+        if not l.get("devices", None):
+            print("could not find any devices in this lab.  has it finished being deployed?")
+            return
+
+        # i know the bootstrap box is a generic
+        for host in l["devices"]["generic"]:
+            if "bootstrap" in host["hostname"]:
+                sshUser = "administrator"
+                sshPassword = self.token["act"]["sshPassword"]
+                pmClient = self._setupSSH(host["internal_ip"], sshUser, sshPassword)
+
+                stdin, stdout, stderr = pmClient.exec_command("cd Projects/Workshops/Scripts/ && git pull && sudo systemctl restart bootstrap", get_pty=True)
+
+                # if we don't read the redirects then the con will terminate and stop the script
+                for line in iter(stdout.readline, ""):
+                    print(line, end="")
+
+                pmClient.close()
