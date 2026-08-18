@@ -41,8 +41,8 @@ class ActClient():
         _addArgument('-actUpdateLinux', action='store_true', default=False, help='configure bootstrap')
         _addArgument('-actTest', action='store_true', default=False)
         _addArgument('-actResetBlocks', action='store_true', default=False)
-        _addArgument('-actUnBlockCampusB', action='store_true', default=False)
-        _addArgument('-actUnBlockZTR', action='store_true', default=False)
+        _addArgument('-actUnblockCampusB', action='store_true', default=False)
+        _addArgument('-actUnblockZTR', action='store_true', default=False)
             
     def __init__(self, token):
         self.token = token
@@ -81,11 +81,11 @@ class ActClient():
             self._iptables("reset")
             return
 
-        if config.args.actUnBlockCampusB:
+        if config.args.actUnblockCampusB:
             self._iptables("unBlockCampusB")
             return
 
-        if config.args.actUnBlockZTR:
+        if config.args.actUnblockZTR:
             self._iptables("unBlockZTR")
             return
 
