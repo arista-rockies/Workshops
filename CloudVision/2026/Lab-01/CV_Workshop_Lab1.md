@@ -36,15 +36,15 @@ In this lab we will onboard devices to the **Inventory and Topology Studio**. Th
 The following is all of the information that you will need complete this lab. Feel free to name your devices as you see fit. Understand the hostnames will be used to identify devices in later labs.
 
 
-|**DeviceID**| **HOSTNAME** |
+|**HOSTNAME**| **DEVICE ID** |
 | :----------: | :------------: |
 | CampusA-Spine1 |	P[$POD#]-CampusA-Spine1 |
 | CampusA-Spine2 |	P[$POD#]-CampusA-Spine2 |
 | CampusA-Leaf1a |	P[$POD#]-CampusA-Leaf1A |
 | CampusA-Leaf1b |	P[$POD#]-CampusA-Leaf1B |
-| CampusA-Leaf1-1|	P[$POD#]-CampusA-Leaf1-1 |
-| CampusA-Leaf2 |	P[$POD#]-CampusA-Leaf2 |
-| CampusA-Host1 |	P[$POD#]-CampusA-Host1 |
+| CampusA-Leaf1c|	P[$POD#]-CampusA-Leaf1C |
+| CampusA-Leaf2a |	P[$POD#]-CampusA-Leaf2A |
+
 
 
 ## Lab Steps:
@@ -62,25 +62,29 @@ The following is all of the information that you will need complete this lab. Fe
 
 4. Select all of the ZTP'd devices with an **Update** status of **Device Added**. Select all device and select **Accept Updates**
 
-![I&T Network Updates](images/iandt-accept.png)
+![I&T Network Updates](images/iandt-accept1.png)
 
-5. Return to the the **Registered Devices** tab
+5. Select **Accept**
+
+![I&T Network Updates](images/iandt-accept2.png)
+
+6. Return to the the **Registered Devices** tab
 
 ![I&T Network Registered Devices](images/iandt-reg-dev.png)
 
-6. The lab devices that are currently in ZTP will now be shown under the registered devices. In the **Hostname** field for each device add the intended hostnaem for the device.
+7. The lab devices that are currently in ZTP will now be shown under the registered devices. In the **Hostname** field for each device add the intended hostnaem for the device.
 
-[!NOTE]
-We will be utilizing Universal Cloud Network Architecture to identify devices type in future lab guides (Leaf, Spine, Member Leaf, Border Leaf), so try and make it easy for yourself to identify those device types in your naming convention.
+> [!NOTE]
+> We will be utilizing Universal Cloud Network Architecture to identify devices type in future lab guides (Leaf, Spine, Member Leaf, Border Leaf), so try and make it easy for yourself to identify those device types in your naming convention.
 
 ![I&T Hostnames](images/iandt-hostnames.png)
 
-7. After you have updated the **Hostname** value for each device, we now need to save these changes to CloudVision. Select the **Clipboard** icon in the Workspace Island toolbar in the bottom center of your screen.
+8. After you have updated the **Hostname** value for each device, we now need to save these changes to CloudVision. Select the **Clipboard** icon in the Workspace Island toolbar in the bottom center of your screen.
 
 ![Workspace Island Review](images/iandt-hostnames.png)
 
 
-8. After the workspace builds, there should be no device configuration changes within the lab. However, we have added the devices to the Inventory and Topology Studio. We will **Submit Workspace** to save those changes.
+9. After the workspace builds, there should be no device configuration changes within the lab. However, we have added the devices to the Inventory and Topology Studio. We will **Submit Workspace** to save those changes.
 
 ![Submit Workspace](images/iandt-submit.png)
 
