@@ -1,83 +1,142 @@
-# CloudVision Lab 02
-## Static Configuration Studio
+# CloudVision Lab 01
+## Inventory and Topology
 ![CloudVision](images/cv-logo.png)
 
 ## This Lab Guide:
 
-[CloudVision Workshop Lab Guide 02- Inventory and Topology ](NEEDLINK!!!!)
+[CloudVision Workshop Lab Guide 01 - Inventory and Topology](https://github.com/arista-rockies/Workshops/blob/main/CloudVision/2026/Lab-01/CV_Workshop_Lab1.md)
 
 ---
 
 ## Table of Contents
 1. [Lab Topology](#1-lab-topology)
-2. [Lab Topology](#2-accessing-lab)
-
+2. [Accessing the Lab](#2-accessing-the-lab)
+3. [Lab Details](#3-lab-details)
 
 ---
 
 # 1. Lab Topology
 
-![Full Lab Topology](images/lab-topology.png)
+![Full Lab Topology](images/a-topology.png)
 
 ---
-# 2. Accessing Lab
 
-# 3. Accessing CloudVision as a Service
+# 2. Accessing the Lab
 
+VERY ELABORATE LOGIN SECTION TO FOLLOW - Need to verify how we are doing this first. Here is a picture of a dog as a placeholder.
 
-# 4. Static Configuration Studio
-The static configuration studio allows you to apply static configuration "configlets" to devices. Configlets can be assigned directly to a device or to a container. Containers are arranged in a hierarchical structure. This allows devices lower in the heirarchy to inherit all off the configlets applied in containers higher in the heirarchy. The end result is the complete designed configuration of the device within the static configuration studio. 
+![Login](images/login-1.png)
 
-There is not right or wrong way to design this heirarchy and each organization may have a different methodolgy to accomplish this. 
-# 5. Lab Exercise
-1. Navigate to Provisioning > Studios
+---
+
+# 3. Lab Details
+
+## Lab Overview
+In this lab, we will utilize the **Static Configuration Studio** to apply a base and management configuration to the devices in Campus A.
+
+## Static Configuration Studio
+The Static Configuration Studio allows you to apply static configuration "configlets" to devices. Configlets can be assigned directly to a device or to a container. Containers are arranged in a hierarchical structure. This allows devices lower in the hierarchy to inherit all of the configlets applied to containers higher in the hierarchy. The end result is the complete designed configuration of the device within the Static Configuration Studio.
+
+There is no right or wrong way to design this hierarchy, and each organization may have a different methodology to accomplish this.
+
+## Lab Steps:
+
+1. Navigate to **Provisioning > Studios**
+
+![Studio Navigation](images/studio-nav.png)
 
 2. Select the **Static Configuration Studio**
 
-3. Begin your Heirarchy design by selecting **+Configuration Container**
-  - Create a Tagging Structure using Key Vlaue : Pair
-    - The Key:Value Tag by default will be the name of the container you create.
+![Static Configuration Studio](images/scs.png)
 
-  - Develop your own heirarchy how you see fit. In this environment there is only a base configuration that all apply to all devices in CampusA and a unique configlet that will be applied to each device. Below are 2 examples that accomplish the same end result. Developing a more in depth heirarchy provides additional locations that configuration could be applied.
-  *NOTE: Avoid using the Devices:All Tag in your heirarchy as we will have CampusB that will not utilize the static configuration studio.*
+3. Begin your hierarchy design by selecting **+Configuration Container**
 
-4. After you have created your heirarchy structure;
-  - Selec the root container
-  - On the right side of the screen select **+Configlet**
-  - Select **Configlet Library**
-  - Locate and Select the configlet **CampuA_Base**.
-  - Select **Assign**
+![Static Configuration Container](images/scs-container.png)
 
-5. Assign all devices to their intended containers.
-  - locate the container that each device belongs under. 
-  - In each devices container select the **3 dots**. Then select **Add Device**
-  - All Devices that have been registered in the Inventory and Topology Studio are available for selection
-  - Select the device(s) that will be added under that container in the heirarchy. Select **Add**
-  - Ensure that every device in CampusA is associated with the Base Configlet 
+4. Create a **Custom Tag** of **Workshop:CampusA** to be used in your hierarchy structure. Select **+ Create**
 
-  6. Accomplish the following for each device within CampusA
-   - Select the device. 
-   - Select **+ Configlet**
-     - Select **Configlet Library**
-   - The per device configlets have been named based on the serial number of the device. Locate the **mgmt_$Device** configlet to associate to your device.
-   *Note: This is going to update the hostname. If you are so inclinded to use your own hostnames you can edit the hostname field in each device specific configlet*
-   
-   7.After all devices have their per device configlet and base configlet associated, select the **Clipboard Icon**
+![Static Configuration Workshop Tag](images/scs-ws-tag.png)
 
-   8. After the Workspace has finished building, review the configuration proposed. 
+5. Develop your own hierarchy as you see fit.
+   - Below are 2 examples that accomplish the same end result within our lab. Developing a more in-depth hierarchy provides additional locations where shared configuration can be applied.
 
-   9. After you have reviewed the proposed configuration, select **Submit Workspace**
+  > [!NOTE]
+  > DO NOT USE the **Devices:All** tag in your hierarchy, as we will have Campus B devices that will not utilize the Static Configuration Studio.
 
-   10. Select **View Change Control**
+![Static Configuration Workshop Hierarchy](images/scs-heirarchy-options.png)
 
-   11. You are now presented with a change control that will push the configuration to the devices. 
 
-   12. Select **Review and Approve**
+6. After you have created your hierarchy structure:
+   - Select the container **Workshop:CampusA**
+   - On the right side of the screen, select **+Configlet**
+   - Select **Configlet Library**
 
-   13. Select **Approve and Execute**
+![Static Configuration Add Base Configlet](images/ws-add-configlet.png)
 
-   14. The devices taken out of Zero Touch Provisioning mode and will relaod. After they have relaoded (may take a few minutes). 
+7. Locate and select the configlet **CampusA_Base**.
+    - Select **Assign**
 
+![Static Configuration Assign Base Configlet](images/ws-assign-configlet.png)    
+
+
+8. Assign all devices to their intended containers.
+   - Locate the device's intended container.
+   - Select the **3 dots** next to the container.
+   - Select **Add Device**
+
+ ![Static Configuration Add Device](images/scs-add-device1.png)     
+
+9. Select the intended device.
+   - Select **Add**
+
+ ![Static Configuration Add Device](images/scs-add-device2.png)     
+
+10. Select the newly added device.
+    - Select **+ Configlet**
+    - Select **Configlet Library**
+
+ ![Static Configuration Device Configlet](images/scs-dev-configlet1.png)    
+
+11. Locate the pre-staged configlets for the added device. We are utilizing the UCN nomenclature for our configlet names: **mgmt_$Device**
+    - Select **Assign**
+
+   > [!NOTE]
+   > The **mgmt_$Device** configlet does assign a hostname. If you wish to continue utilizing your previously established names, update the hostname field in the per-device configlet.
+
+
+ ![Static Configuration Device Configlet](images/scs-dev-configlet2.png)    
+
+12. Repeat this process until all devices in the topology have their per-device configlet assigned.
+
+13. After all devices have their per-device configlet and base configlet associated, select the **Clipboard Icon**
+
+ ![Review Workspace](images/island-review.png)  
+
+14. After the Workspace has finished building, review the proposed configuration.
+
+ ![Review Workspace](images/ws-review.png)  
+
+15. After you have reviewed the proposed configuration, select **Submit Workspace**
+
+ ![Submit Workspace](images/submit-ws.png)  
+
+16. Select **View Change Control**
+
+ ![View Change Control](images/view-change-control.png) 
+
+17. You are now presented with a Change Control that will push the configuration to the devices.
+    - Select **Review and Approve**
+
+ ![Change Control Review and Approve](images/cc-review.png) 
+
+18. If the **Execute Immediately Slider** is greyed out, select the slider.
+    - Select **Approve and Execute**
+
+ ![Change Control Execute](images/cc-execute.png) 
+
+19. Pushing the configuration to the devices will take them out of Zero Touch Provisioning. This requires a reload and may take a few minutes. After the devices have reloaded and the configuration has been applied, your Change Control will complete.
+
+ ![Change Control Execute](images/cc-complete.png) 
 
 ---
 
