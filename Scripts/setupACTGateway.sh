@@ -202,6 +202,9 @@ sudo -i -u administrator bash << EOF
 	# configure uv
 	echo "configuring uv `date`"
 	cd ~/Projects/Workshops/Scripts
+
+	mv ~/images .
+
 	uv python install 3.14.0
 	uv python pin 3.14.0
 	uv venv --clear

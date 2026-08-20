@@ -3,6 +3,7 @@ import requests, argparse, json, yaml, time, paramiko, socks, urllib
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from modules.pgf import pgfAction
 from enum import Enum
+import tqdm
 
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
@@ -431,6 +432,8 @@ class ActClient():
         for dev in lab['devices']['generic']:
             if 'bootstrap' in dev['hostname']:
                 print(f"{dev['hostname']}: {dev['internal_ip']}")
+            elif 'host' in dev['hostname']:
+                print(f"{dev['hostname']}: {dev['internal_ip']}")
         return True
 
     def _setupSSH(self, ip, sshUser, sshPassword):
@@ -483,6 +486,16 @@ class ActClient():
                     pmClient.exec_command(f"sudo bash workshopIPTables.sh {operation}")
 
     def doSetupLinux(self):
+        def updateBar(transferred, total):
+            nonlocal lastUpdate
+
+            if pbar.total is None:
+                pbar.total = total
+
+            val = transferred - lastUpdate
+            pbar.update(val)
+            lastUpdate = transferred
+
         print(f"{config.currentPod} - doSetupLinux ")
         name = self.resourceName.format(config.currentPod)
 
@@ -507,6 +520,18 @@ class ActClient():
                 pmClient = self._setupSSH(host["internal_ip"], sshUser, sshPassword)
 
                 scp = pmClient.open_sftp()
+                try:
+                    scp.mkdir('/home/administrator/images/')
+                except OSError:
+                    pass
+
+                for image in ['EOS-4.34.5M.swi', 'EOS-4.35.4M.swi']:
+                    lastUpdate = 0
+                    pbar = tqdm.tqdm(unit="B", unit_scale=True, desc=f"{image} Upload")
+                    scp.put(f'images/{image}', f'/home/administrator/images/{image}', callback=updateBar)
+
+                return
+
                 scp.put('tokenConfig.yml', '/home/administrator/tokenConfig.yml')
                 scp.put('setupACTGateway.sh', '/home/administrator/setupACTGateway.sh')
                 scp.put('workshopIPTables.sh', '/home/administrator/workshopIPTables.sh')
@@ -519,6 +544,7 @@ class ActClient():
                 # if we don't read the redirects then the con will terminate and stop the script
                 for line in iter(stdout.readline, ""):
                     print(line, end="")
+
 
                 pmClient.close()
 
