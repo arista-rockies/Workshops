@@ -1,3 +1,4 @@
+# if updating the versions here, ensure you update the modules/act.py to copy those images up or bootstrap will fail
 veos:
   # Define the global vEOS node parameters
   username: cvpadmin
@@ -53,21 +54,12 @@ nodes:
       serial_number: P###-CampusA-Leaf1C
       node_type: veos
       ztp: true
-      version: 4.34.5M
 
   - P###-CampusA-Leaf2A:
       ip_addr: 192.168.1.35/22
       device_model: 720XP-24Y6
       system_mac_address: 00:1c:73:###:01:35
       serial_number: P###-CampusA-Leaf2A
-      node_type: veos
-      ztp: true
-
-  - P###-CampusA-Host1:
-      ip_addr: 192.168.1.36/22
-      device_model: 720XP-24Y6
-      system_mac_address: 00:1c:73:###:01:36
-      serial_number: P###-CampusA-Host1
       node_type: veos
       ztp: true
 
@@ -111,6 +103,7 @@ nodes:
       serial_number: P###-CampusB-Leaf1C
       node_type: veos
       ztp: true
+      version: 4.34.5M
 
   - P###-CampusB-Leaf2A:
       ip_addr: 192.168.2.35/22
@@ -128,14 +121,9 @@ nodes:
       node_type: veos
       ztp: true
 
-
-  - P###-CampusB-Host1:
-      ip_addr: 192.168.2.36/22
-      device_model: 720XP-24Y6
-      system_mac_address: 00:1c:73:###:02:36
-      serial_number: P###-CampusB-Host1
-      node_type: veos
-      ztp: true
+  - host###:
+      ip_addr: 192.168.0.2/22
+      node_type: generic
 
 links:
   - connection:
@@ -174,9 +162,6 @@ links:
   - connection:
     - P###-CampusA-Leaf1B:Ethernet5
     - P###-CampusA-Leaf1C:Ethernet2
-  - connection:
-    - P###-CampusA-Leaf1C:Ethernet7
-    - P###-CampusA-Host1:Ethernet1
 
   - connection:
     - P###-CampusB-Spine1:Ethernet1
@@ -222,4 +207,10 @@ links:
     - P###-CampusB-ZTR:Ethernet2
   - connection:
     - P###-CampusB-Leaf1C:Ethernet7
-    - P###-CampusB-Host1:Ethernet1
+    - host###:eth11
+  - connection:
+    - P###-CampusB-Leaf2A:Ethernet7
+    - host###:eth21
+  - connection:
+    - P###-CampusB-ZTR:Ethernet7
+    - host###:eth22
