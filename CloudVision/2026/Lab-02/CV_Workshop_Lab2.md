@@ -1,10 +1,10 @@
-# CloudVision Lab 01
+# CloudVision Lab 02
 ## Inventory and Topology
 ![CloudVision](images/cv-logo.png)
 
 ## This Lab Guide:
 
-[CloudVision Workshop Lab Guide 01 - Inventory and Topology](https://github.com/arista-rockies/Workshops/blob/main/CloudVision/2026/Lab-01/CV_Workshop_Lab1.md)
+[CloudVision Workshop Lab Guide 02 - Inventory and Topology](https://github.com/arista-rockies/Workshops/blob/main/CloudVision/2026/Lab-02/CV_Workshop_Lab2.md)
 
 ---
 
