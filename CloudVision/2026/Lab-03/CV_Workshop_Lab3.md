@@ -94,9 +94,9 @@ Use studios to build some stuff
 ![Add Leafs](images/pod-add-leaf.png)
 
 10. Add Member Leaf
-   - Within the same Access-Pod select **+ Add Member Leaf**
-   - Select the **Member Leaf Device**
-   - A pop up will be presented to add tags to the device. Select **Confirm** 
+    - Within the same Access-Pod select **+ Add Member Leaf**
+    - Select the **Member Leaf Device**
+    - A pop up will be presented to add tags to the device. Select **Confirm** 
 
 ![Add Member Leaf](images/pod-add-member-leaf.png)
 
@@ -105,9 +105,9 @@ Use studios to build some stuff
 ![Switch to Second Pod](images/pod-nav.png)
 
 12. Add Device to 2nd Pod
-   - Select **+ Add Device**
-   - Select **Leaf2a** 
-   - A pop up will be presented to add tags to the device. Select **Confirm** 
+    - Select **+ Add Device**
+    - Select **Leaf2a** 
+    - A pop up will be presented to add tags to the device. Select **Confirm** 
 
 ![Add Leafs](images/pod-add-leaf2.png)
 
@@ -117,6 +117,8 @@ Use studios to build some stuff
        - *This will auto assign node-ids to devices*
 
 ![Add Leafs](images/node-id.png)
+
+---
 
 ### Adding VLANs
 
@@ -166,33 +168,101 @@ Use studios to build some stuff
 ![Add VLANS](images/add-vlan-8.png)
 
 9. Repeat the previous steps for each VLAN. 
-  - Assign the 2nd VLAN only to the first POD
-  - Assing the 3rd VLAN only to the second POD
-  - Ensure each VLAN uses Unique IP Subnets
+   - Assign the 2nd VLAN only to the first POD
+   - Assing the 3rd VLAN only to the second POD
+   - Ensure each VLAN uses Unique IP Subnets
 
-5. Build Workspace
-6. Review Configuration
-8. Submit Workspace
-7. Push CC
+10. After all 3 VLANs have been added locate the **Workspace Island** toolbar at the bottom of you screen. Select the **Clipboard Icon** to Review your Workspace.
+
+![Workspace Island](images/wsi-review.png)
+
+11. After the Workspace has finished building, review the proposed configuration and Select **Submit**
+
+![Workspace Review](images/ws-review.png)
+
+12. Select **View Change Control**
+
+![View Change Control](images/view-cc.png)
+
+13. You are now presented with a Change Control that will push the configuration to the devices.
+    - Select **Review and Approve**
+
+![Review Change Control](images/review-cc.png)
+
+14. Select **Approve and Execute**
+
+![Review Change Control](images/execute-cc.png)
+
+15. When the change control is completed succesfully the intended configuration will be present on the devices.
+
+![Complete Change Control](images/cc-complete.png)
+
+---
+
 ### Order of Operations
-We are going to demonstrate how the order of operations works in Studios
-1. Return to Studios **Provisioning > Studios**
-2. Make have to select **Active Studio**
-3. Navigate to the **Date and Time** Studio
-4. Under **Device Time Zone**
-  - Select **device:**
-  - Under **Select Time Zone** Add anything other than MST
-5. Build Workspace (No Changes shoudld be present)
-6. Go to **Static Configuration Studio**
-7. Remove the Timezone from the Base configurat **SHOULD WE HAVE A STATIC THAT IS ONLY TIMEZONE?**
-8. Build (Maybe need a rebuild?)
-9. Select the **?** in CVP Top Menu
-   - Select the magnifying class
-   - Search  **Configuration Hierarchy** and click the link
-   - Review the Image
-10. Push the workspace with the Time
-11. Push CC
+In this lab seciton we are going to demonstrate an example of how the order of operations works is handled in Studios
+1. Navigate to Studios **Provision > Studios**
 
+![Studio Navigation](images/studio-nav.png)
+
+2. Locate and Select the Studio named **Date and Time**
+
+![Studio Date and Time](images/dt-studio.png)
+
+3. Under **Device Time Zone**
+   - Select **+Add Device Time Zone**
+   - Under **Device Time Zone** add your Campus Devices using  **Campus-Pod:** Tag you created earlier
+   - Under **Select Time Zone** Select anything other than MST
+
+![Date and Time Timezone](images/dt-time-zone.png)
+
+5. Select the **Clipboard** icon on Workspace Island toolbar at the bottom of your screen.
+
+![Date and Time Review Workspace](images/dt-wsi-review.png)
+
+6. After the Workspace has finished building you should see not proposed configuration changes.
+   - Close the Workspace Review Window
+
+![Date and Time No Changes](images/dt-no-changes.png)
+
+7. Select the blue **Studios** breadcrumb to return to the main Studios Page
+
+![Date and Time Studios Navigation](images/dt-back-to-studios.png)
+
+8. Open the **Static Configuration** Studios
+
+![Date and Time Static Configuration](images/dt-static-config.png)
+
+9. Select the top container in your heirarchy structure where the configlet **CampusA_Base** is applied.
+   - Locate the **clock timezone** command in the static configuration **Line14**
+   - Add a **!** to the beginning of that line to comment out the command
+
+![Date and Time Static Configuration](images/dt-static-changes.png)
+
+11. One again select the **Clipboard** icon on Workspace Island toolbar at the bottom of your screen.
+
+![Date and Time Review](images/dt-wsi-review2.png)
+
+12. Now that we have removed the static configuration line, we should see the proposed configuration change for the new timezone.
+    - Select Submit 
+
+![Date and Time Review](images/dt-ws-changes.png)  
+
+13. Select **View Change Control**
+
+![Date and Time Review](images/dt-view-cc.png)  
+
+14. Select **Review and Approve**
+
+![Date and Time Review](images/dt-review-approve.png)  
+
+15. Select **Approve and Execute** to push the configuration to the devices
+
+![Date and Time Approve/Execute](images/dt-approve-execute.png)  
+
+15. When the Change Control is complete, you have now succesfully pushed the date and time to the devices.
+
+![Date and Time Change](images/dt-cc-complete.png)  
 
 ---
 
