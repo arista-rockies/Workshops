@@ -405,6 +405,25 @@ class pgfCVClient():
 
     async def studioCleanup(self, c, workspaceID, studioID):
         print(f"{config.currentPod} - studioCleanup({studioID})")
+
+        client = pyavd._cv.api.arista.studio.v1.AssignedTagsConfigServiceStub(c._channel)
+        req = pyavd._cv.api.arista.studio.v1.AssignedTagsConfigSetRequest(
+            value=pyavd._cv.api.arista.studio.v1.AssignedTagsConfig(
+                key=pyavd._cv.api.arista.studio.v1.StudioKey(
+                    studio_id=studioID,
+                    workspace_id=workspaceID
+                ),
+                remove=True
+            )
+        )
+
+        try:
+            resp = await client.set(req, metadata=c._metadata, timeout=30.0)
+        except grpc.RpcError as e:
+            if e.code() == grpc.StatusCode.NOT_FOUND:
+                return None
+
+            raise
         await c.set_studio_inputs(studio_id=studioID, workspace_id=workspaceID, inputs={})
 
     async def buildAndSubmitWorkspace(self, c, workspaceID, expectCC=True):
