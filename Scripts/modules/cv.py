@@ -863,7 +863,7 @@ class pgfCVClient():
             await self.cleanupDashboards(cvpRacClient)
             await self.tagsCleanup(c, workspaceID)
             await self.scsCleanup(c, workspaceID)
-            for studio in ['studio-avd-campus-fabric', 'studio-campus-access-interfaces', 'studio-software-management', 'studio-authentication', 'studio-date-time', 'studio-dns-settings', 'studio-management-connectivity', 'studio-telemetry-config']:
+            for studio in ['studio-avd-campus-fabric', 'studio-campus-access-interfaces', 'studio-software-management', 'studio-authentication', 'studio-date-time', 'studio-dns-settings', 'studio-management-connectivity', 'studio-telemetry-config', 'studio-connectivity']:
                 await self.studioCleanup(c, workspaceID, studio)
 
             await self.inventoryCleanup(c, workspaceID)
