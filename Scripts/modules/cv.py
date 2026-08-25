@@ -857,9 +857,9 @@ class pgfCVClient():
             await self.cleanupDashboards(cvpRacClient)
             await self.tagsCleanup(c, workspaceID)
             await self.scsCleanup(c, workspaceID)
-            await self.studioCleanup(c, workspaceID, "studio-avd-campus-fabric")
-            await self.studioCleanup(c, workspaceID, "studio-campus-access-interfaces")
-            await self.studioCleanup(c, workspaceID, "studio-software-management")
+            for studio in ['studio-avd-campus-fabric', 'studio-campus-access-interfaces', 'studio-software-management', 'studio-authentication', 'studio-date-time', 'studio-dns-settings', 'studio-management-connectivity', 'studio-telemetry-config']:
+                await self.studioCleanup(c, workspaceID, studio)
+
             await self.inventoryCleanup(c, workspaceID)
             await self.notificationReceiverCleanup(c)
             #done below
