@@ -529,8 +529,7 @@ class ActClient():
                     lastUpdate = 0
                     pbar = tqdm.tqdm(unit="B", unit_scale=True, desc=f"{image} Upload")
                     scp.put(f'images/{image}', f'/home/administrator/images/{image}', callback=updateBar)
-
-                return
+                    pbar.close()
 
                 scp.put('tokenConfig.yml', '/home/administrator/tokenConfig.yml')
                 scp.put('setupACTGateway.sh', '/home/administrator/setupACTGateway.sh')
