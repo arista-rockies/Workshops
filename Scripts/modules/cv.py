@@ -520,18 +520,24 @@ class pgfCVClient():
 
         url = f'{self.baseURL}/api/resources/changecontrol/v1/ChangeControlConfig'
         resp = requests.post(url, json=cc, verify=False, timeout=300, headers={'Authorization': f'Bearer {self.tok}'})
-        resp.raise_for_status()
+        try:
+            resp.raise_for_status()
 
-        # from here on out, let's reconnect with the second token
-        #  this allows for us to complete even if four-eyes is set
-        c = pyavd._cv.client.CVClient(self.server, token=self.tok2)
-        c._connect()
-        print("executing the ztp change control")
-        await self.executeChangeControl(c, ccID, wait=False)
+            # from here on out, let's reconnect with the second token
+            #  this allows for us to complete even if four-eyes is set
+            c = pyavd._cv.client.CVClient(self.server, token=self.tok2)
+            c._connect()
+            print("executing the ztp change control")
+            await self.executeChangeControl(c, ccID, wait=False)
 
-        print("sleeping for 2m to hopefully give ztp time to kick in")
-        time.sleep(120)
+            print("sleeping for 2m to hopefully give ztp time to kick in")
+            time.sleep(120)
+        except:
+            # if we get an exception here, it's likely we didn't get any cc out of the submission.
+            #  this is probably a valid scenario
+            pass
 
+        # we can now do the actual decom in cv
         devices = cvpRacClient.api.get_inventory(provisioned=False)
         for device in devices:
             print(f"decomming {device['hostname']}")
