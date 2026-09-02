@@ -947,19 +947,20 @@ class pgfCVClient():
             await self.doPackage("files/sleep_0.2.0.tar")
             await self.doPackage("files/cv-workshop_1.0.0.tar")
 
-            await self.onboardDevices(c, cvpRacClient, workspaceID, deviceInventory)
-            await self.assignTags(c, workspaceID, deviceInventory)
-
             # TODO: fix this to always use checkpoints
             if config.args.type == "campus":
+                await self.onboardDevices(c, cvpRacClient, workspaceID, deviceInventory)
+                await self.assignTags(c, workspaceID, deviceInventory)
+
                 await self.scsSetup(c, workspaceID, deviceInventory)
+                await self.smsSetup(c, workspaceID, deviceInventory)
+                await self.aicStudioSetup(c, workspaceID, deviceInventory)
+                await self.campusStudioSetup(c, workspaceID, deviceInventory)
             elif config.args.type == "cv":
+                # this is a bit of a hack here
                 setattr(config.args, "cvCheckpoint", "initial")
                 await self.cvCheckpoint(c, workspaceID, deviceInventory)
-
-            await self.smsSetup(c, workspaceID, deviceInventory)
-            await self.aicStudioSetup(c, workspaceID, deviceInventory)
-            await self.campusStudioSetup(c, workspaceID, deviceInventory)
+                config.args.cvCheckpoint = None
 
         if config.args.cvCheckpoint:
             workspaceID = str(uuid.uuid4())
