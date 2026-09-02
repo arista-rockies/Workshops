@@ -51,6 +51,7 @@ class pgfCVClient():
         _addArgument('-cvAddImages', default='', nargs='+', help='space separated list of swi images to upload')
         _addArgument('-cvAddPackages', default=False, action='store_true', help='this option is only required for alraedy provisioned pods and will add the required packages.  these steps are automatically done on pods as they are provisioned moving forward')
         _addArgument('-cvAddCCStuff', default=False, action='store_true', help='this option is only required for already provisioned pods and will add actionBundles and ccTemplates only.  these steps are automatically done on pods as they are provisioned moving forward')
+        _addArgument('-cvCheckpoint', default=None, help='string name of the checkpoint you wish to load.  is based off the specified workshop type')
 
     def __init__(self, token):
         self.token = token
@@ -71,6 +72,40 @@ class pgfCVClient():
             if device["hostname"] == hostname:
                 return device
         return None
+
+    async def cvCheckpoint(self, c, workspaceID, deviceInventory):
+        print(f"{config.currentPod} - cvCheckpoint")
+        # let's try to load the config for this checkpoint type
+        #  this isn't safe code as it uses un-sanitized cli data
+        basePath = f'files/{config.args.type}/{config.args.cvCheckpoint}'
+        try:
+            with open(f'{basePath}/config.yml', 'r') as f:
+                checkpointConfig = yaml.safe_load(f.read())
+        except Exception as e:
+            print(f"could not load the checkpoint config properly.  does it exist? - {e}")
+            return
+
+        # right now we only really support scs, let's get that set up
+        for module in checkpointConfig:
+            if module['name'] == 'configlets':
+                # let's load the configlets config
+                #  also, unsafe code
+                try:
+                    with open(f'{basePath}/configlets/config.yml', 'r') as f:
+                        configletsConfig = yaml.safe_load(f.read())
+                except Exception as e:
+                    print(f"could not load the configlets config.  does it exist? - {e}")
+                    return
+
+                for configlet in configletsConfig:
+                    try:
+                        with open(f'{basePath}/configlets/{configlet["filename"]}', 'r') as f:
+                            configlet["configletText"] = f.read()
+
+                        print(f'  loading configlet {configlet["configletName"]}')
+                        await self._doConfiglet(c, workspaceID, configlet)
+                    except Exception as e:
+                        print(f"could not load configlet file.  does it exist? - {e}")
 
 
     async def scsCleanup(self, c, workspaceID):
@@ -248,6 +283,30 @@ class pgfCVClient():
         await c.set_tags(workspaceID, tags, "device", 300)
         await c.set_tag_assignments(workspaceID, tagAssignments, "device", 300)
 
+    async def _doConfiglet(self, c, workspaceID, configlet):
+        configletID = configlet["configletName"]
+        configletText = configlet["configletText"]
+
+        await c.set_configlet(
+            workspace_id=workspaceID,
+            configlet_id=configletID,
+            display_name=configletID,
+            description=configletID,
+            body=configletText
+        )
+
+        if configlet["container"]:
+            # let's create the assignment
+            await c.set_configlet_container(
+                    workspace_id=workspaceID,
+                    container_id=configlet["container"],
+                    display_name=configlet["container"],
+                    description=configlet["container"],
+                    configlet_ids=[configletID],
+                    child_assignment_ids=configlet["children"],
+                    query=configlet["query"],
+            )
+
     async def scsSetup(self, c, workspaceID, deviceInventory):
         print(f"{config.currentPod} - scsSetup")
         #configletContainers = await c.get_configlet_containers(workspace_id=workspaceID)
@@ -282,30 +341,11 @@ class pgfCVClient():
             "podInt": int(config.currentPod)+100
         }
         for configlet in configlets:
-            configletID = configlet["configletName"]
-
             f = open(f"files/campusConfiglets/{configlet['filename']}", "r")
-            configletText = f.read().format(**vals)
+            configlet["configletText"] = f.read().format(**vals)
 
-            await c.set_configlet(
-                workspace_id=workspaceID,
-                configlet_id=configletID,
-                display_name=configletID,
-                description=configletID,
-                body=configletText
-            )
+            await self._doConfiglet(c, workspaceID, configlet)
 
-            if configlet["container"]:
-                # let's create the assignment
-                await c.set_configlet_container(
-                        workspace_id=workspaceID,
-                        container_id=configlet["container"],
-                        display_name=configlet["container"],
-                        description=configlet["container"],
-                        configlet_ids=[configletID],
-                        child_assignment_ids=configlet["children"],
-                        query=configlet["query"],
-                )
         await c.set_studio_inputs(studio_id='studio-static-configlet', workspace_id=workspaceID, inputs={"configletAssignmentRoots": ["Device"]})
 
         ###################### sms upload ####################
@@ -441,11 +481,7 @@ class pgfCVClient():
         if submitResult.status != 1: #SUCCESS
             raise Exception(f"submit failed for pod: {config.currentPod} {workspaceID}: {submitResult.status}")
 
-        #there is a better way to do this......
-        if expectCC:
-            return workspace.cc_ids.values[0]
-        else:
-            return
+        return workspace.cc_ids.values[0] if len(workspace.cc_ids) else None
 
     async def executeChangeControl(self, c, ccID, wait=True):
         print(f"{config.currentPod} - executeChangeControl")
@@ -836,6 +872,8 @@ class pgfCVClient():
         expectCC = True
 
         if config.args.cvTest:
+            return
+
             print("connected")
             await self.unprovisionDevicesCV(c, cvpRacClient, deviceInventory)
             return
@@ -911,10 +949,28 @@ class pgfCVClient():
 
             await self.onboardDevices(c, cvpRacClient, workspaceID, deviceInventory)
             await self.assignTags(c, workspaceID, deviceInventory)
-            await self.scsSetup(c, workspaceID, deviceInventory)
+
+            # TODO: fix this to always use checkpoints
+            if config.args.type == "campus":
+                await self.scsSetup(c, workspaceID, deviceInventory)
+            elif config.args.type == "cv":
+                setattr(config.args, "cvCheckpoint", "initial")
+                await self.cvCheckpoint(c, workspaceID, deviceInventory)
+
             await self.smsSetup(c, workspaceID, deviceInventory)
             await self.aicStudioSetup(c, workspaceID, deviceInventory)
             await self.campusStudioSetup(c, workspaceID, deviceInventory)
+
+        if config.args.cvCheckpoint:
+            workspaceID = str(uuid.uuid4())
+            workspace = await c.create_workspace(
+                workspace_id=workspaceID,
+                display_name="automation - checkpoint")
+
+            workToDo = True
+
+            time.sleep(1)
+            await self.cvCheckpoint(c, workspaceID, deviceInventory)
 
         if workToDo:
             ccID = await self.buildAndSubmitWorkspace(c, workspaceID, expectCC=expectCC)
@@ -924,7 +980,7 @@ class pgfCVClient():
             c = pyavd._cv.client.CVClient(self.server, token=self.tok2)
             c._connect()
 
-            if expectCC:
+            if ccID:
                 await self.executeChangeControl(c, ccID, wait=False)
 
             if config.args.cvCleanup:
