@@ -360,6 +360,12 @@ class ActClient():
             resp = self.waitOnOperation(resp["id"], sleep=10, timeout=None, statusChar=".")
 
         newTopology = yaml.safe_load(s.replace("###", f"{config.currentPod:0>2}"))
+        # act doesn't allow metadata fields, nor does it ignore unused data.  we need the id
+        #  later in the cv.  let's loop over the topology and delete any id tags
+        for dev in newTopology["nodes"]:
+            for k, dev in dev.items():
+                t = dev.pop("id", None)
+
         try:
             print(f"  creating topology {name}", end="", flush=True)
             resp = self.createTopology(name, newTopology)

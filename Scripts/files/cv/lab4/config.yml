@@ -2,3 +2,7 @@
   directory: configlets
 - name: studios
   directory: studios
+- name: topology
+  directory: topology
+- name: tags
+  directory: tags

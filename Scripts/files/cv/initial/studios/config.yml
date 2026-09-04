@@ -1,0 +1,3 @@
+- name: studio-telemetry-config
+  filename: null
+  deviceSelector: "device: *"

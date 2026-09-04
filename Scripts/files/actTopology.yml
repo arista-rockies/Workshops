@@ -21,6 +21,7 @@ nodes:
       system_mac_address: 00:1c:73:###:01:30
       serial_number: P###-CampusA-Spine1
       node_type: veos
+      id: CampusA-Spine1
       ztp: true
 
   - P###-CampusA-Spine2:
@@ -29,6 +30,7 @@ nodes:
       system_mac_address: 00:1c:73:###:01:31
       serial_number: P###-CampusA-Spine2
       node_type: veos
+      id: CampusA-Spine2
       ztp: true
 
   - P###-CampusA-Leaf1A:
@@ -37,6 +39,7 @@ nodes:
       system_mac_address: 00:1c:73:###:01:32
       serial_number: P###-CampusA-Leaf1A
       node_type: veos
+      id: CampusA-Leaf1A
       ztp: true
 
   - P###-CampusA-Leaf1B:
@@ -45,6 +48,7 @@ nodes:
       system_mac_address: 00:1c:73:###:01:33
       serial_number: P###-CampusA-Leaf1B
       node_type: veos
+      id: CampusA-Leaf1B
       ztp: true
 
   - P###-CampusA-Leaf1C:
@@ -53,6 +57,7 @@ nodes:
       system_mac_address: 00:1c:73:###:01:34
       serial_number: P###-CampusA-Leaf1C
       node_type: veos
+      id: CampusA-Leaf1C
       ztp: true
 
   - P###-CampusA-Leaf2A:
@@ -61,6 +66,7 @@ nodes:
       system_mac_address: 00:1c:73:###:01:35
       serial_number: P###-CampusA-Leaf2A
       node_type: veos
+      id: CampusA-Leaf2A
       ztp: true
 
   #--------------
@@ -70,6 +76,7 @@ nodes:
       system_mac_address: 00:1c:73:###:02:30
       serial_number: P###-CampusB-Spine1
       node_type: veos
+      id: CampusB-Spine1
       ztp: true
 
   - P###-CampusB-Spine2:
@@ -78,6 +85,7 @@ nodes:
       system_mac_address: 00:1c:73:###:02:31
       serial_number: P###-CampusB-Spine2
       node_type: veos
+      id: CampusB-Spine2
       ztp: true
 
   - P###-CampusB-Leaf1A:
@@ -86,6 +94,7 @@ nodes:
       system_mac_address: 00:1c:73:###:02:32
       serial_number: P###-CampusB-Leaf1A
       node_type: veos
+      id: CampusB-Leaf1A
       ztp: true
 
   - P###-CampusB-Leaf1B:
@@ -94,6 +103,7 @@ nodes:
       system_mac_address: 00:1c:73:###:02:33
       serial_number: P###-CampusB-Leaf1B
       node_type: veos
+      id: CampusB-Leaf1B
       ztp: true
 
   - P###-CampusB-Leaf1C:
@@ -102,6 +112,7 @@ nodes:
       system_mac_address: 00:1c:73:###:02:34
       serial_number: P###-CampusB-Leaf1C
       node_type: veos
+      id: CampusB-Leaf1C
       ztp: true
       version: 4.34.5M
 
@@ -111,6 +122,7 @@ nodes:
       system_mac_address: 00:1c:73:###:02:35
       serial_number: P###-CampusB-Leaf2A
       node_type: veos
+      id: CampusB-Leaf2A
       ztp: true
 
   - P###-CampusB-ZTR:
@@ -119,6 +131,7 @@ nodes:
       system_mac_address: 00:1c:73:###:02:40
       serial_number: P###-CampusB-ZTR
       node_type: veos
+      id: CampusB-ZTR
       ztp: true
 
   - host###:

@@ -1,0 +1,22 @@
+tags:
+  - key: Workshop
+    values: [ CampusA, Leaf, Leaf1, Leaf1-Member-Leaf, Leaf2, Spine ]
+assignments:
+    - key: Workshop
+      value: CampusA
+      devices: [ "{CampusA-Spine1_Serial}", "{CampusA-Spine2_Serial}", "{CampusA-Leaf1A_Serial}", "{CampusA-Leaf1B_Serial}", "{CampusA-Leaf1C_Serial}", "{CampusA-Leaf2A_Serial}" ]
+    - key: Workshop
+      value: Spine
+      devices: [ "{CampusA-Spine1_Serial}", "{CampusA-Spine2_Serial}" ]
+    - key: Workshop
+      value: Leaf
+      devices: [ "{CampusA-Leaf1A_Serial}", "{CampusA-Leaf1B_Serial}", "{CampusA-Leaf1C_Serial}", "{CampusA-Leaf2A_Serial}" ]
+    - key: Workshop
+      value: Leaf1
+      devices: [ "{CampusA-Leaf1A_Serial}", "{CampusA-Leaf1B_Serial}", "{CampusA-Leaf1C_Serial}" ]
+    - key: Workshop
+      value: Leaf1-Member-Leaf
+      devices: [ "{CampusA-Leaf1C_Serial}" ]
+    - key: Workshop
+      value: Leaf2
+      devices: [ "{CampusA-Leaf2A_Serial}" ]

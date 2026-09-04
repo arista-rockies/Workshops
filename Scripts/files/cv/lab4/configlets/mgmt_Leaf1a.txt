@@ -1,0 +1,5 @@
+hostname CampusA_Leaf1a
+!
+interface Management1 
+   ip address 192.168.1.3/22
+
