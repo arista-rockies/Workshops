@@ -1,40 +1,17 @@
-- children: null
-  configletName: CampusA_Base
-  container: null
-  filename: CampusA_Base.txt
-  query: null
-- children: null
-  configletName: mgmt_Leaf1a
-  container: null
-  filename: mgmt_Leaf1a.txt
-  query: null
-- children: null
-  configletName: mgmt_Leaf1b
-  container: null
-  filename: mgmt_Leaf1b.txt
-  query: null
-- children: null
-  configletName: mgmt_Leaf1c
-  container: null
-  filename: mgmt_Leaf1c.txt
-  query: null
-- children: null
-  configletName: mgmt_Leaf2a
-  container: null
-  filename: mgmt_Leaf2a.txt
-  query: null
-- children: null
-  configletName: mgmt_Spine1
-  container: null
-  filename: mgmt_Spine1.txt
-  query: null
-- children: null
-  configletName: mgmt_Spine2
-  container: null
-  filename: mgmt_Spine2.txt
-  query: null
-- children: null
-  configletName: allUsers
-  container: null
-  filename: allUsers.txt
-  query: null
+configlets:
+  - name: "allUsers"
+    filename: "allUsers.txt"
+  - name: "mgmt_Leaf1a"
+    filename: "mgmt_Leaf1a.txt"
+  - name: "mgmt_Leaf1b"
+    filename: "mgmt_Leaf1b.txt"
+  - name: "mgmt_Leaf1c"
+    filename: "mgmt_Leaf1c.txt"
+  - name: "mgmt_Leaf2a"
+    filename: "mgmt_Leaf2a.txt"
+  - name: "mgmt_Spine1"
+    filename: "mgmt_Spine1.txt"
+  - name: "mgmt_Spine2"
+    filename: "mgmt_Spine2.txt"
+  - name: "CampusA_Base"
+    filename: "CampusA_Base.txt"
