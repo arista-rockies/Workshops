@@ -1,0 +1,147 @@
+path: []
+inputs:
+  campus:
+    - inputs:
+        campusDetails:
+          campusPod:
+            - inputs:
+                campusPodFacts:
+                  accessPodDefaults: {{}}
+                  accessPods:
+                    - inputs:
+                        accessPodFacts:
+                          leafs:
+                            - inputs:
+                                leafsInfo:
+                                  nodeId: 1
+                              tags:
+                                query: device:{CampusA-Leaf1A_Serial}
+                            - inputs:
+                                leafsInfo:
+                                  nodeId: 2
+                              tags:
+                                query: device:{CampusA-Leaf1B_Serial}
+                          leafsBgpAs: null
+                          memberLeafMlagPairs: []
+                          memberLeafs:
+                            - inputs:
+                                memberLeafsInfo:
+                                  nodeId: 4
+                              tags:
+                                query: device:{CampusA-Leaf1C_Serial}
+                          nodeGroupAttributesList: []
+                      tags:
+                        query: Access-Pod:Pod1
+                    - inputs:
+                        accessPodFacts:
+                          leafs:
+                            - inputs:
+                                leafsInfo:
+                                  nodeId: 3
+                              tags:
+                                query: device:{CampusA-Leaf2A_Serial}
+                          leafsBgpAs: null
+                          memberLeafMlagPairs: []
+                          memberLeafs: []
+                          nodeGroupAttributesList: []
+                      tags:
+                        query: Access-Pod:Pod2
+                  advancedFabricSettings: {{}}
+                  campusPodRoutingProtocols: {{}}
+                  design:
+                    campusType: L2
+                    vxlanOverlay: false
+                  egressConnectivity: {{}}
+                  fabricConfigurations: {{}}
+                  nodeTypeProperties: {{}}
+                  spineDefaults: {{}}
+                  spines:
+                    - inputs:
+                        spinesInfo:
+                          nodeId: 1
+                      tags:
+                        query: device:{CampusA-Spine1_Serial}
+                    - inputs:
+                        spinesInfo:
+                          nodeId: 2
+                      tags:
+                        query: device:{CampusA-Spine2_Serial}
+                  thirdPartyDevices: []
+              tags:
+                query: Campus-Pod:CampusA
+      tags:
+        query: Campus:Workshop
+  campusServices:
+    - inputs:
+        campusServicesGroup:
+          campusPodsServices:
+            - inputs:
+                services:
+                  campusType: L2
+                  svis:
+                    - addressLocking: {{}}
+                      devices:
+                        - enabled: null
+                          ipVirtualRouterSubnet: null
+                          tagQuery:
+                            tags:
+                              query: Access-Pod:Pod1
+                        - enabled: null
+                          ipVirtualRouterSubnet: null
+                          tagQuery:
+                            tags:
+                              query: Access-Pod:Pod2
+                      dhcpHelpers: []
+                      enabled: 'Yes'
+                      eosCli: null
+                      id: 100
+                      ipVirtualRouterSubnet: 10.1.100.0/24
+                      multicast: {{}}
+                      name: Vlan100
+                      nodes: []
+                      ospf: {{}}
+                      privateVlan: {{}}
+                      stpPriority: []
+                      vrf: null
+                    - addressLocking: {{}}
+                      devices:
+                        - enabled: null
+                          ipVirtualRouterSubnet: null
+                          tagQuery:
+                            tags:
+                              query: Access-Pod:Pod1
+                      dhcpHelpers: []
+                      enabled: 'Yes'
+                      eosCli: null
+                      id: 101
+                      ipVirtualRouterSubnet: 10.1.101.0/24
+                      multicast: {{}}
+                      name: Vlan101
+                      nodes: []
+                      ospf: {{}}
+                      privateVlan: {{}}
+                      stpPriority: []
+                      vrf: null
+                    - addressLocking: {{}}
+                      devices:
+                        - enabled: null
+                          ipVirtualRouterSubnet: null
+                          tagQuery:
+                            tags:
+                              query: Access-Pod:Pod2
+                      dhcpHelpers: []
+                      enabled: 'Yes'
+                      eosCli: null
+                      id: 102
+                      ipVirtualRouterSubnet: 10.1.102.0/24
+                      multicast: {{}}
+                      name: Vlan102
+                      nodes: []
+                      ospf: {{}}
+                      privateVlan: {{}}
+                      stpPriority: []
+                      vrf: null
+              tags:
+                query: Campus-Pod:CampusA
+      tags:
+        query: Campus:Workshop

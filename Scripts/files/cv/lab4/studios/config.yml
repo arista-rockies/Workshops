@@ -1,0 +1,10 @@
+studios:
+  - name: CampusL2L3EVPN
+    id: studio-avd-campus-fabric
+    filename: campus.yaml
+  - name: DateTime
+    id: studio-date-time
+    filename: date_time.yaml
+  - name: StreamingTelemetry
+    id: studio-telemetry-config
+    selector: "device: *"

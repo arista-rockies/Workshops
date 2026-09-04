@@ -93,7 +93,32 @@ class pgfCVClient():
                 await self._cvCheckpointTopology(c, workspaceID, deviceInventory, basePath)
             elif module['name'] == 'tags':
                 await self._cvCheckpointTags(c, workspaceID, deviceInventory, basePath)
+            elif module['name'] == "studios":
+                await self._cvCheckpointStudios(c, workspaceID, deviceInventory, basePath)
 
+    async def _cvCheckpointStudios(self, c, workspaceID, deviceInventory, basePath):
+        vals = config.globalSubstitutions[config.currentPod]
+
+        # let's load the topology config
+        #  also, unsafe code
+        try:
+            with open(f'{basePath}/studios/config.yml', 'r') as f:
+                studiosConfig = yaml.safe_load(f.read())
+        except Exception as e:
+            print(f"could not load the configlets config.  does it exist? - {e}")
+            return
+
+        for studio in studiosConfig.get("studios", []):
+            try:
+                with open(f'{basePath}/studios/{studio["filename"]}', 'r') as f:
+                    studio['text'] = yaml.safe_load(f.read().format(**vals))["inputs"]
+                    await self._doConfiglet(c, workspaceID, configlet)
+            except Exception as e:
+                # we don't really care about an exception here, eat it
+                pass
+
+            await self._doStudio(c, workspaceID, studio)
+            
     async def _cvCheckpointTags(self, c, workspaceID, deviceInventory, basePath):
         vals = config.globalSubstitutions[config.currentPod]
 
@@ -386,6 +411,35 @@ class pgfCVClient():
         # assign tags
         await c.set_tags(workspaceID, tags, "device", 300)
         await c.set_tag_assignments(workspaceID, tagAssignments, "device", 300)
+
+    async def _doStudio(self, c, workspaceID, studio):
+        # we need to set the studio inputs if they are there:
+        if (studioText := studio.get("text", None)):
+            print(f"  pushing to {studio["id"]}")
+            await c.set_studio_inputs(
+                studio_id=studio["id"],
+                workspace_id=workspaceID,
+                inputs=studioText)
+
+        if (studioSelector := studio.get("selector", None)):
+            print(f"  setting selector for {studio["id"]}")
+            client = pyavd._cv.api.arista.studio.v1.AssignedTagsConfigServiceStub(c._channel)
+            req = pyavd._cv.api.arista.studio.v1.AssignedTagsConfigSetRequest(
+                value=pyavd._cv.api.arista.studio.v1.AssignedTagsConfig(
+                    key=pyavd._cv.api.arista.studio.v1.StudioKey(
+                        studio_id=studio["id"],
+                        workspace_id=workspaceID
+                    ),
+                    query=studioSelector
+                )
+            )
+
+            try:
+                resp = await client.set(req, metadata=c._metadata, timeout=30.0)
+            except grpc.RpcError as e:
+                if e.code() == grpc.StatusCode.NOT_FOUND:
+                    return None
+                raise
 
     async def _doConfiglet(self, c, workspaceID, request):
         # this function handles both uploading a configlet and setting the hierarchy up in scs.
@@ -985,9 +1039,10 @@ class pgfCVClient():
 
         if config.args.cvTest:
             basePath = f'files/{config.args.type}/lab4'
-            await self._cvCheckpointTopology(c, "c0a32daa-a067-4b71-a0a0-7390e3981382", deviceInventory, basePath)
+            #await self._cvCheckpointTopology(c, "c0a32daa-a067-4b71-a0a0-7390e3981382", deviceInventory, basePath)
             await self._cvCheckpointTags(c, "c0a32daa-a067-4b71-a0a0-7390e3981382", deviceInventory, basePath)
-            await self._cvCheckpointConfiglets(c, "c0a32daa-a067-4b71-a0a0-7390e3981382", deviceInventory, basePath)
+            #await self._cvCheckpointConfiglets(c, "c0a32daa-a067-4b71-a0a0-7390e3981382", deviceInventory, basePath)
+            await self._cvCheckpointStudios(c, "c0a32daa-a067-4b71-a0a0-7390e3981382", deviceInventory, basePath)
             return
 
             print("connected")
