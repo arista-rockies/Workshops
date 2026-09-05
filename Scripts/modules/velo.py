@@ -10,7 +10,7 @@ from modules import veloDataModel
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from nmcli._exception import NotExistException
-from modules.pgf import pgfAction
+from modules.pgf import pgfAction, pgfBoolAction
 
 # *very* basic velo client
 class VeloClient():
@@ -18,11 +18,12 @@ class VeloClient():
         def _addArgument(*args, **kwargs):
             if kwargs.get('action', None) == 'store_true':
                 kwargs.pop('action')
-                kwargs["nargs"] = '?'
                 kwargs.setdefault("default", False)
-                kwargs.setdefault("const", True)
+                config.parser.add_argument(*args, action=pgfBoolAction, module="velo", **kwargs)
+            else:
+                config.parser.add_argument(*args, action=pgfAction, module="velo", **kwargs)
 
-            config.parser.add_argument(*args, action=pgfAction, module="velo", **kwargs)
+        config.parser.set_defaults(velo=False)
 
         _addArgument('-veloCleanup', default=False, action='store_true', help='do velo cleanup steps')
         _addArgument('-veloReconfigure', default=False, action='store_true', help='reconfigure the velo for lag')

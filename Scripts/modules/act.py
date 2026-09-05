@@ -1,7 +1,7 @@
 from modules import config
 import requests, argparse, json, yaml, time, paramiko, socks, urllib
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
-from modules.pgf import pgfAction
+from modules.pgf import pgfAction, pgfBoolAction
 from enum import Enum
 import tqdm
 
@@ -26,11 +26,12 @@ class ActClient():
         def _addArgument(*args, **kwargs):
             if kwargs.get('action', None) == 'store_true':
                 kwargs.pop('action')
-                kwargs["nargs"] = '?'
                 kwargs.setdefault("default", False)
-                kwargs.setdefault("const", True)
+                config.parser.add_argument(*args, action=pgfBoolAction, module="act", **kwargs) 
+            else:
+                config.parser.add_argument(*args, action=pgfAction, module="act", **kwargs) 
 
-            config.parser.add_argument(*args, action=pgfAction, module="act", **kwargs) 
+        config.parser.set_defaults(act=False)
 
         _addArgument('-actProxy', default=None, help='Set a socks proxy. defaults to None')
         _addArgument('-actStartLab', action='store_true', default=False, help='start specified labs')

@@ -107,35 +107,35 @@ async def main():
         config.currentPod = pod
         token = tokens.get(config.currentPod, {})
 
-        if hasattr(config.args, 'act'):
+        if config.args.act:
             if not 'act' in token:
                 print("no act token provided, but act actions requested.  skipping")
             else:
                 actClient = ActClient(token)
                 actClient.execute()
 
-        if hasattr(config.args, 'agni'):
+        if config.args.agni:
             if not 'agni' in token:
                 print("no agni token provided, but agni actions requested.  skipping")
             else:
                 agniClient = AgniClient(token)
                 agniClient.execute()
 
-        if hasattr(config.args, 'cue'):
+        if config.args.cue:
             if not 'cue' in token:
                 print("no cue token provided, but cue actions requested.  skipping")
             else:
                 cueClient = CueClient(token)
                 cueClient.execute()
 
-        if hasattr(config.args, 'cv'):
+        if config.args.cv:
             if not 'cv' in token:
                 print("no cv token provided, but cv actions requested.  skipping")
             else:
                 cvClient = pgfCVClient(token)
                 await cvClient.execute()
 
-        if hasattr(config.args, 'velo'):
+        if config.args.velo:
             if not 'velo' in token:
                 print("no velo token provided, but velo actions requested.  skipping")
             else:

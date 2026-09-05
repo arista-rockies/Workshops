@@ -2,7 +2,7 @@ from modules import config
 from modules import pgf
 import uuid, requests, time, yaml, tempfile
 from requests_toolbelt import MultipartEncoder
-from modules.pgf import pgfAction
+from modules.pgf import pgfAction, pgfBoolAction
 from os.path import basename
 from jinja2 import Environment, FileSystemLoader
 
@@ -36,11 +36,12 @@ class pgfCVClient():
         def _addArgument(*args, **kwargs):
             if kwargs.get('action', None) == 'store_true':
                 kwargs.pop('action')
-                kwargs["nargs"] = '?'
                 kwargs.setdefault("default", False)
-                kwargs.setdefault("const", True)
+                config.parser.add_argument(*args, action=pgfBoolAction, module="cv", **kwargs)
+            else:
+                config.parser.add_argument(*args, action=pgfAction, module="cv", **kwargs)
 
-            config.parser.add_argument(*args, action=pgfAction, module="cv", **kwargs)
+        config.parser.set_defaults(cv=False)
 
         _addArgument('-cvCleanup', default=False, action='store_true', help='do cleanup steps')
         _addArgument('-cvSetup', default=False, action='store_true', help='do setup steps')
@@ -53,6 +54,19 @@ class pgfCVClient():
         _addArgument('-cvAddPackages', default=False, action='store_true', help='this option is only required for alraedy provisioned pods and will add the required packages.  these steps are automatically done on pods as they are provisioned moving forward')
         _addArgument('-cvAddCCStuff', default=False, action='store_true', help='this option is only required for already provisioned pods and will add actionBundles and ccTemplates only.  these steps are automatically done on pods as they are provisioned moving forward')
         _addArgument('-cvCheckpoint', default=None, help='string name of the checkpoint you wish to load.  is based off the specified workshop type')
+
+    def configure1():
+        config.parser.add_argument('-cvCleanup', default=False, action='store_true', help='do cleanup steps')
+        config.parser.add_argument('-cvSetup', default=False, action='store_true', help='do setup steps')
+
+        config.parser.add_argument('-cvCleanupNotifiers', default=False, action='store_true', help='only cleanup the event system')
+        config.parser.add_argument('-cvThirdParty', default='', help='comma delimited list of 3rd party devices to configure')
+        config.parser.add_argument('-cvTest', default=False, action='store_true', help='dev code')
+        config.parser.add_argument('-cvAddAdmins', default='', nargs='+', help='space separated list of email address of new admin users')
+        config.parser.add_argument('-cvAddImages', default='', nargs='+', help='space separated list of swi images to upload')
+        config.parser.add_argument('-cvAddPackages', default=False, action='store_true', help='this option is only required for alraedy provisioned pods and will add the required packages.  these steps are automatically done on pods as they are provisioned moving forward')
+        config.parser.add_argument('-cvAddCCStuff', default=False, action='store_true', help='this option is only required for already provisioned pods and will add actionBundles and ccTemplates only.  these steps are automatically done on pods as they are provisioned moving forward')
+        config.parser.add_argument('-cvCheckpoint', default=None, help='string name of the checkpoint you wish to load.  is based off the specified workshop type')
 
     def __init__(self, token):
         self.token = token

@@ -19,6 +19,18 @@ class pgfAction(argparse.Action):
         setattr(namespace, self.dest, values)
         setattr(namespace, self.module, True)
 
+class pgfBoolAction(argparse.BooleanOptionalAction):
+    def __init__(self, option_strings, dest, module=None, **kwargs):
+        if module == None:
+            raise ValueError("must specify a module")
+        super().__init__(option_strings, dest, **kwargs)
+        self.module = module
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        setattr(namespace, self.module, True)
+        super().__call__(parser, namespace, values, option_string)
+        
+
 class pgfInterface():
     _name: str
     _peer: dict
