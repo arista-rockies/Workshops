@@ -1,0 +1,3 @@
+- hostname: "{{switches['leaf1a']['hostname']}}"
+  serial: "{{switches['leaf1a']['serial']}}"
+  model: "710XP-12TH-2S"

@@ -6,7 +6,7 @@ inputs:
           campusPod:
             - inputs:
                 campusPodFacts:
-                  accessPodDefaults: {{}}
+                  accessPodDefaults: {}
                   accessPods:
                     - inputs:
                         accessPodFacts:
@@ -15,12 +15,12 @@ inputs:
                                 leafsInfo:
                                   nodeId: 1
                               tags:
-                                query: device:{CampusA-Leaf1A_Serial}
+                                query: device:{{switches['CampusA-Leaf1A']['serial']}}
                             - inputs:
                                 leafsInfo:
                                   nodeId: 2
                               tags:
-                                query: device:{CampusA-Leaf1B_Serial}
+                                query: device:{{switches['CampusA-Leaf1B']['serial']}}
                           leafsBgpAs: null
                           memberLeafMlagPairs: []
                           memberLeafs:
@@ -28,7 +28,7 @@ inputs:
                                 memberLeafsInfo:
                                   nodeId: 4
                               tags:
-                                query: device:{CampusA-Leaf1C_Serial}
+                                query: device:{{switches['CampusA-Leaf1C']['serial']}}
                           nodeGroupAttributesList: []
                       tags:
                         query: Access-Pod:Pod1
@@ -39,33 +39,33 @@ inputs:
                                 leafsInfo:
                                   nodeId: 3
                               tags:
-                                query: device:{CampusA-Leaf2A_Serial}
+                                query: device:{{switches['CampusA-Leaf2A']['serial']}}
                           leafsBgpAs: null
                           memberLeafMlagPairs: []
                           memberLeafs: []
                           nodeGroupAttributesList: []
                       tags:
                         query: Access-Pod:Pod2
-                  advancedFabricSettings: {{}}
-                  campusPodRoutingProtocols: {{}}
+                  advancedFabricSettings: {}
+                  campusPodRoutingProtocols: {}
                   design:
                     campusType: L2
                     vxlanOverlay: false
-                  egressConnectivity: {{}}
-                  fabricConfigurations: {{}}
-                  nodeTypeProperties: {{}}
-                  spineDefaults: {{}}
+                  egressConnectivity: {}
+                  fabricConfigurations: {}
+                  nodeTypeProperties: {}
+                  spineDefaults: {}
                   spines:
                     - inputs:
                         spinesInfo:
                           nodeId: 1
                       tags:
-                        query: device:{CampusA-Spine1_Serial}
+                        query: device:{{switches['CampusA-Spine1']['serial']}}
                     - inputs:
                         spinesInfo:
                           nodeId: 2
                       tags:
-                        query: device:{CampusA-Spine2_Serial}
+                        query: device:{{switches['CampusA-Spine2']['serial']}}
                   thirdPartyDevices: []
               tags:
                 query: Campus-Pod:CampusA
@@ -79,7 +79,7 @@ inputs:
                 services:
                   campusType: L2
                   svis:
-                    - addressLocking: {{}}
+                    - addressLocking: {}
                       devices:
                         - enabled: null
                           ipVirtualRouterSubnet: null
@@ -96,14 +96,14 @@ inputs:
                       eosCli: null
                       id: 100
                       ipVirtualRouterSubnet: 10.1.100.0/24
-                      multicast: {{}}
+                      multicast: {}
                       name: Vlan100
                       nodes: []
-                      ospf: {{}}
-                      privateVlan: {{}}
+                      ospf: {}
+                      privateVlan: {}
                       stpPriority: []
                       vrf: null
-                    - addressLocking: {{}}
+                    - addressLocking: {}
                       devices:
                         - enabled: null
                           ipVirtualRouterSubnet: null
@@ -115,14 +115,14 @@ inputs:
                       eosCli: null
                       id: 101
                       ipVirtualRouterSubnet: 10.1.101.0/24
-                      multicast: {{}}
+                      multicast: {}
                       name: Vlan101
                       nodes: []
-                      ospf: {{}}
-                      privateVlan: {{}}
+                      ospf: {}
+                      privateVlan: {}
                       stpPriority: []
                       vrf: null
-                    - addressLocking: {{}}
+                    - addressLocking: {}
                       devices:
                         - enabled: null
                           ipVirtualRouterSubnet: null
@@ -134,11 +134,11 @@ inputs:
                       eosCli: null
                       id: 102
                       ipVirtualRouterSubnet: 10.1.102.0/24
-                      multicast: {{}}
+                      multicast: {}
                       name: Vlan102
                       nodes: []
-                      ospf: {{}}
-                      privateVlan: {{}}
+                      ospf: {}
+                      privateVlan: {}
                       stpPriority: []
                       vrf: null
               tags:

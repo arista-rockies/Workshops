@@ -7,7 +7,7 @@ inputs:
           - interfaces: Ethernet11-12
             tagQuery:
               tags:
-                query: device:{leaf1}
+                query: device:{{switches['leaf1a']['serial']}}
       interfaceZtpMethod: access
   campus:
     - inputs:
@@ -18,7 +18,7 @@ inputs:
                   accessPodDefaults:
                     routerIdPool: 172.16.0.0/24
                     uplinkInterfaceDetails:
-                      leafPortChannelUplinksEosCli: switchport trunk native vlan {podInt}
+                      leafPortChannelUplinksEosCli: switchport trunk native vlan {{podInt+100}}
                       leafUplinksEosCli: null
                     uplinkIpv4Pool: 172.15.0.0/24
                     vtepLoopbackIPv4Pool: 172.16.1.0/24
@@ -30,26 +30,26 @@ inputs:
                                 leafsInfo:
                                   nodeId: 2
                               tags:
-                                query: device:{leaf1}
+                                query: device:{{switches['leaf1a']['serial']}}
                           memberLeafMlagPairs: []
                           memberLeafs: []
                           nodeGroupAttributesList: []
                       tags:
                         query: Access-Pod:IDF1
-                  advancedFabricSettings: {{}}
-                  campusPodRoutingProtocols: {{}}
+                  advancedFabricSettings: {}
+                  campusPodRoutingProtocols: {}
                   design:
                     campusType: L2
                     vxlanOverlay: false
-                  egressConnectivity: {{}}
+                  egressConnectivity: {}
                   fabricConfigurations: 
                     inbandManagementDetails:
                       accessPods: []
-                      inbandManagementGateway: 10.0.{podInt}.1
-                      inbandManagementSubnet: 10.0.{podInt}.0/24
-                      inbandManagementVlan: {podInt}
-                  nodeTypeProperties: {{}}
-                  spineDefaults: {{}}
+                      inbandManagementGateway: 10.0.{{podInt+100}}.1
+                      inbandManagementSubnet: 10.0.{{podInt+100}}.0/24
+                      inbandManagementVlan: {{podInt+100}}
+                  nodeTypeProperties: {}
+                  spineDefaults: {}
                   spines: []
                   thirdPartyDevices:
                     - hostname: Velo
@@ -68,7 +68,7 @@ inputs:
                 services:
                   campusType: L2
                   svis:
-                    - addressLocking: {{}}
+                    - addressLocking: {}
                       devices:
                         - enabled: null
                           ipVirtualRouterSubnet: null
@@ -78,13 +78,13 @@ inputs:
                       dhcpHelpers: []
                       enabled: null
                       eosCli: null
-                      id: {podInt}
+                      id: {{podInt+100}}
                       ipVirtualRouterSubnet: null
-                      multicast: {{}}
+                      multicast: {}
                       name: test
                       nodes: []
-                      ospf: {{}}
-                      privateVlan: {{}}
+                      ospf: {}
+                      privateVlan: {}
                       routed: false
                       vrf: null
               tags:

@@ -149,8 +149,8 @@ logging level ZTP informational
  !
  !ip route 0.0.0.0/0 10.0.101.241
  !
- ntp local-interface Vlan{podInt}
- !ntp server 10.0.10.1 prefer iburst source Vlan{podInt}
+ ntp local-interface Vlan{{podInt+100}}
+ !ntp server 10.0.10.1 prefer iburst source Vlan{{podInt+100}}
  ntp server 100.64.0.1 prefer iburst
  !
  management ssh

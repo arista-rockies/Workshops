@@ -1,41 +1,41 @@
 configlets:
   - name: "allUsers"
-    filename: "allUsers.txt"
+    filename: "allUsers.j2"
   - name: "mgmt_Leaf1a"
-    filename: "mgmt_Leaf1a.txt"
+    filename: "mgmt_Leaf1a.j2"
   - name: "mgmt_Leaf1b"
-    filename: "mgmt_Leaf1b.txt"
+    filename: "mgmt_Leaf1b.j2"
   - name: "mgmt_Leaf1c"
-    filename: "mgmt_Leaf1c.txt"
+    filename: "mgmt_Leaf1c.j2"
   - name: "mgmt_Leaf2a"
-    filename: "mgmt_Leaf2a.txt"
+    filename: "mgmt_Leaf2a.j2"
   - name: "mgmt_Spine1"
-    filename: "mgmt_Spine1.txt"
+    filename: "mgmt_Spine1.j2"
   - name: "mgmt_Spine2"
-    filename: "mgmt_Spine2.txt"
+    filename: "mgmt_Spine2.j2"
   - name: "CampusA_Base"
-    filename: "CampusA_Base.txt"
+    filename: "CampusA_Base.j2"
 
 assignments:
   #################
   - container: "Leaf1A_A"
     configlets: [ "mgmt_Leaf1a" ]
-    query: "device: {CampusA-Leaf1A_Serial}"
+    query: "device: {{switches['CampusA-Leaf1A']['serial']}}"
   - container: "Leaf1B_A"
     configlets: [ "mgmt_Leaf1b" ]
-    query: "device: {CampusA-Leaf1B_Serial}"
+    query: "device: {{switches['CampusA-Leaf1B']['serial']}}"
   - container: "Leaf1C_A"
     configlets: [ "mgmt_Leaf1c" ]
-    query: "device: {CampusA-Leaf1C_Serial}"
+    query: "device: {{switches['CampusA-Leaf1C']['serial']}}"
   - container: "Leaf2A_A"
     configlets: [ "mgmt_Leaf2a" ]
-    query: "device: {CampusA-Leaf2A_Serial}"
+    query: "device: {{switches['CampusA-Leaf2A']['serial']}}"
   - container: "Spine1_A"
     configlets: [ "mgmt_Spine1" ]
-    query: "device: {CampusA-Spine1_Serial}"
+    query: "device: {{switches['CampusA-Spine1']['serial']}}"
   - container: "Spine2_A"
     configlets: [ "mgmt_Spine2" ]
-    query: "device: {CampusA-Spine2_Serial}"
+    query: "device: {{switches['CampusA-Spine2']['serial']}}"
   
  ########
   - container: "Leaf2"

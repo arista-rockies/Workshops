@@ -7,6 +7,6 @@ inputs:
           imageName: EOSarm-4.35.4M.swi
           streamingAgentName: null
       tags:
-        query: device:{leaf1}
+        query: device:{{switches['leaf1a']['serial']}}
   ztpSoftwareAssignment: []
-  ztpSoftwareConfig: {{}}
+  ztpSoftwareConfig: {}

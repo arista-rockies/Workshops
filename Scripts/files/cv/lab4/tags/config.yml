@@ -12,41 +12,41 @@ tags:
 assignments:
     - key: Workshop
       value: CampusA
-      devices: [ "{CampusA-Spine1_Serial}", "{CampusA-Spine2_Serial}", "{CampusA-Leaf1A_Serial}", "{CampusA-Leaf1B_Serial}", "{CampusA-Leaf1C_Serial}", "{CampusA-Leaf2A_Serial}" ]
+      devices: [ "{{switches['CampusA-Spine1']['serial']}}", "{{switches['CampusA-Spine2']['serial']}}", "{{switches['CampusA-Leaf1A']['serial']}}", "{{switches['CampusA-Leaf1B']['serial']}}", "{{switches['CampusA-Leaf1C']['serial']}}", "{{switches['CampusA-Leaf2A']['serial']}}" ]
     - key: Workshop
       value: Spine
-      devices: [ "{CampusA-Spine1_Serial}", "{CampusA-Spine2_Serial}" ]
+      devices: [ "{{switches['CampusA-Spine1']['serial']}}", "{{switches['CampusA-Spine2']['serial']}}" ]
     - key: Workshop
       value: Leaf
-      devices: [ "{CampusA-Leaf1A_Serial}", "{CampusA-Leaf1B_Serial}", "{CampusA-Leaf1C_Serial}", "{CampusA-Leaf2A_Serial}" ]
+      devices: [ "{{switches['CampusA-Leaf1A']['serial']}}", "{{switches['CampusA-Leaf1B']['serial']}}", "{{switches['CampusA-Leaf1C']['serial']}}", "{{switches['CampusA-Leaf2A']['serial']}}" ]
     - key: Workshop
       value: Leaf1
-      devices: [ "{CampusA-Leaf1A_Serial}", "{CampusA-Leaf1B_Serial}", "{CampusA-Leaf1C_Serial}" ]
+      devices: [ "{{switches['CampusA-Leaf1A']['serial']}}", "{{switches['CampusA-Leaf1B']['serial']}}", "{{switches['CampusA-Leaf1C']['serial']}}" ]
     - key: Workshop
       value: Leaf1-Member-Leaf
-      devices: [ "{CampusA-Leaf1C_Serial}" ]
+      devices: [ "{{switches['CampusA-Leaf1C']['serial']}}" ]
     - key: Workshop
       value: Leaf2
-      devices: [ "{CampusA-Leaf2A_Serial}" ]
+      devices: [ "{{switches['CampusA-Leaf2A']['serial']}}" ]
     - key: Campus
       value: Workshop
-      devices: [ "{CampusA-Spine1_Serial}", "{CampusA-Spine2_Serial}", "{CampusA-Leaf1A_Serial}", "{CampusA-Leaf1B_Serial}", "{CampusA-Leaf1C_Serial}", "{CampusA-Leaf2A_Serial}" ]
+      devices: [ "{{switches['CampusA-Spine1']['serial']}}", "{{switches['CampusA-Spine2']['serial']}}", "{{switches['CampusA-Leaf1A']['serial']}}", "{{switches['CampusA-Leaf1B']['serial']}}", "{{switches['CampusA-Leaf1C']['serial']}}", "{{switches['CampusA-Leaf2A']['serial']}}" ]
     - key: Campus-Pod
       value: CampusA
-      devices: [ "{CampusA-Spine1_Serial}", "{CampusA-Spine2_Serial}", "{CampusA-Leaf1A_Serial}", "{CampusA-Leaf1B_Serial}", "{CampusA-Leaf1C_Serial}", "{CampusA-Leaf2A_Serial}" ]
+      devices: [ "{{switches['CampusA-Spine1']['serial']}}", "{{switches['CampusA-Spine2']['serial']}}", "{{switches['CampusA-Leaf1A']['serial']}}", "{{switches['CampusA-Leaf1B']['serial']}}", "{{switches['CampusA-Leaf1C']['serial']}}", "{{switches['CampusA-Leaf2A']['serial']}}" ]
     - key: Access-Pod
       value: Pod1
-      devices: [ "{CampusA-Leaf1A_Serial}", "{CampusA-Leaf1B_Serial}", "{CampusA-Leaf1C_Serial}" ]
+      devices: [ "{{switches['CampusA-Leaf1A']['serial']}}", "{{switches['CampusA-Leaf1B']['serial']}}", "{{switches['CampusA-Leaf1C']['serial']}}" ]
     - key: Access-Pod
       value: Pod2
-      devices: [ "{CampusA-Leaf2A_Serial}" ]
+      devices: [ "{{switches['CampusA-Leaf2A']['serial']}}" ]
     - key: Role
       value: Leaf
-      devices: [ "{CampusA-Leaf1A_Serial}", "{CampusA-Leaf1B_Serial}", "{CampusA-Leaf2A_Serial}" ]
+      devices: [ "{{switches['CampusA-Leaf1A']['serial']}}", "{{switches['CampusA-Leaf1B']['serial']}}", "{{switches['CampusA-Leaf2A']['serial']}}" ]
     - key: Role
       value: Member-Leaf
-      devices: [ "{CampusA-Leaf1C_Serial}" ]
+      devices: [ "{{switches['CampusA-Leaf1C']['serial']}}" ]
     - key: Role
       value: Spine
-      devices: [ "{CampusA-Spine1_Serial}", "{CampusA-Spine2_Serial}" ]
+      devices: [ "{{switches['CampusA-Spine1']['serial']}}", "{{switches['CampusA-Spine2']['serial']}}" ]
 

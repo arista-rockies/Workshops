@@ -9,6 +9,7 @@ requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 class LabState(Enum):
     RUNNING = 2
+    STOPPING = 3
     STOPPED = 4
 
 class actException(Exception):

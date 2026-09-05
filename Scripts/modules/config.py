@@ -1,4 +1,4 @@
-import argparse, yaml, csv
+import argparse, yaml, csv, json
 
 # not a huge fan, but i'm out of time
 def findDeviceBySerial(deviceInventory, sn):
@@ -26,7 +26,7 @@ def loadInventory():
                 device["mac"] = device["Mac address"]
                 device["hostname"] = device["Hostname"]
                 device["software"] = device["Software Version"]
-                device["id"] = device.get("ID", device["Hostname"])
+                device["id"] = device.get("ID", device["hostname"][device["hostname"].rfind("-")+1:])
                 device["model"] = device.get("Model", "")
 
                 if device['Model'][0] == 'A':
@@ -36,9 +36,11 @@ def loadInventory():
                     p = globalInventory.setdefault(podNum, [])
                     p.append(device)
 
-                    subs = globalSubstitutions.setdefault(podNum, {"podInt": int(podNum), "podStr": str(podNum)})
-                    subs[f'{device["hostname"]}_Serial'] = device["sn"]
-                    subs[f'{device["hostname"]}_Hostname'] = device["hostname"]
+                    subs = globalSubstitutions.setdefault(podNum, {"podInt": int(podNum), "podStr": f"{podNum:>02}", "switches": {}})
+                    subs['switches'][device["id"]] = {
+                        "serial": device["sn"],
+                        "hostname": device["hostname"]
+                    }
 
                 elif device['Model'][0] == 'V':
                     podNum = device["CVaaS and CV-CUE Pod Assignment"]
@@ -51,7 +53,6 @@ def loadInventory():
 
         for pod in apiTokens:
             p = globalInventory.setdefault(pod, [])
-            subs = globalSubstitutions.setdefault(pod, {})
             topology = yaml.safe_load(s.replace("###", f"{str(pod):0>2}"))
 
             for node in topology.get("nodes", []):
@@ -70,9 +71,11 @@ def loadInventory():
                         }
                         p.append(device)
 
-                        subs = globalSubstitutions.setdefault(pod, {"podInt": int(pod), "podStr": str(pod)})
-                        subs[f'{device["id"]}_Serial'] = device["sn"]
-                        subs[f'{device["id"]}_Hostname'] = device["hostname"]
+                        subs = globalSubstitutions.setdefault(pod, {"podInt": int(pod), "podStr": f"{pod:>02}", "switches": {}})
+                        subs['switches'][device["id"]] = {
+                            "serial": device["sn"],
+                            "hostname": device["hostname"]
+                        }
 
                     break
 
