@@ -4,23 +4,7 @@ class ParseRangeAction(argparse.Action):
     """Custom argparse action.
     Parses a comma-separated string of integers and ranges into a sorted list of unique integers.
 
-        Args:
-            value (str): A string containing individual integers, ranges, or a mix
-                separated by commas (e.g., "1-5,10,12-15").
-
-        Returns:
-            list[int]: A sorted list of unique integers expanded from the input.
-
-        Raises:
-            argparse.ArgumentTypeError: If any comma-separated segment is not a valid
-                integer or range (e.g., "1-a", "5-1-10").
-
-        Examples:
-            >>> parse_range("1-5,10")
-            [1, 2, 3, 4, 5, 10]
-
-            >>> parse_range("10, 1-3, 5")
-            [1, 2, 3, 5, 10]
+    Sample input formats: "all", 0-100, 1-10,15,20
     """
 
     def __call__(self, parser, namespace, values, option_string=None):

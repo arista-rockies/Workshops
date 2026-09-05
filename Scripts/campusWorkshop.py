@@ -51,7 +51,7 @@ apiToken:
         "key": "actKey"
         "sshPassword": ""
 """
-import os, argparse, yaml, asyncio, csv, requests, json
+import os, argparse, yaml, asyncio, csv, requests, json, sys
 
 from modules import config
 config.parser = argparse.ArgumentParser()
@@ -94,13 +94,16 @@ async def main():
         tokens = yaml.safe_load(f.read())["apiToken"]
 
     # Determine if pods is "all" or string range like 1-5,10,20
-    if "all" in confg.args.pods:
+    if "all" in config.args.pods:
         target_pods = token.keys()
     else:
-        target_pods = confg.args.pods
+        target_pods = config.args.pods
 
     # Follow the script convention for assigning ingested token values to the config object
     for pod in target_pods:
+        if pod not in tokens:
+            sys.stderr.write(f"Warning: Pod '{pod}' not found in token configuration. Skipping.\n")
+            continue
         config.apiTokens[pod] = tokens[pod]
 
     config.loadInventory()
