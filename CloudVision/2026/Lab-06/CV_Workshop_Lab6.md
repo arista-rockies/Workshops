@@ -39,7 +39,7 @@ CampusB-Leaf2A device will simulate a failure requiring device replacement so th
 
 Lab section goal - use CloudVision's tags and Events system to create a customized email alert when leaf to spine uplinks or specific devices go offline.
 
-1. Set customized tags
+Set customized tags
   -  Create a new workspace
   -  Navigate to **Provisioning > Tags**
 
@@ -149,6 +149,54 @@ Next, Add a notification rule by navigating to **Rules** within the Notification
 - Send a test notification if you desire. Make sure to use your rule label for example use the  **Rule Label: Prod-device-down**
 - ![Match rule names](images/test-notifs.png)
 - 
+
+
+- Create change control and reboot either one of the CampusB Spine devices.
+- Navigate to **Provisioning**, **Change Control**, then click **Create Change Control**
+- ![Navigate to Change Control](images/navccspinereboot-events.png)
+
+- Give the Change Control a more descriptive name by clicking the **pencil icon**
+- Then click **Add Action**
+- ![Change Control Add Action](images/createcc-events.png)
+- On the right side Add Action menu, search for Action **Reboot** and click on it to select and add it
+- ![Change Control Add Action](images/ccselectreboot-events.png)
+- Search for your Campus B naming standard, and find one of the Spine devices (either spine will do) and click **Add to Change Control**
+- ![Add Spine](images/addspineaction-events.png)
+- Verify that a Campus B spine device has been added to the Reboot Change and **Click Review and Approve**
+- This Change Control will cause Campus B leafs to have an uplink failure including Leaf2A which will trigger your customized email alert
+- ![Approve Reboot CC](images/rebootspinecc-events.png)
+- 
+- **Approve and Execute** immediately the Reboot Change Control
+- ![Approve Reboot CC](images/execrebootcc-events.png)
+
+- Navigate back to the Events main dashboard using the menu bar, and adjust your viewport to show **Last 15 mins**
+- ![Approve Reboot CC](images/eventslast15-events.png)
+- From this view you should see events periodically stream in to the Event List
+- ![Approve Reboot CC](images/eventstream-events.png)
+- Note that CloudVision also recorded all of the default events for events and device reboots in the Events menu. However only the customized uplink alert is set to generate email alerts. Also note that even though many uplink interfaces went down, the only email alert received for this event type is for the uplinks failure occuring on Leaf2A because it is the only device matching the device tag configured for the custom event.
+- Check for alert emails sent from **cvaas-alerts@arista.com** After a few minutes you should receive the uplink failure email alert containing additional information and a link to the event in CloudVision viewport date/time
+- - ![Approve Reboot CC](images/uplinkfailemail-events.png)
+
+- Filter the main Events dashboard
+- - Deselect the **Warning** and **Info** level events.
+  - Type in your uplink event rule name in the **Rule Label** filter
+  - Click the **Unexpected Interface Failure** event name in the Event List to open details about that event
+- ![Events Filtered Dashboard](images/uplinkeventmain-events.png)
+
+
+- Notice your viewport has moved to the date and time the event occurred. If you browse to other dashboards in CloudVision from here, it will render those dashboard at that point in time.
+- Browse the additional related information in the Summary tab to see this interface's history and LLDP neighbors
+- Select **Related Events** menu tab (to the right of Summary) and view the events CloudVision correlates with the alerted interface failure event.
+- ![Event Summary](images/summintdetails-events.png)
+  
+Notice the Change Control event is correlated and the link failures are shown with likely **Administrative Interface Shutdown** events. From this information the user is shown that the Unexpected Link Failure and Change Control events are related and that it was administrative in nature, rather than a correlated hardware or software failure events.
+- ![Related Events Uplink Failure](images/relatedevents-spinereboot.png)
+
+**This concludes the CloudVision Events and Notifications Customization Section**
+
+# 4. CloudVision Events
+
+### Customize Events and Notifications
 
 ---
 
