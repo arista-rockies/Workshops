@@ -110,6 +110,7 @@ In the Tag Selected Column on the right, verify your CampusB-Leaf2A device shows
 - Specify your custom device tag e.g. **ptptype: prod**
 - Verify the tag match by clicking the save icon and seeing CampusB-Leaf2A device
 - Label this rule something you can reference later such as **Prod-device-down**
+- ![Add Rule](images/ptptagmatch-event.png)
 
 - Click Save in the upper right to save your changes:
 - ![Save Event](images/save-event.png)
