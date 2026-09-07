@@ -254,9 +254,9 @@ Goal - In this lab section, CloudVision Studios will be used to configure **Conn
 - Select Metric Packet Loss and Connectivity probes as all three leaf switches
 - ![Packet Loss Dashboard](images/cmdashboard-cm.png)
 - Next, use previous lab instructions to execute a reboot change control on either Campus-B Spine device. Watch this Connectivity Monitor dashboard in another browser tab while the spine device reboots.
-- Note - some probes to the Gateway virtual address may initially fail and render as brief loss as the
+- Note - some probes to the Gateway virtual address may initially fail and render as brief loss as the VARP IP address resolves by the probe.
 - ![Packet Loss Impact](images/packetlossprerecovery-cm.png)
-- For the remaining duration of Spine reboot we should see the network converged to only the unique IP address is affected, the other spine and gateway address are reachable
+- For the remaining duration of Spine reboot we should see the network converged to only the unique Spine IP address is affected, the other Spine and Gateway addresses remain reachable
 - ![Packet Loss Synchronized](images/packetlossrecover-cm.png)
 - After the Spine device recovers, the dashboard should render back to healthy
 - Clicking into the boxes reveals the time-series statistics for the probe
