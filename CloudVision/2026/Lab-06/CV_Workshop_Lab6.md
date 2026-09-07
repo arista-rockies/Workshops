@@ -1,19 +1,18 @@
-<img width="670" height="926" alt="image" src="https://github.com/user-attachments/assets/20fa6e4f-ef0f-4bee-99f0-f9404cf4e96d" /># CloudVision Lab 06
+# CloudVision Lab 06
 ## Campus Fabric Studio
 ![CloudVision](images/cv-logo.png)
 
 ## This Lab Guide:
 
 
-
-[CloudVision Workshop Lab Guide 06- Inventory and Topology ](NEEDLINK!!!!)
-
 ---
 
 ## Table of Contents
 1. [Lab Topology](#1-lab-topology)
-2. [Lab Topology](#2-accessing-lab)
-
+2. [Lab Details](#2-lab-details)
+3. [CloudVision Event Customization](#3-CV-Events)
+4. [Connectivity Monitor](#4-Connectivity-Monitor)
+5. [Zero Touch Replacement ZTR](#5-ZeroTouchReplacement)
 
 ---
 
@@ -23,7 +22,7 @@
 
 **Note - this section uses Campus B devices including ZTR - Zero Touch Replacement of CampusB-Leaf2A.
 Complete previous lab sections to ensure Leaf2A is provisioned before starting this lab section.**
-
+#
 ---
 
 # 2. Lab Details
