@@ -19,7 +19,7 @@
 
 # 1. Lab Topology
 
-![Full Lab Topology](images/lab-topology.png)
+![Full Lab Topology](../lab-topology.png)
 
 **Note - this section uses Campus B devices including ZTR - Zero Touch Replacement of CampusB-Leaf2A.
 Complete previous lab sections to ensure Leaf2A is provisioned before starting this lab section.**
