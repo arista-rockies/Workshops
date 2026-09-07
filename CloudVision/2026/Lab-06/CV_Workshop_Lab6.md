@@ -195,9 +195,82 @@ Notice the Change Control event is correlated and the link failures are shown wi
 
 **This concludes the CloudVision Events and Notifications Customization Section**
 
-# 4. CloudVision Events
+# 4. Connectivity Monitor
 
-### Customize Events and Notifications
+### Configure Connectivity Monitor to collect data plane telemetry
+
+Goal - In this lab section, CloudVision Studios will be used to configure **Connectivity Monitor** which runs on EOS devices and sends probes to defined destinations using in-band data plane packets. This feature is useful to collect latency, jitter, and packet loss within the network in real-time and historically.
+
+** Connectivity Monitor Steps Overview **
+1) Use Network Hierarchy to add a designated routed in-band VLAN with SVIs, if one is not already created.
+2) Use Studios to Setup **in-band** mgmt addresses on VLAN X with IP subnet:__________________
+3) Use CM studio to probe from leafs to spine IPs and virtual router within the VLAN
+
+
+- Use the Network Hierarchy to create within Campus B a routed VLAN that is added to both Pod1 and Pod2.
+- Ensure the VLAN Type is **Routed**, set as **Enabled**, and note down the IP Virtual Router Subnet you choose as it will be referred to later
+- Click Save to return to the CampusB configuration
+- ![Add VLAN](images/addvlan-cm.png)
+
+- Next, select the **In-band Management** function under Device Management Menu and click **Edit**
+- Enable the in-band management toggle
+- Specify **Automatic** Address Allocation and select **Front-to-Back** Allocation Order
+- Specify your VLAN ID and IP subnet in CIDR notation of the routed VLAN in Campus B
+- Click Save
+- ![Add VLAN](images/editinband-cm.png)
+
+- Review your Workspace for the following changes:
+- Leaf switches have truck allowed list updated and receive a unique SVI IP address within the VLAN subnet
+- Spine switches receive unique IP addresses and a shared **ip virtual-router address** which is common among the spines
+- Note down the virtual router address - e.g. 10.0.201.1 and spine-1 and spine-2's unique addresses, e.g. 10.0.201.2 and 10.0.201.3 in this example. These spine addresses will be the probe destination addresses for Connectivity Monitor.
+- - ![Verify Inband](images/inbandverify-cm.png)
+ 
+- Submit the workspace and push the VLAN changes out to Campus B by Approving and Executing the Change Control
+
+- Configure Connectivity Monitor
+- Navigate to **Provisioning** then **Studios**
+- Deselect the Active Studios filter to show all available studios, select **Connectivity Monitoring**
+- ![Connectivity Monitoring](images/selectcmstudio-cm.png)
+
+- Within the Connectivity Monitoring Studio set the following configuration:
+- Add Hosts entries for each of the spine IP addresses in the routed VLAN and click the **Add Host Monitoring** 
+- ![Add Hosts](images/addcmhosts-cm.png)
+- Add Host Monitoring tags which select **Campus-Pod: CampusB** and **Role: Leaf** then click into the rule to modify it
+- ![Add Hosts](images/addmontags-cm.png)
+
+- Verify your tag match includes the top-level leaf switches in Campus B by hovering your mouse over the hint, spines and other downstream member-leaf are excluded in this example.
+- ![Add Hosts](images/verifytags-cm.png)
+- Within the Monitoring Hosts list, add all three addresses the VLAN Gateway and each spine.
+- ![Add Host Entries](images/addhostentries-cm.png)
+  
+- Review your workspace for the following configuration
+
+- Leaf Switches only are modified with to enable the feature **monitor connectivity** with a host entry for each host IP address to be probed.
+- ![Review CM Workspace](images/reviewcmws-cm.png)
+- Approve and Execute the corresponding change control to enable the feature on the leaf switches in Campus B.
+- ![Execute CM Change Control](images/execcmcc-cm.png)
+
+- Navigate to **Devices** then **Connectivity Monitor** menu
+- Select Metric Packet Loss and Connectivity probes as all three leaf switches
+- ![Packet Loss Dashboard](images/cmdashboard-cm.png)
+- Next, use previous lab instructions to execute a reboot change control on either Campus-B Spine device. Watch this Connectivity Monitor dashboard in another browser tab while the spine device reboots.
+- Note - some probes to the Gateway virtual address may initially fail and render as brief loss as the
+- ![Packet Loss Impact](images/packetlossprerecovery-cm.png)
+- For the remaining duration of Spine reboot we should see the network converged to only the unique IP address is affected, the other spine and gateway address are reachable
+- ![Packet Loss Synchronized](images/packetlossrecover-cm.png)
+- After the Spine device recovers, the dashboard should render back to healthy
+- Clicking into the boxes reveals the time-series statistics for the probe
+- ![Packet Loss Synchronized](images/probepopup-cm.png)
+- Explore the Jitter and Latency probes similarly
+- ![Packet Loss Synchronized](images/otherprobes-cm.png)
+- Finally navigate to Network Hierarchy then select your **CampusB** to reveal the scoped dashboard.
+- Note that Connectivity Monitor Anomalies are now summarized where this data is available to CloudVision.
+- ![Packet Loss Synchronized](images/nhdash-cm.png)
+- You now have an at a glance view of the data plane health within this portion of the network. This feature can also probe to host IPs, 3rd party devices, or any destination that responds to ICMP or an HTTP get.
+
+- **This Concludes the Connectivity Monitor lab section**
+
+
 
 ---
 
