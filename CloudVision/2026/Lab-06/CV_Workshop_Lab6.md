@@ -1,4 +1,4 @@
-# CloudVision Lab 06
+<img width="670" height="926" alt="image" src="https://github.com/user-attachments/assets/20fa6e4f-ef0f-4bee-99f0-f9404cf4e96d" /># CloudVision Lab 06
 ## Campus Fabric Studio
 ![CloudVision](images/cv-logo.png)
 
@@ -270,7 +270,39 @@ Goal - In this lab section, CloudVision Studios will be used to configure **Conn
 
 - **This Concludes the Connectivity Monitor lab section**
 
+# 5. Zero Touch Replacement - ZTR
 
+**ZTR Lab Section**
+Goal - In this lab section, CampusB-Leaf2A will be simulated offline by blocking its management connection to CloudVision. A fresh virtual device Leaf-ZTR will be unblocked to replace it. Due to the nature of the virtual lab environment, the port connections must remain in-place while the topology is deployed. Therefore, the new ZTR replacement device is cabled to different interfaces within the environment.
+
+The lab instructor will inform the class when CampusB-Leaf2A will be disrupted so that you can begin this lab section. Do not start the ZTR replacement until CampusB-Leaf2A shows offline in CloudVision.
+
+- From the **Devices** menu **Inventory** page click on the offline CampusB-Leaf2A's device page by clicking on the Hostname
+- ![Select Leaf2A](images/selectleaf2a-ztr.png)
+
+- Within the device page, scroll down and click the **Replace Device** button.
+- ![Replace Device](images/clickreplace-ztr.png)
+
+- In the Replace Device Dialog, check the Leaf2A failed device to select it, then click the drop-down for Replacement Device and select the ZTP-status DHCP IP address device (look for the green indicator)
+- ![Select Replacement](images/selectreplacement-ztr.png)
+
+- CloudVision will displace a status window while the process is in-flight.
+- ![Status](images/qastatus-ztr.png)
+
+- Next, CloudVision presents you with changes it has detected.
+- 1) Spine connections are different since the ZTR device is pre-connected to ports adjacent to Leaf2A
+  2) Copies over the existing configuration from Leaf2A.
+
+ - ![Spine Config](images/spineadjust-ztr.png)
+ - ![Leaf Config](images/leafztrcfg-ztr.png)
+
+ - Once you have reviewed the changes, select **Continue to Replace** button
+ - ![Continue Replace](images/continuereplace-ztr.png)
+
+- Note - the device replacement Change Control will execute automatically for you at this stage. The replacement device will need to go through the same Zero Touch Provisioning reboot process after configuration is updated that previous provisioning operations completed. Please give the replacement Leaf2A device a few minutes to boot up after replacement.
+
+- After the replacement Leaf2A has booted back up, confirm that your customized device tags, and Connectivity Monitor configuration have updated.
+- 
 
 ---
 
