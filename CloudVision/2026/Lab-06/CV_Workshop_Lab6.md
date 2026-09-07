@@ -271,10 +271,12 @@ Goal - In this lab section, CloudVision Studios will be used to configure **Conn
 
 # 5. Zero Touch Replacement - ZTR
 
-**ZTR Lab Section**
-Goal - In this lab section, CampusB-Leaf2A will be simulated offline by blocking its management connection to CloudVision. A fresh virtual device Leaf-ZTR will be unblocked to replace it. Due to the nature of the virtual lab environment, the port connections must remain in-place while the topology is deployed. Therefore, the new ZTR replacement device is cabled to different interfaces within the environment.
+Stop and wait here until the lab instructor informs the class when CampusB-Leaf2A will be disrupted for the ZTR section. Do not start the ZTR replacement until CampusB-Leaf2A shows offline in CloudVision.
 
-The lab instructor will inform the class when CampusB-Leaf2A will be disrupted so that you can begin this lab section. Do not start the ZTR replacement until CampusB-Leaf2A shows offline in CloudVision.
+**ZTR Lab Section**
+Goal - In this lab section, CampusB-Leaf2A will be simulated offline by blocking its management connection to CloudVision. A fresh virtual device Leaf-ZTR will be unblocked to replace it. Due to the nature of the virtual lab environment, the port connections must remain in-place while the topology is deployed. Therefore you will see the new ZTR replacement device is connected to different interfaces within the environment versus the original Leaf2A and how the ZTR process accommodates updating the fabric configurations to the new connections.
+
+
 
 - From the **Devices** menu **Inventory** page click on the offline CampusB-Leaf2A's device page by clicking on the Hostname
 - ![Select Leaf2A](images/selectleaf2a-ztr.png)
