@@ -3,7 +3,8 @@ import requests, argparse, json, yaml, time, paramiko, socks, urllib
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from modules.pgf import pgfAction, pgfBoolAction
 from enum import Enum
-import tqdm
+import tqdm, io
+from jinja2 import Environment, FileSystemLoader
 
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
@@ -41,6 +42,7 @@ class ActClient():
         _addArgument('-actDeployLab', action='store_true', default=False, help='deploy and start the topology')
         _addArgument('-actGetLab', action='store_true', default=False, help='print bootstrap ips')
         _addArgument('-actSetupLinux', action='store_true', default=False, help='configure bootstrap')
+        _addArgument('-actSetupHost', action='store_true', default=False, help='configure the linux host')
         _addArgument('-actUpdateLinux', action='store_true', default=False, help='configure bootstrap')
         _addArgument('-actTest', action='store_true', default=False)
         _addArgument('-actResetBlocks', action='store_true', default=False)
@@ -75,10 +77,17 @@ class ActClient():
 
     def execute(self):
         if config.args.actTest:
-            while True:
-                resp = self.waitOnOperation('84af49feafa945738a321a5533db650f', sleep=10, timeout=None, statusChar=".", debug=True)
-                print(resp)
-                time.sleep(1)
+            name = self.resourceName.format(config.currentPod)
+
+            # not sure why getLabByName doesn't return devices but getLabByID does
+            lab = self.getLabByName(name)
+            l = self.getLabByID(lab["id"])
+            if not l.get("devices", None):
+                print("could not find any devices in this lab.  has it finished being deployed?")
+                return
+
+            print(json.dumps(l, indent=2))
+            return
 
         if config.args.actResetBlocks:
             self._iptables("reset")
@@ -115,6 +124,9 @@ class ActClient():
             return
         if config.args.actSetupLinux:
             self.doSetupLinux()
+            return
+        if config.args.actSetupHost:
+            self.doSetupHost()
             return
 
     def connect(self):
@@ -442,10 +454,12 @@ class ActClient():
                 print(f"{dev['hostname']}: {dev['internal_ip']}")
             elif 'host' in dev['hostname']:
                 print(f"{dev['hostname']}: {dev['internal_ip']}")
+
         return True
 
     def _setupSSH(self, ip, sshUser, sshPassword):
         # https://stackoverflow.com/questions/47441351/using-paramiko-with-socks-proxy
+        print(f"   connecting to {ip} via ssh")
         sock = None
         if self.proxies:
             s = urllib.parse.urlsplit(self.proxies["http"])
@@ -455,9 +469,15 @@ class ActClient():
                 addr=s.hostname,
                 port=s.port
             )
-            sock.connect((ip, 22))
+            while True:
+                try:
+                    sock.connect((ip, 22))
+                    break
+                except:
+                    print(",", flush=True, end="")
+                    time.sleep(1)
+            
 
-        print(f"   connecting to {ip} via ssh")
         pmClient = paramiko.SSHClient()
         pmClient.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         connected = False
@@ -468,7 +488,7 @@ class ActClient():
                 print("   connected", flush=True, end="\n")
                 return pmClient
             except Exception as e:
-                print(".", flush=True, end="")
+                print(f".{e}", flush=True, end="")
                 time.sleep(1)
 
         raise Exception(f'could not connect to {ip}')
@@ -492,6 +512,43 @@ class ActClient():
                     pmClient = self._setupSSH(host["internal_ip"], sshUser, sshPassword)
 
                     pmClient.exec_command(f"sudo bash workshopIPTables.sh {operation}")
+
+    def doSetupHost(self):
+        print(f"{config.currentPod} - doSetupHost")
+        name = self.resourceName.format(config.currentPod)
+
+        while not self.doGetLab(quiet=True):
+            print(".", flush=True, end="")
+            time.sleep(10)
+
+        print("", flush=True)
+
+        # not sure why getLabByName doesn't return devices but getLabByID does
+        lab = self.getLabByName(name)
+        l = self.getLabByID(lab["id"])
+        if not l.get("devices", None):
+            print("could not find any devices in this lab.  has it finished being deployed?")
+            return
+
+        # i know the bootstrap box is a generic
+        for host in l["devices"]["generic"]:
+            if "host" in host["hostname"]:
+                sshUser = "administrator"
+                sshPassword = self.token["act"]["sshPassword"]
+                pmClient = self._setupSSH(host["internal_ip"], sshUser, sshPassword)
+
+                scp = pmClient.open_sftp()
+                scp.put('setupACTHost.sh', '/home/administrator/setupACTHost.sh')
+                scp.chmod('/home/administrator/setupACTHost.sh', 0o700)
+
+                stdin, stdout, stderr = pmClient.exec_command("sudo -S /home/administrator/setupACTHost.sh", get_pty=True)
+
+                # if we don't read the redirects then the con will terminate and stop the script
+                for line in iter(stdout.readline, ""):
+                    print(line, end="")
+
+
+                pmClient.close()
 
     def doSetupLinux(self):
         def updateBar(transferred, total):
@@ -520,6 +577,19 @@ class ActClient():
             print("could not find any devices in this lab.  has it finished being deployed?")
             return
 
+        deviceInventory = config.globalInventory.get(str(int(config.currentPod)), -1)
+
+        # this could be built with a crafty comprehension.   not doing that in an effort of... comprehension
+        devList = {"switches": {}}
+        for actDev in l["devices"]["veos"]:
+            #hostname here is really the sn
+            # let's look through the device inventory for this act device so we can get the ID.  we'll want that
+            #  for the jinja substituions to work globally
+            inventoryDev = config.findDeviceBySerial(deviceInventory, actDev["hostname"])
+            devList["switches"][inventoryDev["id"]] = { "ip": actDev["internal_ip"], "serial": actDev["hostname"]}
+            
+        blockScript = io.BytesIO(Environment(loader=FileSystemLoader('files')).get_template('workshopIPTables.j2').render(devList).encode('utf-8'))
+
         # i know the bootstrap box is a generic
         for host in l["devices"]["generic"]:
             if "bootstrap" in host["hostname"]:
@@ -541,7 +611,8 @@ class ActClient():
 
                 scp.put('tokenConfig.yml', '/home/administrator/tokenConfig.yml')
                 scp.put('setupACTGateway.sh', '/home/administrator/setupACTGateway.sh')
-                scp.put('workshopIPTables.sh', '/home/administrator/workshopIPTables.sh')
+                scp.putfo(blockScript, '/home/administrator/workshopIPTables.sh')
+                #scp.put('workshopIPTables.sh', '/home/administrator/workshopIPTables.sh')
                 scp.chmod('/home/administrator/setupACTGateway.sh', 0o700)
                 scp.chmod('/home/administrator/workshopIPTables.sh', 0o700)
 

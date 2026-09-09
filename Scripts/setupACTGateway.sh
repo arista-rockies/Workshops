@@ -127,16 +127,6 @@ cat <<EOF > /etc/kea/kea-dhcp4.conf
                     "client-class": "CampusB"
                 }
             ],
-            "reservations": [
-                {
-                    "client-id": "001c73${PODPAD}0235",
-                    "ip-address": "192.168.3.35"
-                },
-                {
-                    "client-id": "001c73${PODPAD}0240",
-                    "ip-address": "192.168.3.40"
-                }
-            ],
 
             "option-data": [
                 {
@@ -161,6 +151,16 @@ cat <<EOF > /etc/kea/kea-dhcp4.conf
   ]
 }
 }
+EOF
+
+cat <<EOF > /var/lib/blocks
+STATE=reset
+EOF
+
+cat << EOF >> /usr/sbin/act-network-create
+# when the machine starts up we need to set up the blocks
+source /var/lib/blocks
+/home/administrator/workshopIPTables.sh \${STATE}
 EOF
 
 cat << EOF > /etc/sysctl.d/98-forwarding.conf
@@ -223,8 +223,6 @@ echo "chowning `date`"
 chown -R administrator:administrator /home/administrator/
 
 # these values are hard set in the dhcp config higher up
-L2=192.168.3.35
-ZTR=192.168.3.40
 CAMPUSB=192.168.2.0/24
 
 # at this point we should be able to run the iptables stuff
@@ -233,13 +231,9 @@ iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
 
 # set up some new chains to make rule changes easier and keep the order right
 iptables -N campusb
-iptables -N leaf2
-iptables -N ztr
 
 iptables -F FORWARD
 iptables -A FORWARD -s ${CAMPUSB} -j campusb
-iptables -A FORWARD -s ${L2} -j leaf2
-iptables -A FORWARD -s ${ZTR} -j ztr
 # make sure to clamp mss so TA won't have issues later
 iptables -A FORWARD -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --set-mss 800
 
