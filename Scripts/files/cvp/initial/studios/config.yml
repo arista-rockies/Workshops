@@ -1,0 +1,4 @@
+studios:
+  - name: StreamingTelemetry
+    id: studio-telemetry-config
+    selector: "device: *"
