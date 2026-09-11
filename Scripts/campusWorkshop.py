@@ -56,7 +56,7 @@ apiToken:
         "key": "actKey"
         "sshPassword": ""
 """
-import os, argparse, yaml, asyncio, csv, requests, json
+import os, argparse, yaml, asyncio, csv, requests, json, sys
 
 from modules import config
 config.parser = argparse.ArgumentParser()
@@ -79,14 +79,16 @@ ActClient.configure()
 
 from modules.pgf import pgfDevice
 
+from modules.third_party import ParseRangeAction # David Sun range parser for '-pods' flag
+
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
 os.environ["GRPC_VERBOSITY"] = "ERROR"
 os.environ["GLOG_minloglevel"] = "2"
 
 config.parser.add_argument('-test', default=False, action='store_true', help='testing new code')
-config.parser.add_argument('-tokenFile', default="tokenConfig.yml", help="Contains the tokens we should use along with the defined pods")
-config.parser.add_argument('-pods', required=True, nargs='+', help='specify a space delimited list of pods to run against, by default all pods will be operated on')
+config.parser.add_argument('-tokenFile', required=True, default="tokenConfig.yml", help="Contains the tokens we should use along with the defined pods")
+config.parser.add_argument('-pods', required=True, action=ParseRangeAction, nargs='+', help='specify a space delimited list of pods to run against, by default all pods will be operated on')
 config.parser.add_argument('-i', default="2026CampusWorkshopHardware.csv", help="hardware inventory")
 config.parser.add_argument('-type', default='campus', help='type of workshop.  can be campus or cv')
 
@@ -96,7 +98,17 @@ async def main():
     with open(config.args.tokenFile, "r") as f:
         tokens = yaml.safe_load(f.read())["apiToken"]
 
-    for pod in config.args.pods:
+    # Determine if pods is "all" or string range like 1-5,10,20
+    if "all" in config.args.pods:
+        target_pods = token.keys()
+    else:
+        target_pods = config.args.pods
+
+    # Follow the script convention for assigning ingested token values to the config object
+    for pod in target_pods:
+        if pod not in tokens:
+            sys.stderr.write(f"Warning: Pod '{pod}' not found in token configuration. Skipping.\n")
+            continue
         config.apiTokens[pod] = tokens[pod]
 
     config.loadInventory()
