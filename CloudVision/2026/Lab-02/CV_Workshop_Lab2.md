@@ -105,10 +105,13 @@ There is no right or wrong way to design this hierarchy, and each organization m
 ![Static Configuration Assign Base Configlet](images/ws-assign-configlet.png)    
 
 
-12. Assign all devices to their intended containers.
+12. Assign each devices to their intended containers.
    - Locate the device's intended container.
    - Select the **3 dots** next to the container.
    - Select **Add Device**
+
+   > [!NOTE]
+   > **THE IMAGE DISPLAYED MAY NOT MATCH YOUR CONFIGURED HIERARCHY. BE SURE TO ADD THE DEVICES TO THE INTENDED CONTAINER STRUCTURE IN YOUR HIERARCHY**
 
  ![Static Configuration Add Device](images/scs-add-device1.png)     
 
