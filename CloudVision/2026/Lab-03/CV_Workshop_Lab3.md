@@ -161,7 +161,7 @@ In this lab we will demonstrate the use of the Campus Fabric Studio. We will bui
 
      - Locate the **Design** section and select the **Lightning Bolt**
 
-       - *This will auto-assign node IDs to devices*
+       - *This will auto-assign node IDs to devices. You will see a green message appear at the top right of your screen*
 
 ![Add Leafs](images/node-id.png)
 
