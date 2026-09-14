@@ -80,12 +80,12 @@ cat <<EOF > /etc/kea/kea-dhcp4.conf
     # Arista;vEOS-lab;P19-CampusA-Leaf1-2
     "client-classes": [
         {
-            "name": "CampusB",
-            "test": "(substring(option[60].hex,26,1) == 'B')"
+            "name": "CampusA",
+            "test": "substring(option[60].hex,26,1) == 'A'"
         },
         {
-            "name": "CampusA",
-            "test": "substring(option[60].hex,26,1) == 'A' and not member('CampusB')"
+            "name": "CampusB",
+            "test": "not member('CampusA')"
         }
     ],
 
