@@ -127,7 +127,7 @@ class pgfCVClient():
         jinjaEnv = Environment(loader=FileSystemLoader(f'{basePath}/studios/'))
 
         for studio in studiosConfig.get("studios", []):
-            print(f'  - {studio["name"]}')
+            print(f"  - {studio['name']}")
             if (filename := studio.get("filename", None)):
                 studioTemplate = jinjaEnv.get_template(filename)
                 studio["text"] = yaml.safe_load(studioTemplate.render(vals))["inputs"]
@@ -223,7 +223,7 @@ class pgfCVClient():
             try:
                 configletTemplate = jinjaEnv.get_template(configlet["filename"])
                 configlet["text"] = configletTemplate.render(vals)
-                print(f'  - pushing {configlet["name"]}')
+                print(f"  - pushing {configlet['name']}")
                 await self._doConfiglet(c, workspaceID, configlet)
             except Exception as e:
                 print(f'could not load configlet {configlet}. skipping')
@@ -234,7 +234,7 @@ class pgfCVClient():
             if container.get("isRoot", False):
                 rootContainers.append(container["container"])
 
-            print(f'  - assigning {container["container"]}')
+            print(f"  - assigning {container['container']}")
             await self._doConfiglet(c, workspaceID, container)
     
         await c.set_studio_inputs(studio_id='studio-static-configlet', workspace_id=workspaceID, inputs={"configletAssignmentRoots": rootContainers})
@@ -310,14 +310,14 @@ class pgfCVClient():
     async def _doStudio(self, c, workspaceID, studio):
         # we need to set the studio inputs if they are there:
         if (studioText := studio.get("text", None)):
-            print(f"    pushing to {studio["id"]}")
+            print(f'    pushing to {studio["id"]}')
             await c.set_studio_inputs(
                 studio_id=studio["id"],
                 workspace_id=workspaceID,
                 inputs=studioText)
 
         if (studioSelector := studio.get("selector", None)):
-            print(f"    setting selector for {studio["id"]}")
+            print(f'    setting selector for {studio["id"]}')
             client = pyavd._cv.api.arista.studio.v1.AssignedTagsConfigServiceStub(c._channel)
             req = pyavd._cv.api.arista.studio.v1.AssignedTagsConfigSetRequest(
                 value=pyavd._cv.api.arista.studio.v1.AssignedTagsConfig(
