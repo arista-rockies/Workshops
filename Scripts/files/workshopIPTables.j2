@@ -1,0 +1,59 @@
+#!/bin/bash
+
+# this script will pull the gre tunnels out of the script file
+SCRIPT=/usr/sbin/act-network-create
+L2A=`grep {{ switches['CampusB-Leaf2A']['ip'] }} ${SCRIPT} | awk '{print $5}'`
+ZTR=`grep {{ switches['CampusB-ZTR']['ip'] }} ${SCRIPT} | awk '{print $5}'`
+
+addBlockCampusB() {
+	iptables -A campusb -j DROP
+}
+addBlockL2() {
+	ip link set dev ${L2A} down
+}
+addBlockZTR() {
+	ip link set dev ${ZTR} down
+}
+delBlockCampusB() {
+	iptables -F campusb
+}
+delBlockL2() {
+	ip link set dev ${L2A} up
+}
+delBlockZTR() {
+	ip link set dev ${ZTR} up
+}
+
+case "$1" in
+	reset)
+		delBlockCampusB
+		delBlockL2
+		delBlockZTR
+
+		addBlockCampusB
+		addBlockL2
+		addBlockZTR
+		;;
+	blockAll)
+		addBlockCampusB
+		addBlockL2
+		addBlockZTR
+		;;
+	unBlockAll)
+		delBlockCampusB
+		delBlockL2
+		delBlockZTR
+		;;
+	unBlockCampusB)
+		delBlockCampusB
+		delBlockL2
+		;;
+	unBlockZTR)
+		addBlockL2
+		delBlockZTR
+		;;
+esac
+
+# save the state out
+echo "STATE=$1" > /var/lib/blocks
+/usr/libexec/iptables/iptables.init save

@@ -1,4 +1,4 @@
-import argparse, yaml, csv
+import argparse, yaml, csv, json
 
 # not a huge fan, but i'm out of time
 def findDeviceBySerial(deviceInventory, sn):
@@ -15,6 +15,7 @@ def findDeviceByName(self, deviceInventory, hostname):
 
 def loadInventory():
     if args.i != "act":
+        print(f"loading non-act inventory {args.i}")
         with open(args.i, "r") as f:
             for device in csv.DictReader(f):
                 if device['Model'][0] not in ['A', 'V']:
@@ -25,13 +26,22 @@ def loadInventory():
                 device["mac"] = device["Mac address"]
                 device["hostname"] = device["Hostname"]
                 device["software"] = device["Software Version"]
+                device["id"] = device.get("ID", device["hostname"][device["hostname"].rfind("-")+1:])
+                device["model"] = device.get("Model", "")
 
                 if device['Model'][0] == 'A':
-                    podNum = int(device["CVaaS and CV-CUE Pod Assignment"][-2:])
+                    podNum = device["CVaaS and CV-CUE Pod Assignment"][-2:]
                     device["pod"] = podNum
 
                     p = globalInventory.setdefault(podNum, [])
                     p.append(device)
+
+                    subs = globalSubstitutions.setdefault(podNum, {"podInt": int(podNum), "podStr": f"{podNum:>02}", "switches": {}})
+                    subs['switches'][device["id"]] = {
+                        "serial": device["sn"],
+                        "hostname": device["hostname"]
+                    }
+
                 elif device['Model'][0] == 'V':
                     podNum = device["CVaaS and CV-CUE Pod Assignment"]
                     device["podNum"] = podNum
@@ -53,12 +63,26 @@ def loadInventory():
                         device = {
                             "sn": node[key]["serial_number"],
                             "mac": node[key]["system_mac_address"],
-                            "hostname": key,
+                            "hostname": node[key].get("id", key),
                             "pod": pod,
-                            "software": node[key].get("version", "") if "version" in node[key] else topology.get("veos", {}).get("version", "")
+                            "software": node[key].get("version", "") if "version" in node[key] else topology.get("veos", {}).get("version", ""),
+                            "id": node[key].get("id", key),
+                            "model": node[key]["device_model"]
                         }
                         p.append(device)
+
+                        subs = globalSubstitutions.setdefault(pod, {"podInt": int(pod), "podStr": f"{pod:>02}", "switches": {}})
+                        subs['switches'][device["id"]] = {
+                            "serial": device["sn"],
+                            "hostname": device["hostname"]
+                        }
+
                     break
+
+####  TODO: should this have values for non-arista gear?
+# this is a dict keyed off the pod number, but that has a dynamic dict of relevant
+# substitution values used in format() calls
+globalSubstitutions = {}
 
 globalInventory = {}
 apiTokens = {}

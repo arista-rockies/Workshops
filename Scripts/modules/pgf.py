@@ -1,6 +1,7 @@
 import tempfile, argparse
 from modules import config
 from cloudvision.Connector.grpc_client import GRPCClient, create_query
+from cloudvision.Connector.codec import Wildcard
 
 import json
 
@@ -17,6 +18,18 @@ class pgfAction(argparse.Action):
     def __call__(self, parser, namespace, values, option_string=None):
         setattr(namespace, self.dest, values)
         setattr(namespace, self.module, True)
+
+class pgfBoolAction(argparse.BooleanOptionalAction):
+    def __init__(self, option_strings, dest, module=None, **kwargs):
+        if module == None:
+            raise ValueError("must specify a module")
+        super().__init__(option_strings, dest, **kwargs)
+        self.module = module
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        setattr(namespace, self.module, True)
+        super().__call__(parser, namespace, values, option_string)
+        
 
 class pgfInterface():
     _name: str
@@ -84,19 +97,32 @@ class pgfDevice():
         return json.dumps(res)
 
     def fetchInterfaces(self):
-        fp = tempfile.NamedTemporaryFile(mode="w")
-        fp.write(self.tok)
-        fp.flush()
+        interfaceLLDP = {}
+        with GRPCClient(self.token["server"], tokenValue=self.tok) as client:
+            path = ["Sysdb", "l2discovery", "lldp", "status", "local", Wildcard(), "portStatus", Wildcard(), "remoteSystem", Wildcard() ]
+            query = [ create_query([(path, []) ], self._sn) ]
+            for batch in client.get(query):
+                for notif in batch["notifications"]:
+                    if not notif["updates"]:
+                        continue
 
-        with GRPCClient(self.token["server"], token=fp.name) as client:
+                    path = notif["path_elements"][7]
+
+                    interface = interfaceLLDP.setdefault(path, {})
+                    interface.update(notif["updates"])
+
+        with GRPCClient(self.token["server"], tokenValue=self.tok) as client:
             path = ["Sysdb", "interface", "status", "all", "intfStatus"]
             query = [ create_query([(path, [])], self._sn) ]
             for batch in client.get(query):
                 for notif in batch["notifications"]:
                     for interface in notif["updates"]:
                         self.addInterface(interface)
-
-        fp.close()
+                        if (lldp := interfaceLLDP.get(interface, None)):
+                            peerName = lldp["sysName"]["value"]["value"]
+                            if lldp["serialNumberTlvInfo"]["isSet"]:
+                                peerName = lldp["serialNumberTlvInfo"]["value"]["value"]
+                            self.addPeer(interface, peerName, lldp["msap"]["portIdentifier"]["portId"])
 
     def addInterface(self, interfaceName: str):
         self._interfaces[interfaceName] = pgfInterface(interfaceName)

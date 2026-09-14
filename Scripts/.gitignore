@@ -8,3 +8,4 @@ old
 *.swp
 *.tok
 tokenConfig.yml
+*tokenConfig*

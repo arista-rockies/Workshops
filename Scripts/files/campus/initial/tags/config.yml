@@ -1,0 +1,22 @@
+tags:
+  - key: Campus
+    values: [ Workshop ]
+  - key: Campus-Pod
+    values: [ IT-Bldg ]
+  - key: Access-Pod
+    values: [ IDF1 ]
+  - key: Role
+    values: [ Leaf ]
+assignments:
+    - key: Campus
+      value: Workshop
+      devices: [ "{{switches['leaf1a']['serial']}}" ]
+    - key: Campus-Pod
+      value: IT-Bldg
+      devices: [ "{{switches['leaf1a']['serial']}}" ]
+    - key: Access-Pod
+      value: IDF1
+      devices: [ "{{switches['leaf1a']['serial']}}" ]
+    - key: Role
+      value: Leaf
+      devices: [ "{{switches['leaf1a']['serial']}}" ] 

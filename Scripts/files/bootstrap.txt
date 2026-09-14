@@ -93,6 +93,11 @@ def log(msg):
    if logger:
       logger.critical(msg)
 
+def addUser():
+    cli = CliManager()
+    configureUserCmds = [ "en", "configure", "username arista role network-admin privilege 15 secret testeroni" ]
+    rc, cmdOut = cli.runCommands(configureUserCmds)
+
 def setupPOE():
    cli = CliManager()
    configureNtpCmds = ["en", "configure", "poe", "reboot action maintain", "exit"]
@@ -639,6 +644,7 @@ if __name__ == "__main__":
    if ntpServer != "":
       configureAndRestartNTP(ntpServer)
 
+   addUser()
    setupPOE()
    if doAGNI:
       getAGNICert()

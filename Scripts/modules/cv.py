@@ -2,8 +2,9 @@ from modules import config
 from modules import pgf
 import uuid, requests, time, yaml, tempfile
 from requests_toolbelt import MultipartEncoder
-from modules.pgf import pgfAction
+from modules.pgf import pgfAction, pgfBoolAction
 from os.path import basename
+from jinja2 import Environment, FileSystemLoader
 
 #######
 from cvprac.cvp_client import CvpClient, json_decoder
@@ -35,11 +36,12 @@ class pgfCVClient():
         def _addArgument(*args, **kwargs):
             if kwargs.get('action', None) == 'store_true':
                 kwargs.pop('action')
-                kwargs["nargs"] = '?'
                 kwargs.setdefault("default", False)
-                kwargs.setdefault("const", True)
+                config.parser.add_argument(*args, action=pgfBoolAction, module="cv", **kwargs)
+            else:
+                config.parser.add_argument(*args, action=pgfAction, module="cv", **kwargs)
 
-            config.parser.add_argument(*args, action=pgfAction, module="cv", **kwargs)
+        config.parser.set_defaults(cv=False)
 
         _addArgument('-cvCleanup', default=False, action='store_true', help='do cleanup steps')
         _addArgument('-cvSetup', default=False, action='store_true', help='do setup steps')
@@ -51,6 +53,20 @@ class pgfCVClient():
         _addArgument('-cvAddImages', default='', nargs='+', help='space separated list of swi images to upload')
         _addArgument('-cvAddPackages', default=False, action='store_true', help='this option is only required for alraedy provisioned pods and will add the required packages.  these steps are automatically done on pods as they are provisioned moving forward')
         _addArgument('-cvAddCCStuff', default=False, action='store_true', help='this option is only required for already provisioned pods and will add actionBundles and ccTemplates only.  these steps are automatically done on pods as they are provisioned moving forward')
+        _addArgument('-cvCheckpoint', default=None, help='string name of the checkpoint you wish to load.  is based off the specified workshop type')
+
+    def configure1():
+        config.parser.add_argument('-cvCleanup', default=False, action='store_true', help='do cleanup steps')
+        config.parser.add_argument('-cvSetup', default=False, action='store_true', help='do setup steps')
+
+        config.parser.add_argument('-cvCleanupNotifiers', default=False, action='store_true', help='only cleanup the event system')
+        config.parser.add_argument('-cvThirdParty', default='', help='comma delimited list of 3rd party devices to configure')
+        config.parser.add_argument('-cvTest', default=False, action='store_true', help='dev code')
+        config.parser.add_argument('-cvAddAdmins', default='', nargs='+', help='space separated list of email address of new admin users')
+        config.parser.add_argument('-cvAddImages', default='', nargs='+', help='space separated list of swi images to upload')
+        config.parser.add_argument('-cvAddPackages', default=False, action='store_true', help='this option is only required for alraedy provisioned pods and will add the required packages.  these steps are automatically done on pods as they are provisioned moving forward')
+        config.parser.add_argument('-cvAddCCStuff', default=False, action='store_true', help='this option is only required for already provisioned pods and will add actionBundles and ccTemplates only.  these steps are automatically done on pods as they are provisioned moving forward')
+        config.parser.add_argument('-cvCheckpoint', default=None, help='string name of the checkpoint you wish to load.  is based off the specified workshop type')
 
     def __init__(self, token):
         self.token = token
@@ -72,6 +88,156 @@ class pgfCVClient():
                 return device
         return None
 
+    async def cvCheckpoint(self, c, workspaceID, deviceInventory):
+        print(f"{config.currentPod} - cvCheckpoint")
+        # let's try to load the config for this checkpoint type
+        #  this isn't safe code as it uses un-sanitized cli data
+        basePath = f'files/{config.args.type}/{config.args.cvCheckpoint}'
+        try:
+            with open(f'{basePath}/config.yml', 'r') as f:
+                checkpointConfig = yaml.safe_load(f.read())
+        except Exception as e:
+            print(f"could not load the checkpoint config properly.  does it exist? - {e}")
+            return
+
+        # right now we only really support scs, let's get that set up
+        for module in checkpointConfig:
+            if module['name'] == 'configlets':
+                await self._cvCheckpointConfiglets(c, workspaceID, deviceInventory, basePath)
+            elif module['name'] == 'topology':
+                await self._cvCheckpointTopology(c, workspaceID, deviceInventory, basePath)
+            elif module['name'] == 'tags':
+                await self._cvCheckpointTags(c, workspaceID, deviceInventory, basePath)
+            elif module['name'] == "studios":
+                await self._cvCheckpointStudios(c, workspaceID, deviceInventory, basePath)
+
+    async def _cvCheckpointStudios(self, c, workspaceID, deviceInventory, basePath):
+        print(f"{config.currentPod} - cvCheckpointStudios")
+        vals = config.globalSubstitutions[config.currentPod]
+
+        # let's load the topology config
+        #  also, unsafe code
+        try:
+            with open(f'{basePath}/studios/config.yml', 'r') as f:
+                studiosConfig = yaml.safe_load(f.read())
+        except Exception as e:
+            print(f"could not load the studios config.  does it exist? - {e}")
+            return
+
+        jinjaEnv = Environment(loader=FileSystemLoader(f'{basePath}/studios/'))
+
+        for studio in studiosConfig.get("studios", []):
+            print(f"  - {studio['name']}")
+            if (filename := studio.get("filename", None)):
+                studioTemplate = jinjaEnv.get_template(filename)
+                studio["text"] = yaml.safe_load(studioTemplate.render(vals))["inputs"]
+
+            await self._doStudio(c, workspaceID, studio)
+            
+    async def _cvCheckpointTags(self, c, workspaceID, deviceInventory, basePath):
+        print(f"{config.currentPod} - cvCheckpointTags")
+        vals = config.globalSubstitutions[config.currentPod]
+
+        jinjaEnv = Environment(loader=FileSystemLoader(f'{basePath}/tags/'))
+        tagConfig = yaml.safe_load(jinjaEnv.get_template("config.yml").render(vals))
+
+        newTags = []
+        for tag in tagConfig.get("tags", []):
+            for value in tag.get("values", []):
+                newTags.append( (tag["key"], value) )
+
+        newAssignments = []
+        for assignment in tagConfig.get("assignments", []):
+            for device in assignment.get("devices", []):
+                newAssignments.append( (assignment["key"], assignment["value"], device, None) )
+
+        await c.set_tags(workspaceID, newTags, "device", 300)
+        await c.set_tag_assignments(workspaceID, newAssignments, "device", 300)
+
+    async def _cvCheckpointTopology(self, c, workspaceID, deviceInventory, basePath):
+        def _buildCache(currentTopology):
+            result = {}
+            for dev in currentTopology.get("devices", []):
+                # each entry in this list represents a complete device in the topology
+                #  in internal yaml format.  let's re-index this entry keyd off the serial
+                #  with the value of the hostname.  this will allow quick searching later
+                qry = dev["tags"]["query"]
+                result[qry[qry.find(":")+1:]] = {
+                    "hostname": dev["inputs"]["device"]["hostname"],
+                    "dev": dev
+                }
+
+            return result
+            
+        print(f"{config.currentPod} - cvCheckpointTopology")
+        vals = config.globalSubstitutions[config.currentPod]
+
+        jinjaEnv = Environment(loader=FileSystemLoader(f'{basePath}/topology/'))
+        topologyConfig = yaml.safe_load(jinjaEnv.get_template("config.yml").render(vals))
+
+        # this code is a little complex.  we need to pull the currently onboarded devices and onboard any
+        #  that are missing
+        currentTopology = await c.get_studio_inputs(
+            studio_id="TOPOLOGY",
+            workspace_id=workspaceID)
+
+        if not currentTopology:
+            # maybe we are new here.  let's fake it
+            currentTopology = {"devices": []}
+
+        currentTopologyCache = _buildCache(currentTopology)
+
+        for newDevice in topologyConfig:
+            if (oldDevice := currentTopologyCache.get(newDevice["serial"], None)):
+                # the device is already in the cache.  if the hostname matches we are good
+                if oldDevice["hostname"] != newDevice["hostname"]:
+                    oldDevice["dev"]["inputs"]["device"]["hostname"] = newDevice["hostname"]
+            else:
+                # the new device isn't already onboarded. we need to add it
+                #  we need some information out of the deviceInventory that we don't already have
+                inventoryDevice = self.findDeviceBySerial(deviceInventory, newDevice["serial"])
+
+                tmpDevice = pgf.pgfDevice(inventoryDevice["sn"], newDevice["model"], inventoryDevice["mac"], inventoryDevice["hostname"], self.tok, self.token["cv"])
+                tmpDevice.fetchInterfaces()
+
+                # this is absolutely the worst possible way to do this, but i'll need to rewrite the device class somewhat to support doing this the smart way.  quite literally, there is likely no worse way to do this.....
+                currentTopology["devices"].append(json.loads(f"{tmpDevice}"))
+
+        await c.set_studio_inputs(
+                studio_id="TOPOLOGY",
+                workspace_id=workspaceID,
+                inputs=currentTopology)
+
+
+    async def _cvCheckpointConfiglets(self, c, workspaceID, deviceInventory, basePath):
+        print(f"{config.currentPod} - cvCheckpointConfiglets")
+        # let's load the configlets config
+        #  also, unsafe code
+        vals = config.globalSubstitutions[config.currentPod]
+        jinjaEnv = Environment(loader=FileSystemLoader(f'{basePath}/configlets/'))
+
+        configletsConfig = yaml.safe_load(jinjaEnv.get_template("config.yml").render(vals))
+
+        # first let's upload all the configlets
+        for configlet in configletsConfig.get("configlets", []):
+            try:
+                configletTemplate = jinjaEnv.get_template(configlet["filename"])
+                configlet["text"] = configletTemplate.render(vals)
+                print(f"  - pushing {configlet['name']}")
+                await self._doConfiglet(c, workspaceID, configlet)
+            except Exception as e:
+                print(f'could not load configlet {configlet}. skipping')
+                
+        rootContainers = []
+        for container in configletsConfig.get("assignments", []):
+            container["query"] = container["query"]
+            if container.get("isRoot", False):
+                rootContainers.append(container["container"])
+
+            print(f"  - assigning {container['container']}")
+            await self._doConfiglet(c, workspaceID, container)
+    
+        await c.set_studio_inputs(studio_id='studio-static-configlet', workspace_id=workspaceID, inputs={"configletAssignmentRoots": rootContainers})
 
     async def scsCleanup(self, c, workspaceID):
         print(f"{config.currentPod} - scsCleanup")
@@ -141,270 +307,83 @@ class pgfCVClient():
             async for response in responses:
                 inputKeys.append(response.key)
 
-    async def onboardDevices(self, c, cvpRacClient, workspaceID, deviceInventory):
-        # for this iteration of the workshop we are only onboarding leaf1a
-        print(f"{config.currentPod} - onboardDevices")
-        deviceList = {}
-        devices = cvpRacClient.api.get_inventory()
+    async def _doStudio(self, c, workspaceID, studio):
+        # we need to set the studio inputs if they are there:
+        if (studioText := studio.get("text", None)):
+            print(f'    pushing to {studio["id"]}')
+            await c.set_studio_inputs(
+                studio_id=studio["id"],
+                workspace_id=workspaceID,
+                inputs=studioText)
 
-        for device in devices:
-            d = self.findDeviceBySerial(deviceInventory, device["serialNumber"])
-            if not d:
-                continue
-            if d["hostname"] != f"campus-pod{config.currentPod:0>2}-leaf1a":
-                continue
-
-            newDevice = pgf.pgfDevice(device["serialNumber"], device["modelName"], device["systemMacAddress"], d["hostname"], self.tok, self.token["cv"])
-            newDevice.fetchInterfaces()
-
-            deviceList[device["serialNumber"]] = newDevice
-
-            # because the topology api is currently broken, we need to hardcode the links
-            #   this is specific out our workshop layout an is hardcoded
-            #newDevice.addPeer("Ethernet1", "pimac", "eth0")
-            newDevice.addPeer("Ethernet9", "d4:e5:c9:06:2f:0b", "Ge1")
-            #newDevice.addPeer("Ethernet14",
-            #newDevice.addPeer("Ethernet15",
-            #newDevice.addPeer("Ethernet16",
-
-        data = {
-            "partialEqFilter": [
-                {
-                    "key": {
-                        "workspaceId": workspaceID,
-                        "studioId": "TOPOLOGY"
-                    }
-                }
-            ]
-        }
-
-        # because the topology api is currently broken, we need to hardcode all the links
-        if False:
-            url = f'{self.baseURL}/api/resources/topology/v1/Edge/all'
-            resp = requests.get(url, json=data, verify=False, timeout=300, headers={'Authorization': f'Bearer {self.tok}'})
-
-            edges = json_decoder(resp.text)
-            for edge in edges:
-                print(f"**********\n{edge}\n*********")
-                left = deviceList.get(edge["result"]["value"]["key"]["from"], None)
-                right = deviceList.get(edge["result"]["value"]["key"]["to"], None)
-                for individualEdge in edge["result"]["value"].get("lldpLinks", {}).get("values", []):
-                    lPort = individualEdge["key"]["srcPort"]
-                    rPort = individualEdge["key"]["dstPort"]
-                    if left:
-                        left.addPeer(lPort, edge["result"]["value"]["key"]["to"], rPort)
-                    if right:
-                        right.addPeer(rPort, edge["result"]["value"]["key"]["from"], lPort)
-
-        # now pull the current inputs from the studio
-        request = pyavd._cv.api.arista.studio.v1.InputsConfigSetSomeRequest(values=[])
-
-        topologyInventory = await c.get_studio_inputs(studio_id="TOPOLOGY", workspace_id=workspaceID)
-        #for deviceIndex, device in enumerate(topologyInventory.get("devices", [])):
-            #print(device)
-            #pass
-
-        idx = 0
-        for deviceName, device in deviceList.items():
-            request.values.append(
-                pyavd._cv.api.arista.studio.v1.InputsConfig(
-                    key=pyavd._cv.api.arista.studio.v1.InputsKey(
-                        studio_id="TOPOLOGY",
-                        workspace_id=workspaceID,
-                        path=pyavd._cv.api.fmp.RepeatedString(values=["devices", str(idx)]),
+        if (studioSelector := studio.get("selector", None)):
+            print(f'    setting selector for {studio["id"]}')
+            client = pyavd._cv.api.arista.studio.v1.AssignedTagsConfigServiceStub(c._channel)
+            req = pyavd._cv.api.arista.studio.v1.AssignedTagsConfigSetRequest(
+                value=pyavd._cv.api.arista.studio.v1.AssignedTagsConfig(
+                    key=pyavd._cv.api.arista.studio.v1.StudioKey(
+                        studio_id=studio["id"],
+                        workspace_id=workspaceID
                     ),
-                    inputs = f"{device}"
+                    query=studioSelector
                 )
             )
-            idx+=1
 
-        inputKeys = []
-        client = pyavd._cv.api.arista.studio.v1.InputsConfigServiceStub(c._channel)
-        responses = client.set_some(request, metadata=c._metadata, timeout=300)
-        async for response in responses:
-            inputKeys.append(response.key)
+            try:
+                resp = await client.set(req, metadata=c._metadata, timeout=30.0)
+            except grpc.RpcError as e:
+                if e.code() == grpc.StatusCode.NOT_FOUND:
+                    return None
+                raise
 
-    async def assignTags(self, c, workspaceID, deviceInventory):
-        print(f"{config.currentPod} - assignTags")
-        leaf1a = self.findDeviceByName(deviceInventory, f"campus-pod{config.currentPod:0>2}-leaf1a")
-        leaf1b = self.findDeviceByName(deviceInventory, f"campus-pod{config.currentPod:0>2}-leaf1b")
+    async def _doConfiglet(self, c, workspaceID, request):
+        # this function handles both uploading a configlet and setting the hierarchy up in scs.
 
-        if not leaf1a or not leaf1b:
-            raise Exception("could not find leaf1a or leaf1b in deviceInventory")
+        if (configletText := request.get("text", None)):
+            # the request must be to upload a configlet
 
-        tags = [
-            ("Campus", f"Workshop"),
-            ("Campus-Pod", f"IT-Bldg"),
-            ("Access-Pod", f"IDF1"),
-            ("Role", "Leaf"),
-        ]
-        tagAssignments = [
-            ("Campus", f"Workshop", leaf1a["sn"],  None),
-            ("Campus-Pod", f"IT-Bldg", leaf1a["sn"],  None),
-            ("Access-Pod", f"IDF1", leaf1a["sn"],  None),
-            ("Role", "Leaf", leaf1a["sn"],  None),
-        ]
-        # assign tags
-        await c.set_tags(workspaceID, tags, "device", 300)
-        await c.set_tag_assignments(workspaceID, tagAssignments, "device", 300)
-
-    async def scsSetup(self, c, workspaceID, deviceInventory):
-        print(f"{config.currentPod} - scsSetup")
-        #configletContainers = await c.get_configlet_containers(workspace_id=workspaceID)
-        #print(configletContainers)
-        #return
-
-        ###################### scs upload ####################
-        leaf1a = self.findDeviceByName(deviceInventory, f"campus-pod{config.currentPod:0>2}-leaf1a")
-        leaf1b = self.findDeviceByName(deviceInventory, f"campus-pod{config.currentPod:0>2}-leaf1b")
-
-        if not leaf1a or not leaf1b:
-            raise Exception("couldn't find leaf1a or leaf1b in deviceInventory")
-        
-        configlets = [
-            {
-                "filename": "Studios-campus-global-config.txt",
-                "configletName": f"Studios-campus-pod{config.currentPod}-global-config",
-                "container": "Device",
-                "query": "device: *",
-                "children": None
-            },{
-                "filename": "Studios-campus-radsec-config.txt",
-                "configletName": f"Studios-campus-pod{config.currentPod}-radsec-config",
-                "container": None,
-                "query": None,
-                "children": None
-            }
-        ]
-
-        vals = {
-            "podStr": f"{config.currentPod:0>2}",
-            "podInt": int(config.currentPod)+100
-        }
-        for configlet in configlets:
-            configletID = configlet["configletName"]
-
-            f = open(f"files/campusConfiglets/{configlet['filename']}", "r")
-            configletText = f.read().format(**vals)
-
+            configletName = request["name"]
             await c.set_configlet(
                 workspace_id=workspaceID,
-                configlet_id=configletID,
-                display_name=configletID,
-                description=configletID,
+                configlet_id=configletName,
+                display_name=configletName,
+                description=configletName,
                 body=configletText
             )
 
-            if configlet["container"]:
-                # let's create the assignment
-                await c.set_configlet_container(
-                        workspace_id=workspaceID,
-                        container_id=configlet["container"],
-                        display_name=configlet["container"],
-                        description=configlet["container"],
-                        configlet_ids=[configletID],
-                        child_assignment_ids=configlet["children"],
-                        query=configlet["query"],
-                )
-        await c.set_studio_inputs(studio_id='studio-static-configlet', workspace_id=workspaceID, inputs={"configletAssignmentRoots": ["Device"]})
-
-        ###################### sms upload ####################
-    async def smsSetup(self, c, workspaceID, deviceInventory):
-        print(f"{config.currentPod} - smsStudioSetup")
-
-        leaf1a = self.findDeviceByName(deviceInventory, f"campus-pod{config.currentPod:0>2}-leaf1a")
-
-        if not leaf1a:
-            raise Exception("could not find leaf1a or leaf1b in deviceInventory")
-
-        vals = {
-            "leaf1": leaf1a["sn"],
-        }
-        f = open("files/campusWorkshop_softwareManagementInputs.txt", "r")
-        smsStudio = yaml.safe_load(f.read().format(**vals))
-        smsStudioID = "studio-software-management"
-        await c.set_studio_inputs(
-                studio_id=smsStudioID,
-                workspace_id=workspaceID,
-                inputs=smsStudio["inputs"])
-
-        ###################### scs upload ####################
-
-    async def aicStudioSetup(self, c, workspaceID, deviceInventory):
-        print(f"{config.currentPod} - aicStudioSetup")
-
-        #### to make this work you need to
-        ####  replace {} as {{}}
-        ####  replace serial references
-        ####  replace pod number references in queries
-        ####  replace pod number references in vlan ids
-
-        leaf1a = self.findDeviceByName(deviceInventory, f"campus-pod{config.currentPod:0>2}-leaf1a")
-
-        if not leaf1a:
-            raise Exception("could not find leaf1a or leaf1b in deviceInventory")
-
-        vals = {
-            "podStr": config.currentPod,
-            "podInt": 100+int(config.currentPod),
-            "leaf1a": leaf1a["sn"],
-        }
-        f = open("files/campusWorkshop_aicInputs.txt", "r")
-        aicStudio = yaml.safe_load(f.read().format(**vals))
-
-        aicStudioID = "studio-campus-access-interfaces"
-        await c.set_studio_inputs(
-            studio_id=aicStudioID,
-            workspace_id=workspaceID,
-            inputs=aicStudio["inputs"])
-
-    async def campusStudioSetup(self, c, workspaceID, deviceInventory):
-        print(f"{config.currentPod} - campusStudioSetup")
-        #with open("files/campusWorkshop_campusFabricInputs.yml", "r") as f:
-                #campusStudio = yaml.safe_load(f.read())
-
-        #### to make this work you need to
-        ####  replace {} as {{}}
-        ####  replace serial references
-        ####  replace pod number references in queries
-        ####  replace pod number references in vlan ids
-
-        leaf1a = self.findDeviceByName(deviceInventory, f"campus-pod{config.currentPod:0>2}-leaf1a")
-        leaf1b = self.findDeviceByName(deviceInventory, f"campus-pod{config.currentPod:0>2}-leaf1b")
-
-        if not leaf1a or not leaf1b:
-            raise Exception("could not find leaf1a or leaf1b in deviceInventory")
-
-        vals = {
-            "podStr": config.currentPod,
-            "podInt": 100+int(config.currentPod),
-            "leaf1": leaf1a["sn"],
-            "leaf2": leaf1b["sn"]
-        }
-        f = open("files/campusWorkshop_campusFabricInputs.txt", "r")
-        campusStudio = yaml.safe_load(f.read().format(**vals))
-
-        #  if there are third-party devices, register them
-        #  this is horrible code
-        t = campusStudio["inputs"]["campus"][0]["inputs"]["campusDetails"]["campusPod"][0]["inputs"]["campusPodFacts"]["thirdPartyDevices"]
-        cnt = 1
-        for device in config.args.cvThirdParty.split(','):
-            t.append({
-                "hostname": f"campus-spine{cnt}",
-                "identifier": device,
-                "nodeId": cnt,
-                "role": "spine"
-            })
-            cnt += 1
-
-        campusStudioID = "studio-avd-campus-fabric"
-        await c.set_studio_inputs(
-            studio_id=campusStudioID,
-            workspace_id=workspaceID,
-            inputs=campusStudio["inputs"])
+        else:
+            # the request must be for some scs hierarchy and/or assignment
+            await c.set_configlet_container(
+                    workspace_id=workspaceID,
+                    container_id=request["container"],
+                    display_name=request["container"],
+                    description=request["container"],
+                    configlet_ids=request.get("configlets", None),
+                    child_assignment_ids=request.get("children", None),
+                    query=request["query"],
+            )
 
     async def studioCleanup(self, c, workspaceID, studioID):
         print(f"{config.currentPod} - studioCleanup({studioID})")
+
+        client = pyavd._cv.api.arista.studio.v1.AssignedTagsConfigServiceStub(c._channel)
+        req = pyavd._cv.api.arista.studio.v1.AssignedTagsConfigSetRequest(
+            value=pyavd._cv.api.arista.studio.v1.AssignedTagsConfig(
+                key=pyavd._cv.api.arista.studio.v1.StudioKey(
+                    studio_id=studioID,
+                    workspace_id=workspaceID
+                ),
+                remove=True
+            )
+        )
+
+        try:
+            resp = await client.set(req, metadata=c._metadata, timeout=30.0)
+        except grpc.RpcError as e:
+            if e.code() == grpc.StatusCode.NOT_FOUND:
+                return None
+
+            raise
         await c.set_studio_inputs(studio_id=studioID, workspace_id=workspaceID, inputs={})
 
     async def buildAndSubmitWorkspace(self, c, workspaceID, expectCC=True):
@@ -422,11 +401,7 @@ class pgfCVClient():
         if submitResult.status != 1: #SUCCESS
             raise Exception(f"submit failed for pod: {config.currentPod} {workspaceID}: {submitResult.status}")
 
-        #there is a better way to do this......
-        if expectCC:
-            return workspace.cc_ids.values[0]
-        else:
-            return
+        return workspace.cc_ids.values[0] if len(workspace.cc_ids) else None
 
     async def executeChangeControl(self, c, ccID, wait=True):
         print(f"{config.currentPod} - executeChangeControl")
@@ -520,18 +495,24 @@ class pgfCVClient():
 
         url = f'{self.baseURL}/api/resources/changecontrol/v1/ChangeControlConfig'
         resp = requests.post(url, json=cc, verify=False, timeout=300, headers={'Authorization': f'Bearer {self.tok}'})
-        resp.raise_for_status()
+        try:
+            resp.raise_for_status()
 
-        # from here on out, let's reconnect with the second token
-        #  this allows for us to complete even if four-eyes is set
-        c = pyavd._cv.client.CVClient(self.server, token=self.tok2)
-        c._connect()
-        print("executing the ztp change control")
-        await self.executeChangeControl(c, ccID, wait=False)
+            # from here on out, let's reconnect with the second token
+            #  this allows for us to complete even if four-eyes is set
+            c = pyavd._cv.client.CVClient(self.server, token=self.tok2)
+            c._connect()
+            print("executing the ztp change control")
+            await self.executeChangeControl(c, ccID, wait=False)
 
-        print("sleeping for 2m to hopefully give ztp time to kick in")
-        time.sleep(120)
+            print("sleeping for 2m to hopefully give ztp time to kick in")
+            time.sleep(120)
+        except:
+            # if we get an exception here, it's likely we didn't get any cc out of the submission.
+            #  this is probably a valid scenario
+            pass
 
+        # we can now do the actual decom in cv
         devices = cvpRacClient.api.get_inventory(provisioned=False)
         for device in devices:
             print(f"decomming {device['hostname']}")
@@ -811,6 +792,20 @@ class pgfCVClient():
         expectCC = True
 
         if config.args.cvTest:
+            p = 20
+            if p == 20:
+                workspaceID = "99863f52-0bd3-4bc4-97b3-b8e86a6cc7d7" # pod 20 campus
+                basePath = f'files/{config.args.type}/initial'
+            elif p == 12:
+                workspaceID = "c0a32daa-a067-4b71-a0a0-7390e3981382" # pod 12 cv
+                basePath = f'files/{config.args.type}/lab4'
+
+            await self._cvCheckpointTopology(c, workspaceID, deviceInventory, basePath)
+            await self._cvCheckpointTags(c, workspaceID, deviceInventory, basePath)
+            await self._cvCheckpointConfiglets(c, workspaceID, deviceInventory, basePath)
+            await self._cvCheckpointStudios(c, workspaceID, deviceInventory, basePath)
+            return
+
             print("connected")
             await self.unprovisionDevicesCV(c, cvpRacClient, deviceInventory)
             return
@@ -857,9 +852,9 @@ class pgfCVClient():
             await self.cleanupDashboards(cvpRacClient)
             await self.tagsCleanup(c, workspaceID)
             await self.scsCleanup(c, workspaceID)
-            await self.studioCleanup(c, workspaceID, "studio-avd-campus-fabric")
-            await self.studioCleanup(c, workspaceID, "studio-campus-access-interfaces")
-            await self.studioCleanup(c, workspaceID, "studio-software-management")
+            for studio in ['studio-avd-campus-fabric', 'studio-campus-access-interfaces', 'studio-software-management', 'studio-authentication', 'studio-date-time', 'studio-dns-settings', 'studio-management-connectivity', 'studio-telemetry-config', 'studio-connectivity']:
+                await self.studioCleanup(c, workspaceID, studio)
+
             await self.inventoryCleanup(c, workspaceID)
             await self.notificationReceiverCleanup(c)
             #done below
@@ -877,6 +872,7 @@ class pgfCVClient():
 
             workToDo = True
 
+            # TODO: fix this to always use checkpoints
             ###### setup steps
             await self.doActionBundles(grpcClient)
             await self.doTemplates(grpcClient)
@@ -884,12 +880,23 @@ class pgfCVClient():
             await self.doPackage("files/sleep_0.2.0.tar")
             await self.doPackage("files/cv-workshop_1.0.0.tar")
 
-            await self.onboardDevices(c, cvpRacClient, workspaceID, deviceInventory)
-            await self.assignTags(c, workspaceID, deviceInventory)
-            await self.scsSetup(c, workspaceID, deviceInventory)
-            await self.smsSetup(c, workspaceID, deviceInventory)
-            await self.aicStudioSetup(c, workspaceID, deviceInventory)
-            await self.campusStudioSetup(c, workspaceID, deviceInventory)
+            # this is a bit of a hack here
+            setattr(config.args, "cvCheckpoint", "initial")
+            await self.cvCheckpoint(c, workspaceID, deviceInventory)
+            config.args.cvCheckpoint = None
+
+        if config.args.cvCheckpoint:
+            workspaceID = str(uuid.uuid4())
+            workspace = await c.create_workspace(
+                workspace_id=workspaceID,
+                display_name="automation - checkpoint")
+
+            workToDo = True
+
+            # sometimes the api is slow in actually setting up the workspace, so the next op would fail.
+            #  lame solution here, i know
+            time.sleep(1)
+            await self.cvCheckpoint(c, workspaceID, deviceInventory)
 
         if workToDo:
             ccID = await self.buildAndSubmitWorkspace(c, workspaceID, expectCC=expectCC)
@@ -899,7 +906,7 @@ class pgfCVClient():
             c = pyavd._cv.client.CVClient(self.server, token=self.tok2)
             c._connect()
 
-            if expectCC:
+            if ccID:
                 await self.executeChangeControl(c, ccID, wait=False)
 
             if config.args.cvCleanup:

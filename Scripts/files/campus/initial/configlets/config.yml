@@ -1,0 +1,12 @@
+configlets:
+  - name: "Studios-campus-pod{{podStr}}-global-config"
+    filename: "Studios-campus-global-config.j2"
+  - name: "Studios-campus-pod{{podStr}}-radsec-config"
+    filename: "Studios-campus-radsec-config.j2"
+
+assignments:
+  #################
+  - container: "Device"
+    configlets: [ "Studios-campus-pod{{podStr}}-global-config" ]
+    query: "device: *"
+    isRoot: true

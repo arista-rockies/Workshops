@@ -1,0 +1,23 @@
+tags:
+  - key: Workshop
+    values: [ CampusA, Leaf, Leaf1, Leaf1-Member-Leaf, Leaf2, Spine ]
+    
+assignments:
+    - key: Workshop
+      value: CampusA
+      devices: [ "{{switches['CampusA-Spine1']['serial']}}", "{{switches['CampusA-Spine2']['serial']}}", "{{switches['CampusA-Leaf1A']['serial']}}", "{{switches['CampusA-Leaf1B']['serial']}}", "{{switches['CampusA-Leaf1C']['serial']}}", "{{switches['CampusA-Leaf2A']['serial']}}" ]
+    - key: Workshop
+      value: Spine
+      devices: [ "{{switches['CampusA-Spine1']['serial']}}", "{{switches['CampusA-Spine2']['serial']}}" ]
+    - key: Workshop
+      value: Leaf
+      devices: [ "{{switches['CampusA-Leaf1A']['serial']}}", "{{switches['CampusA-Leaf1B']['serial']}}", "{{switches['CampusA-Leaf1C']['serial']}}", "{{switches['CampusA-Leaf2A']['serial']}}" ]
+    - key: Workshop
+      value: Leaf1
+      devices: [ "{{switches['CampusA-Leaf1A']['serial']}}", "{{switches['CampusA-Leaf1B']['serial']}}", "{{switches['CampusA-Leaf1C']['serial']}}" ]
+    - key: Workshop
+      value: Leaf1-Member-Leaf
+      devices: [ "{{switches['CampusA-Leaf1C']['serial']}}" ]
+    - key: Workshop
+      value: Leaf2
+      devices: [ "{{switches['CampusA-Leaf2A']['serial']}}" ]

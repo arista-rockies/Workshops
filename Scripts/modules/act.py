@@ -1,13 +1,16 @@
 from modules import config
 import requests, argparse, json, yaml, time, paramiko, socks, urllib
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
-from modules.pgf import pgfAction
+from modules.pgf import pgfAction, pgfBoolAction
 from enum import Enum
+import tqdm, io
+from jinja2 import Environment, FileSystemLoader
 
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 class LabState(Enum):
     RUNNING = 2
+    STOPPING = 3
     STOPPED = 4
 
 class actException(Exception):
@@ -24,11 +27,12 @@ class ActClient():
         def _addArgument(*args, **kwargs):
             if kwargs.get('action', None) == 'store_true':
                 kwargs.pop('action')
-                kwargs["nargs"] = '?'
                 kwargs.setdefault("default", False)
-                kwargs.setdefault("const", True)
+                config.parser.add_argument(*args, action=pgfBoolAction, module="act", **kwargs) 
+            else:
+                config.parser.add_argument(*args, action=pgfAction, module="act", **kwargs) 
 
-            config.parser.add_argument(*args, action=pgfAction, module="act", **kwargs) 
+        config.parser.set_defaults(act=False)
 
         _addArgument('-actProxy', default=None, help='Set a socks proxy. defaults to None')
         _addArgument('-actStartLab', action='store_true', default=False, help='start specified labs')
@@ -38,9 +42,12 @@ class ActClient():
         _addArgument('-actDeployLab', action='store_true', default=False, help='deploy and start the topology')
         _addArgument('-actGetLab', action='store_true', default=False, help='print bootstrap ips')
         _addArgument('-actSetupLinux', action='store_true', default=False, help='configure bootstrap')
+        _addArgument('-actSetupHost', action='store_true', default=False, help='configure the linux host')
+        _addArgument('-actUpdateLinux', action='store_true', default=False, help='configure bootstrap')
         _addArgument('-actTest', action='store_true', default=False)
-        _addArgument('-actAddBlock', action='store_true', default=False)
-        _addArgument('-actDelBlock', action='store_true', default=False)
+        _addArgument('-actResetBlocks', action='store_true', default=False)
+        _addArgument('-actUnblockCampusB', action='store_true', default=False)
+        _addArgument('-actUnblockZTR', action='store_true', default=False)
             
     def __init__(self, token):
         self.token = token
@@ -56,9 +63,10 @@ class ActClient():
         self.connected = False
         self.topologies = None
         self.labs = None
+        self.resourceName = token["act"]["resourceName"]
 
         self.connect()
-        labs = self.getLabs(nameFilter="cv-workshop-pod")
+        labs = self.getLabs(nameFilter=self.resourceName.format("")) # our filter is a startsWith.  just string substitute empty
 
     def _findByName(self, lst, name):
         for i in lst:
@@ -69,17 +77,28 @@ class ActClient():
 
     def execute(self):
         if config.args.actTest:
-            while True:
-                resp = self.waitOnOperation('84af49feafa945738a321a5533db650f', sleep=10, timeout=None, statusChar=".", debug=True)
-                print(resp)
-                time.sleep(1)
+            name = self.resourceName.format(config.currentPod)
 
-        if config.args.actAddBlock:
-            self.doAddIPTables()
+            # not sure why getLabByName doesn't return devices but getLabByID does
+            lab = self.getLabByName(name)
+            l = self.getLabByID(lab["id"])
+            if not l.get("devices", None):
+                print("could not find any devices in this lab.  has it finished being deployed?")
+                return
+
+            print(json.dumps(l, indent=2))
             return
 
-        if config.args.actDelBlock:
-            self.doDelIPTables()
+        if config.args.actResetBlocks:
+            self._iptables("reset")
+            return
+
+        if config.args.actUnblockCampusB:
+            self._iptables("unBlockCampusB")
+            return
+
+        if config.args.actUnblockZTR:
+            self._iptables("unBlockZTR")
             return
 
         if config.args.actStartLab:
@@ -100,8 +119,14 @@ class ActClient():
         if config.args.actGetLab:
             self.doGetLab()
             return
+        if config.args.actUpdateLinux:
+            self.doUpdateLinux()
+            return
         if config.args.actSetupLinux:
             self.doSetupLinux()
+            return
+        if config.args.actSetupHost:
+            self.doSetupHost()
             return
 
     def connect(self):
@@ -303,21 +328,21 @@ class ActClient():
     def doStopLab(self):
         print(f"{config.currentPod} - doStopLab")
 
-        name = f"cv-workshop-pod{config.currentPod}"
+        name = self.resourceName.format(config.currentPod)
         lab = self.getLabByName(name)
         if LabState(lab["state"]) == LabState.RUNNING:
             self.stopLab(lab["id"])
 
     def doStartLab(self):
         print(f"{config.currentPod} - doStartLab")
-        name = f"cv-workshop-pod{config.currentPod}"
+        name = self.resourceName.format(config.currentPod)
         lab = self.getLabByName(name)
         if LabState(lab["state"]) == LabState.STOPPED:
             res = self.startLab(lab["id"])
 
     def doUndeployLab(self):
         print(f"{config.currentPod} - doUndeployLab")
-        name = f"cv-workshop-pod{config.currentPod}"
+        name = self.resourceName.format(config.currentPod)
         lab = self.getLabByName(name)
         self.undeployLab(lab["id"])
 
@@ -334,7 +359,7 @@ class ActClient():
         self.getTopologies()
 
         print(f"{config.currentPod} - doDeployAndStart ")
-        name = f'cv-workshop-pod{config.currentPod}'
+        name = self.resourceName.format(config.currentPod)
 
         lab = self.getLabByName(name)
         if lab:
@@ -349,6 +374,12 @@ class ActClient():
             resp = self.waitOnOperation(resp["id"], sleep=10, timeout=None, statusChar=".")
 
         newTopology = yaml.safe_load(s.replace("###", f"{config.currentPod:0>2}"))
+        # act doesn't allow metadata fields, nor does it ignore unused data.  we need the id
+        #  later in the cv.  let's loop over the topology and delete any id tags
+        for dev in newTopology["nodes"]:
+            for k, dev in dev.items():
+                t = dev.pop("id", None)
+
         try:
             print(f"  creating topology {name}", end="", flush=True)
             resp = self.createTopology(name, newTopology)
@@ -378,7 +409,7 @@ class ActClient():
             return
 
         topologies = self.getTopologies()
-        name = f'cv-workshop-pod{config.currentPod}'
+        name = self.resourceName.format(config.currentPod)
         topology = self._findByName(topologies["result"], name)
 
         if not topology:
@@ -387,7 +418,7 @@ class ActClient():
 
         print(f"{config.currentPod} - doUpdateTopology ")
 
-        newTopology = yaml.safe_load(s.replace("###", str(pod)))
+        newTopology = yaml.safe_load(s.replace("###", f"{config.currentPod:0>2}"))
         try:
 
             print(f"  updating topology ", end="", flush=True)
@@ -400,27 +431,35 @@ class ActClient():
             print("!")
             return
 
-    def doGetLab(self):
-        print(f"{config.currentPod} - doGetLab ")
-        name = f'cv-workshop-pod{config.currentPod}'
+    def doGetLab(self, quiet=False):
+        if not quiet:
+            print(f"{config.currentPod} - doGetLab ")
+
+        name = self.resourceName.format(config.currentPod)
         lab = self.getLabByName(name)
         if not lab:
             print("could not find lab, skipping")
-            return
+            return None
 
         lab = self.getLabByID(lab['id'])
         if not lab.get('devices', None):
-            print("could not find any devices.  has this lab deployed?")
-            return
+            if not quiet:
+                print("could not find any devices.  has this lab deployed?")
+            return None
 
         print(LabState(lab["state"]))
         # i want to print out the ip of the bootstrap boxes
         for dev in lab['devices']['generic']:
             if 'bootstrap' in dev['hostname']:
                 print(f"{dev['hostname']}: {dev['internal_ip']}")
+            elif 'host' in dev['hostname']:
+                print(f"{dev['hostname']}: {dev['internal_ip']}")
+
+        return True
 
     def _setupSSH(self, ip, sshUser, sshPassword):
         # https://stackoverflow.com/questions/47441351/using-paramiko-with-socks-proxy
+        print(f"   connecting to {ip} via ssh")
         sock = None
         if self.proxies:
             s = urllib.parse.urlsplit(self.proxies["http"])
@@ -430,9 +469,15 @@ class ActClient():
                 addr=s.hostname,
                 port=s.port
             )
-            sock.connect((ip, 22))
+            while True:
+                try:
+                    sock.connect((ip, 22))
+                    break
+                except:
+                    print(",", flush=True, end="")
+                    time.sleep(1)
+            
 
-        print(f"   connecting to {ip} via ssh")
         pmClient = paramiko.SSHClient()
         pmClient.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         connected = False
@@ -443,15 +488,15 @@ class ActClient():
                 print("   connected", flush=True, end="\n")
                 return pmClient
             except Exception as e:
-                print(".", flush=True, end="")
+                print(f".{e}", flush=True, end="")
                 time.sleep(1)
 
         raise Exception(f'could not connect to {ip}')
 
     def _iptables(self, operation):
-        if operation in ["add", "del"]:
+        if operation in ["reset", "blockAll", "unBlockAll", "unBlockCampusB", "unBlockZTR"]:
             print(f"{config.currentPod} - {operation}IPTables")
-            name = f'cv-workshop-pod{config.currentPod}'
+            name = self.resourceName.format(config.currentPod)
             # not sure why getLabByName doesn't return devices but getLabByID does
             lab = self.getLabByName(name)
             l = self.getLabByID(lab["id"])
@@ -468,15 +513,129 @@ class ActClient():
 
                     pmClient.exec_command(f"sudo bash workshopIPTables.sh {operation}")
 
-    def doAddIPTables(self):
-        self._iptables("add")
+    def doSetupHost(self):
+        print(f"{config.currentPod} - doSetupHost")
+        name = self.resourceName.format(config.currentPod)
 
-    def doDelIPTables(self):
-        self._iptables("del")
+        while not self.doGetLab(quiet=True):
+            print(".", flush=True, end="")
+            time.sleep(10)
+
+        print("", flush=True)
+
+        # not sure why getLabByName doesn't return devices but getLabByID does
+        lab = self.getLabByName(name)
+        l = self.getLabByID(lab["id"])
+        if not l.get("devices", None):
+            print("could not find any devices in this lab.  has it finished being deployed?")
+            return
+
+        # i know the bootstrap box is a generic
+        for host in l["devices"]["generic"]:
+            if "host" in host["hostname"]:
+                sshUser = "administrator"
+                sshPassword = self.token["act"]["sshPassword"]
+                pmClient = self._setupSSH(host["internal_ip"], sshUser, sshPassword)
+
+                scp = pmClient.open_sftp()
+                scp.put('setupACTHost.sh', '/home/administrator/setupACTHost.sh')
+                scp.chmod('/home/administrator/setupACTHost.sh', 0o700)
+
+                stdin, stdout, stderr = pmClient.exec_command("sudo -S /home/administrator/setupACTHost.sh", get_pty=True)
+
+                # if we don't read the redirects then the con will terminate and stop the script
+                for line in iter(stdout.readline, ""):
+                    print(line, end="")
+
+
+                pmClient.close()
 
     def doSetupLinux(self):
+        def updateBar(transferred, total):
+            nonlocal lastUpdate
+
+            if pbar.total is None:
+                pbar.total = total
+
+            val = transferred - lastUpdate
+            pbar.update(val)
+            lastUpdate = transferred
+
         print(f"{config.currentPod} - doSetupLinux ")
-        name = f'cv-workshop-pod{config.currentPod}'
+        name = self.resourceName.format(config.currentPod)
+
+        while not self.doGetLab(quiet=True):
+            print(".", flush=True, end="")
+            time.sleep(10)
+
+        print("", flush=True)
+
+        # not sure why getLabByName doesn't return devices but getLabByID does
+        lab = self.getLabByName(name)
+        l = self.getLabByID(lab["id"])
+        if not l.get("devices", None):
+            print("could not find any devices in this lab.  has it finished being deployed?")
+            return
+
+        deviceInventory = config.globalInventory.get(str(int(config.currentPod)), -1)
+
+        # this could be built with a crafty comprehension.   not doing that in an effort of... comprehension
+        devList = {"switches": {}}
+        for actDev in l["devices"]["veos"]:
+            #hostname here is really the sn
+            # let's look through the device inventory for this act device so we can get the ID.  we'll want that
+            #  for the jinja substituions to work globally
+            inventoryDev = config.findDeviceBySerial(deviceInventory, actDev["hostname"])
+            devList["switches"][inventoryDev["id"]] = { "ip": actDev["internal_ip"], "serial": actDev["hostname"]}
+            
+        blockScript = io.BytesIO(Environment(loader=FileSystemLoader('files')).get_template('workshopIPTables.j2').render(devList).encode('utf-8'))
+
+        # i know the bootstrap box is a generic
+        for host in l["devices"]["generic"]:
+            if "bootstrap" in host["hostname"]:
+                sshUser = "administrator"
+                sshPassword = self.token["act"]["sshPassword"]
+                pmClient = self._setupSSH(host["internal_ip"], sshUser, sshPassword)
+
+                scp = pmClient.open_sftp()
+                try:
+                    scp.mkdir('/home/administrator/images/')
+                except OSError:
+                    pass
+
+                for image in ['EOS-4.34.5M.swi', 'EOS-4.35.4M.swi']:
+                    lastUpdate = 0
+                    pbar = tqdm.tqdm(unit="B", unit_scale=True, desc=f"{image} Upload")
+                    scp.put(f'images/{image}', f'/home/administrator/images/{image}', callback=updateBar)
+                    pbar.close()
+
+                scp.put('tokenConfig.yml', '/home/administrator/tokenConfig.yml')
+                scp.put('setupACTGateway.sh', '/home/administrator/setupACTGateway.sh')
+                scp.putfo(blockScript, '/home/administrator/workshopIPTables.sh')
+                #scp.put('workshopIPTables.sh', '/home/administrator/workshopIPTables.sh')
+                scp.chmod('/home/administrator/setupACTGateway.sh', 0o700)
+                scp.chmod('/home/administrator/workshopIPTables.sh', 0o700)
+
+                pmClient.exec_command("sudo setenforce Permissive")
+                stdin, stdout, stderr = pmClient.exec_command("sudo -S /home/administrator/setupACTGateway.sh", get_pty=True)
+
+                # if we don't read the redirects then the con will terminate and stop the script
+                for line in iter(stdout.readline, ""):
+                    print(line, end="")
+
+
+                pmClient.close()
+
+    def doUpdateLinux(self):
+        print(f"{config.currentPod} - doUpdateLinux ")
+        name = self.resourceName.format(config.currentPod)
+
+        while not self.doGetLab(quiet=True):
+            print(".", flush=True, end="")
+            time.sleep(10)
+
+        print("", flush=True)
+
         # not sure why getLabByName doesn't return devices but getLabByID does
         lab = self.getLabByName(name)
         l = self.getLabByID(lab["id"])
@@ -491,20 +650,10 @@ class ActClient():
                 sshPassword = self.token["act"]["sshPassword"]
                 pmClient = self._setupSSH(host["internal_ip"], sshUser, sshPassword)
 
-                scp = pmClient.open_sftp()
-                scp.put('tokenConfig.yml', '/home/administrator/tokenConfig.yml')
-                scp.put('setupACTGateway.sh', '/home/administrator/setupACTGateway.sh')
-                scp.put('workshopIPTables.sh', '/home/administrator/workshopIPTables.sh')
-                scp.chmod('/home/administrator/setupACTGateway.sh', 0o700)
-                scp.chmod('/home/administrator/workshopIPTables.sh', 0o700)
-
-                pmClient.exec_command("sudo setenforce Permissive")
-                stdin, stdout, stderr = pmClient.exec_command("sudo -S /home/administrator/setupACTGateway.sh", get_pty=True)
+                stdin, stdout, stderr = pmClient.exec_command("cd Projects/Workshops/Scripts/ && git pull && sudo systemctl restart bootstrap", get_pty=True)
 
                 # if we don't read the redirects then the con will terminate and stop the script
                 for line in iter(stdout.readline, ""):
                     print(line, end="")
 
                 pmClient.close()
-
-

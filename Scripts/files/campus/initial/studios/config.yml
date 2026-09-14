@@ -1,0 +1,13 @@
+studios:
+  - name: Telemetry
+    id: studio-telemetry-config
+    deviceSelector: "device: *"
+  - name: SMS
+    id: studio-software-management
+    filename: sms.j2
+  - name: AIC
+    id: studio-campus-access-interfaces
+    filename: aic.j2
+  - name: CampusL2L3
+    id: studio-avd-campus-fabric
+    filename: campus.j2

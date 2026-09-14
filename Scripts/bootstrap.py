@@ -14,7 +14,7 @@ currentPod = os.getenv("POD")
 inventory = os.getenv("INVENTORY")
 
 config.args = SimpleNamespace()
-setattr(config.args, "i", "act")
+setattr(config.args, "i", inventory)
 setattr(config.args, "pods", [currentPod])
 
 # we need to load and parse the token file
@@ -63,13 +63,13 @@ async def getSWI(request: Request, sn, eosVersion):
 async def bootstrap(request: Request):
     # Headers({'host': '10.0.96.20:8000', 'accept': '*/*', 'x-arista-systemmac': '2c:dd:e9:f6:f9:9b', 'x-arista-modelname': 'CCS-710P-16P', 'x-arista-serial': 'WTW23490441', 'x-arista-hardwareversion': '11.04', 'x-arista-tpmapi': '2.0', 'x-arista-tpmfwversion': '1.512', 'x-arista-secureztp': 'True', 'x-arista-softwareversion': '4.32.5.1M', 'x-arista-architecture': 'i386'})
     device = config.findDeviceBySerial(config.globalInventory.get(currentPod, []), request.headers["x-arista-serial"])
-    device["headers"] = request.headers
+    print(f" {currentPod} - {device}")
     if not device:
         print(f'could not find {request.headers["x-arista-serial"]}')
         return
 
+    device["headers"] = request.headers
     token = tokens[str(device["pod"])]
-
     cvpRacClient = CvpClient()
     cvpRacClient.connect(nodes=[token["cv"]["server"]], username='', password='', is_cvaas=True, api_token=token["cv"]["key1"])
     enrollmentToken = cvpRacClient.api.create_enroll_token(duration="900s")

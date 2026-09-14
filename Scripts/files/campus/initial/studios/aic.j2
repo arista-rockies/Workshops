@@ -13,18 +13,18 @@ inputs:
                             enabled: 'Yes'
                             mode: access
                             vlans:
-                              vlans: '{podInt}'
+                              vlans: '{{podInt}}'
                         tags:
-                          query: interface:Ethernet11@{leaf1a}
+                          query: interface:Ethernet11@{{switches['leaf1a']['serial']}}
                       - inputs:
                           adapterDetails:
                             description: tmp
                             enabled: 'Yes'
                             mode: access
                             vlans:
-                              vlans: '{podInt}'
+                              vlans: '{{podInt}}'
                         tags:
-                          query: interface:Ethernet12@{leaf1a}
+                          query: interface:Ethernet12@{{switches['leaf1a']['serial']}}
                   tags:
                     query: Access-Pod:IDF1
             tags:

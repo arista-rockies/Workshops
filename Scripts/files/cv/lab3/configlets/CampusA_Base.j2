@@ -1,0 +1,43 @@
+!
+vrf instance MGMT
+!
+daemon TerminAttr
+   exec /usr/bin/TerminAttr -smashexcludes=ale,flexCounter,hardware,kni,pulse,strata -cvaddr=apiserver.arista.io:443 -cvauth=token-secure,/tmp/cv-onboarding-token -cvvrf=MGMT -taillogs -disableaaa
+   no shutdown
+!
+ip routing
+!
+spanning-tree mode mstp
+no spanning-tree vlan-id 4093-4094
+!
+clock timezone US/Mountain
+!
+banner motd
+  /$$$$$$            /$$             /$$                     /$$                 /$$
+ /$$__  $$          |__/            | $$                    | $$                | $$
+| $$  \ $$  /$$$$$$  /$$  /$$$$$$$ /$$$$$$    /$$$$$$       | $$        /$$$$$$ | $$$$$$$
+| $$$$$$$$ /$$__  $$| $$ /$$_____/|_  $$_/   |____  $$      | $$       |____  $$| $$__  $$
+| $$__  $$| $$  \__/| $$|  $$$$$$   | $$      /$$$$$$$      | $$        /$$$$$$$| $$  \ $$
+| $$  | $$| $$      | $$ \____  $$  | $$ /$$ /$$__  $$      | $$       /$$__  $$| $$  | $$
+| $$  | $$| $$      | $$ /$$$$$$$/  |  $$$$/|  $$$$$$$      | $$$$$$$$|  $$$$$$$| $$$$$$$/
+|__/  |__/|__/      |__/|_______/    \___/   \_______/      |________/ \_______/|_______/
+**********************************************************************************************
+EOF
+!
+management api http-commands
+   no shutdown
+   !
+   vrf MGMT
+      no shutdown
+!
+ip name-server vrf MGMT 1.1.1.1
+!   
+interface Management1
+   vrf MGMT
+!
+ip route vrf MGMT 0.0.0.0/0 192.168.0.1
+!
+ntp server vrf MGMT 100.64.0.1
+
+
+

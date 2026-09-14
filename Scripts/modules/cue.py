@@ -1,7 +1,7 @@
 #TODO: need to move the cue server to the tokenFile
 from modules import config
 import requests, json
-from modules.pgf import pgfAction
+from modules.pgf import pgfAction, pgfBoolAction
 
 class CueService():
     def __init__(self, serviceType, serviceServer, serviceURI):
@@ -15,14 +15,15 @@ class CueClient():
         def _addArgument(*args, **kwargs):
             if kwargs.get('action', None) == 'store_true':
                 kwargs.pop('action')
-                kwargs["nargs"] = '?'
                 kwargs.setdefault("default", False)
-                kwargs.setdefault("const", True)
+                config.parser.add_argument(*args, action=pgfBoolAction, module="cue", **kwargs)
+            else:
+                config.parser.add_argument(*args, action=pgfAction, module="cue", **kwargs)
+    
+        config.parser.set_defaults(cue=False)
 
-            config.parser.add_argument(*args, action=pgfAction, module="cue", **kwargs)
-
-        config.parser.add_argument('-cueCleanup', default=False, action='store_true', help='do cue cleanup steps')
-        config.parser.add_argument('-cueTest', default=False, action='store_true', help='dev code')
+        _addArgument('-cueCleanup', default=False, action='store_true', help='do cue cleanup steps')
+        _addArgument('-cueTest', default=False, action='store_true', help='dev code')
 
     def __init__(self, token):
         self.token = token

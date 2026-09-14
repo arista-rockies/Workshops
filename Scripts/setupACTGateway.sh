@@ -19,6 +19,7 @@ echo "allow 192.168.0.0/22" >> /etc/chrony.conf
 # find my hostname and convert it to an int
 HOSTNAME=`hostname`
 POD=$((10#${HOSTNAME: -2}+0))
+PODPAD=${HOSTNAME: -2}
 
 cat << EOF > /usr/local/etc/bootstrap.conf
 POD=$POD
@@ -79,12 +80,12 @@ cat <<EOF > /etc/kea/kea-dhcp4.conf
     # Arista;vEOS-lab;P19-CampusA-Leaf1-2
     "client-classes": [
         {
-            "name": "CampusB",
-            "test": "(substring(option[60].hex,26,1) == 'B') or (substring(option[60].hex,28,1) == 'Z')"
+            "name": "CampusA",
+            "test": "substring(option[60].hex,26,1) == 'A'"
         },
         {
-            "name": "CampusA",
-            "test": "substring(option[60].hex,26,1) == 'A' and not member('CampusB')"
+            "name": "CampusB",
+            "test": "not member('CampusA')"
         }
     ],
 
@@ -152,6 +153,16 @@ cat <<EOF > /etc/kea/kea-dhcp4.conf
 }
 EOF
 
+cat <<EOF > /var/lib/blocks
+STATE=reset
+EOF
+
+cat << EOF >> /usr/sbin/act-network-create
+# when the machine starts up we need to set up the blocks
+source /var/lib/blocks
+/home/administrator/workshopIPTables.sh \${STATE}
+EOF
+
 cat << EOF > /etc/sysctl.d/98-forwarding.conf
 net.ipv4.ip_forward = 1
 EOF
@@ -181,13 +192,19 @@ sudo -i -u administrator bash << EOF
 	echo "cloning `date`"
 	git clone https://github.com/arista-rockies/Workshops
 
+        cd Workshops
+	git checkout fatpeltscripting
+
 	echo "installing uv `date`"
 	# install uv as this is the easiest way to get a recent python
 	curl -LsSf https://astral.sh/uv/install.sh | sh
 
 	# configure uv
 	echo "configuring uv `date`"
-	cd Workshops/Scripts
+	cd ~/Projects/Workshops/Scripts
+
+	mv ~/images .
+
 	uv python install 3.14.0
 	uv python pin 3.14.0
 	uv venv --clear
@@ -205,14 +222,22 @@ mv /home/administrator/tokenConfig.yml /home/administrator/Projects/Workshops/Sc
 echo "chowning `date`"
 chown -R administrator:administrator /home/administrator/
 
+# these values are hard set in the dhcp config higher up
+CAMPUSB=192.168.2.0/24
+
 # at this point we should be able to run the iptables stuff
 iptables -t nat -F POSTROUTING
 iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
 
+# set up some new chains to make rule changes easier and keep the order right
+iptables -N campusb
+
 iptables -F FORWARD
+iptables -A FORWARD -s ${CAMPUSB} -j campusb
+# make sure to clamp mss so TA won't have issues later
 iptables -A FORWARD -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --set-mss 800
 
-bash workshopIPTables.sh add
+bash workshopIPTables.sh reset
 
 echo "trying reboot `date`"
 /sbin/shutdown -r +1 rebooting in 1m
