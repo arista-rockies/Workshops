@@ -111,7 +111,7 @@ There is no right or wrong way to design this hierarchy, and each organization m
    - Select **Add Device**
 
    > [!NOTE]
-   > **THE IMAGE DISPLAYED MAY NOT MATCH YOUR CONFIGURED HIERARCHY**
+   > **THE IMAGE DISPLAYED MAY NOT MATCH YOUR CONFIGURED HIERARCHY. BE SURE TO ADD THE DEVICES TO THE INTENDED CONTAINER STRUCTURE IN YOUR HIERARCHY**
 
  ![Static Configuration Add Device](images/scs-add-device1.png)     
 
