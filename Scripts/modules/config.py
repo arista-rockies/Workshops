@@ -116,21 +116,7 @@ class Device:
     software: str
     id: str
     model: str
-
-"""
-# not a huge fan, but i'm out of time
-def findDeviceBySerial(deviceInventory, sn):
-    for device in deviceInventory:
-        if device["sn"] == sn:
-            return device
-    return None
-
-def findDeviceByName(self, deviceInventory, hostname):
-    for device in deviceInventory:
-        if device["hostname"] == hostname:
-            return device
-    return None
-"""
+    headers: dict[str, str] = field(default_factory=dict)
 
 def loadConfiguration():
     tokens = loadTokens()

@@ -401,7 +401,7 @@ class VeloClient():
     def activate(self, activationKey):
         print(f"{self.pod.pod} - activating edge")
         ssid = f"velocloud-{self.serialNumber[-3:]}"
-        url = f'http://192.168.2.1/?activation_key={activationKey}&custom_vco={self.pods.tokens.velo.server}'
+        url = f'http://192.168.2.1/?activation_key={activationKey}&custom_vco={self.pod.tokens.velo.server}'
         print(f"  connecting to ssid: {ssid}")
         connected = False
         while not connected:
