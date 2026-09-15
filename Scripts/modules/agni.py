@@ -23,7 +23,7 @@ class AgniClient():
         self.pod = pod
         self._connected = False
 
-        if not config.args.act:
+        if not config.args.agni:
             return
         if not pod.tokens.agni:
             print("no agni token provided, but agni actions requested.  skipping")
