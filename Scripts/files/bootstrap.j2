@@ -16,9 +16,9 @@ import sys
 import time
 
 ######## this is stuff set by our bootstrap server
-desiredEOSVersion = "{desiredEOSVersion}"
-enrollmentToken = "{enrollmentToken}"
-doAGNI = {doAGNI}
+desiredEOSVersion = "{{desiredEOSVersion}}"
+enrollmentToken = "{{enrollmentToken}}"
+doAGNI = {{doAGNI}}
 
 ##############  USER INPUT  ##############
 # Note: If you are saving the file on windows, please make sure to use linux (LF) as newline.
@@ -36,7 +36,7 @@ doAGNI = {doAGNI}
 # Japan: "www.cv-prod-apnortheast-1.arista.io"
 # Australia: "www.cv-prod-ausoutheast-1.arista.io"
 # United Kingdon: "www.cv-prod-uk-1.arista.io"
-cvAddr = "{cvAddr}"
+cvAddr = "{{cvAddr}}"
 
 # this variable should be set to the entirety of the uri for the p12 download, *without* the trailing file
 # in this case, .p12 files are placed in the root of the webserver
@@ -72,7 +72,7 @@ REDIRECTOR_PATH = "api/v3/services/arista.redirector.v1.AssignmentService/GetOne
 VERSION = "2.0.1"
 
 ##############  HELPER FUNCTIONS  ##############
-proxies = {{"https": cvproxy, "http": cvproxy}}
+proxies = {"https": cvproxy, "http": cvproxy}
 
 logger = None
 def setupLogger():
@@ -107,17 +107,17 @@ def getInstallImage():
     cli = CliManager()
     mibStatus = SysdbPathHelper(os.environ.get("SYSNAME", "ar")).getEntity("hardware/entmib")
 
-    uri = "{{}}/swi/{{}}/{desiredEOSVersion}".format(certServerURI, mibStatus.root.serialNum)
+    uri = "{}/swi/{}/{}".format(certServerURI, mibStatus.root.serialNum, desiredEOSVersion)
 
     # Install new image
-    cmdList = ["enable", "install source {{}}".format(uri)]
+    cmdList = ["enable", "install source {}".format(uri)]
     rc, cmdOut = cli.runCommands(cmdList)
 
     # Reboot device
     cmdList = ["enable", "reload all now"]
     rc, cmdOut = cli.runCommands(cmdList)
     if rc:
-        err = "Failed to reboot for image upgrade, err: {{err}}. Aborting.".format(err=cmdOut)
+        err = "Failed to reboot for image upgrade, err: {err}. Aborting.".format(err=cmdOut)
         log(err)
         raise Exception(err)
 
@@ -145,7 +145,7 @@ def getAGNICert():
     cli = CliManager()
     mibStatus = SysdbPathHelper(os.environ.get("SYSNAME", "ar")).getEntity("hardware/entmib")
 
-    uri = "{{}}/radsec_ca_certificate.pem".format(certServerURI)
+    uri = "{}/radsec_ca_certificate.pem".format(certServerURI)
     resp = requests.get(uri, verify=False, timeout=20)
     resp.raise_for_status()
 
@@ -153,7 +153,7 @@ def getAGNICert():
         f.write(resp.text)
         f.close()
 
-    uri = "{{}}/cert/{{}}".format(certServerURI, mibStatus.root.serialNum)
+    uri = "{}/cert/{}".format(certServerURI, mibStatus.root.serialNum)
     resp = requests.get(uri, verify=False, timeout=20)
     try:
         resp.raise_for_status()
@@ -166,8 +166,8 @@ def getAGNICert():
         f.close()
 
     # extract the key
-    _doCMD("openssl pkcs12 -in /mnt/flash/710p.p12 {{}} -nocerts -password pass:temp -nodes | openssl rsa -out /mnt/flash/710p.key")
-    _doCMD("openssl pkcs12 -in /mnt/flash/710p.p12 {{}} -clcerts -nokeys -password pass:temp -out /mnt/flash/710p.pem")
+    _doCMD("openssl pkcs12 -in /mnt/flash/710p.p12 {} -nocerts -password pass:temp -nodes | openssl rsa -out /mnt/flash/710p.key")
+    _doCMD("openssl pkcs12 -in /mnt/flash/710p.p12 {} -clcerts -nokeys -password pass:temp -out /mnt/flash/710p.pem")
     # for some reason sometimes certs have the wrong perms on them and don't copy right.
     _doCMD("chmod +r /mnt/flash/710p*")
 
@@ -186,8 +186,8 @@ def monitorNtpSync():
       try:
          ntpStatInfo = subprocess.call(["ntpstat"])
       except Exception as e:
-         raise Exception("ntpstat command failed, err: {{err}}. Aborting".format(err=e))
-      log("NTP sync status - {{ntpStatInfo}}".format(ntpStatInfo=str(ntpStatInfo)))
+         raise Exception("ntpstat command failed, err: {err}. Aborting".format(err=e))
+      log("NTP sync status - {ntpStatInfo}".format(ntpStatInfo=str(ntpStatInfo)))
       if ntpStatInfo == 0:
          log("NTP sync complete.")
          return
@@ -205,7 +205,7 @@ def getExpiryFromToken(token):
       payload = json.loads(token_payload_decoded)
       return payload["exp"], True
    except Exception as e:
-      log("Could not parse the enrollment token, err: {{err}}".format(err=e))
+      log("Could not parse the enrollment token, err: {err}".format(err=e))
       log("Continuing with ZTP.")
       return -1, False
 
@@ -235,21 +235,21 @@ class CliManager(object):
          cmds = "\n".join(cmdList)
          cmdStr = delimiter.join(cmdList)
 
-         log("Executing the commands: [{{cmdStr}}]".format(cmdStr=cmdStr))
+         log("Executing the commands: [{cmdStr}]".format(cmdStr=cmdStr))
          cmdOutput = subprocess.check_output(
             "echo -e '" + cmds + "' | " + self.fastCliBinary, shell=True,
             stderr=subprocess.STDOUT, universal_newlines=True )
       except subprocess.CalledProcessError as e:
          rc = e.returncode
          err = e.output
-         log("Error running commands: [{{cmdStr}}], err: {{err}}".format(cmdStr=cmdStr, err=err))
+         log("Error running commands: [{cmdStr}], err: {err}".format(cmdStr=cmdStr, err=err))
          return (rc, err)
 
       if cmdOutput:
          for line in cmdOutput.split("\n"):
             if line.startswith("%"):
                err = cmdOutput
-               log("Error running commands: [{{cmdStr}}], err: {{err}}".format(
+               log("Error running commands: [{cmdStr}], err: {err}".format(
                   cmdStr=cmdStr, err=err))
                return(1, err)
 
@@ -266,7 +266,7 @@ def configureAndRestartNTP(ntpServer):
    stopNtpCmds = ["en", "configure", "no ntp", "exit"]
    rc, cmdOut = cli.runCommands(stopNtpCmds)
    if rc:
-      err = "NTP server could not be stopped, err: {{cmdOut}}. Aborting".format(cmdOut=cmdOut)
+      err = "NTP server could not be stopped, err: {cmdOut}. Aborting".format(cmdOut=cmdOut)
       log(err)
       raise Exception(err)
 
@@ -296,11 +296,11 @@ def configureAndRestartNTP(ntpServer):
 
    # Command to configure and restart ntp process.
    # Note: iburst flag is added for faster synchronization
-   configureNtpCmds = ["en", "configure", "ntp server {{ntpServer}} prefer iburst".format(
+   configureNtpCmds = ["en", "configure", "ntp server {ntpServer} prefer iburst".format(
       ntpServer=ntpServer), "exit"]
    rc, cmdOut = cli.runCommands(configureNtpCmds)
    if rc:
-      err = "Could not restart NTP server, err: {{cmdOut}}. Aborting".format(cmdOut=cmdOut)
+      err = "Could not restart NTP server, err: {cmdOut}. Aborting".format(cmdOut=cmdOut)
       log(err)
       raise Exception(err)
 
@@ -338,10 +338,10 @@ def tryImageUpgrade(e):
       raise e
 
    # Install new image
-   cmdList = ["enable", "install source {{eosUrl}} destination flash:/EOS.swi".format(eosUrl=eosUrl)]
+   cmdList = ["enable", "install source {eosUrl} destination flash:/EOS.swi".format(eosUrl=eosUrl)]
    rc, cmdOut = cli.runCommands(cmdList)
    if rc:
-      err = "Failed to upgrade EOS from {{eosUrl}}, err: {{err}}. Aborting.".format(
+      err = "Failed to upgrade EOS from {eosUrl}, err: {err}. Aborting.".format(
          eosUrl=eosUrl, err=cmdOut)
       log(err)
       raise Exception(err)
@@ -350,7 +350,7 @@ def tryImageUpgrade(e):
    cmdList = ["enable", "reload all now"]
    rc, cmdOut = cli.runCommands(cmdList)
    if rc:
-      err = "Failed to reboot for image upgrade, err: {{err}}. Aborting.".format(err=cmdOut)
+      err = "Failed to reboot for image upgrade, err: {err}. Aborting.".format(err=cmdOut)
       log(err)
       raise Exception(err)
 
@@ -431,18 +431,18 @@ class BootstrapManager(object):
          return
 
       try:
-         payload = {{
-            "key": {{
+         payload = {
+            "key": {
                 "system_id": self.mibStatus.root.serialNum
-            }}
-         }}
+            }
+         }
 
-         headers = {{"redirector_token": enrollmentToken}}
+         headers = {"redirector_token": enrollmentToken}
          response = requests.post(self.redirectorURL.geturl(), data=json.dumps(payload),
                                     headers=headers, proxies=proxies)
          response.raise_for_status()
       except Exception as e:
-         err = "No assignment found. Error talking to redirector: {{err}}".format(err=e)
+         err = "No assignment found. Error talking to redirector: {err}".format(err=e)
          log(err)
          raise Exception(err)
 
@@ -455,7 +455,7 @@ class BootstrapManager(object):
       self.enrollAddr = self.enrollAddr.replace("www", "apiserver")
 
       log("Step 0 done, redirected to the correct cluster URL")
-      log("enrollAddr - {{enrollAddr}}".format(enrollAddr=self.enrollAddr))
+      log("enrollAddr - {enrollAddr}".format(enrollAddr=self.enrollAddr))
 
    ##################################################################################
    # Step 1: Get client certificate using the enrollment token
@@ -468,15 +468,15 @@ class BootstrapManager(object):
       # versions of TerminAttr, the command execution does not finish if a wrong
       # flag is specified leading to the catch block being never executed
       cmd = "timeout 60s /usr/bin/TerminAttr"
-      cmd += " -cvauth {{tokenType}},{{tokenFilePath}}".format(
+      cmd += " -cvauth {tokenType},{tokenFilePath}".format(
          tokenType=self.tokenType, tokenFilePath=TOKEN_FILE_PATH)
-      cmd += " -cvaddr {{enrollAddr}}".format(enrollAddr=self.enrollAddr)
+      cmd += " -cvaddr {enrollAddr}".format(enrollAddr=self.enrollAddr)
       cmd += " -enrollonly"
 
       # Use cvproxy only when it is specified, this is to ensure that if we are on
       # older version of EOS that doesn't support cvproxy flag, the script won't fail
       if cvproxy != "":
-         cmd += " -cvproxy={{cvproxy}}".format(cvproxy=cvproxy)
+         cmd += " -cvproxy={cvproxy}".format(cvproxy=cvproxy)
 
       try:
          subprocess.check_output(cmd, shell=True, stderr=subprocess.STDOUT)
@@ -485,11 +485,11 @@ class BootstrapManager(object):
          # flag is not present in the TerminAttr version running on that device
          # Hence we have to do an image upgrade in this case.
          if e.returncode == 124: # timeout
-            log("TerminAttr enrollment timed out, err: {{err}}".format(err=e.output))
+            log("TerminAttr enrollment timed out, err: {err}".format(err=e.output))
             log("Attempting EOS version upgrade")
             tryImageUpgrade(e)
          else:
-            log("Failed to retrieve certs, err: {{err}}".format(err=e.output))
+            log("Failed to retrieve certs, err: {err}".format(err=e.output))
             raise e
 
       log("Step 1 done, exchanged enrollment token for client certificates")
@@ -500,7 +500,7 @@ class BootstrapManager(object):
    def getCertificatePaths( self ):
       # Timeout added for TerminAttr
       cmd = "timeout 60s /usr/bin/TerminAttr"
-      cmd += " -cvaddr {{enrollAddr}}".format(enrollAddr=self.enrollAddr)
+      cmd += " -cvaddr {enrollAddr}".format(enrollAddr=self.enrollAddr)
       cmd += " -certsconfig"
 
       try:
@@ -510,36 +510,36 @@ class BootstrapManager(object):
          self.certificate = str(json_response[self.enrollAddr]["certFile"])
          self.key = str( json_response[self.enrollAddr]["keyFile"])
       except subprocess.CalledProcessError as e:
-         log("Failed to get the path of the stored client certs, err: {{err}}".format(
+         log("Failed to get the path of the stored client certs, err: {err}".format(
             err=e.output))
          log("Using fallback paths for client certs")
          basePath = "/persist/secure/ssl/terminattr/primary"
-         self.certificate = "{{basePath}}/certs/client.crt".format(basePath=basePath)
-         self.key = "{{basePath}}/keys/client.key".format(basePath=basePath)
+         self.certificate = "{basePath}/certs/client.crt".format(basePath=basePath)
+         self.key = "{basePath}/keys/client.key".format(basePath=basePath)
 
       log("Step 2 done, obtained client certs location")
-      log("certificate location - {{certificate}}".format(certificate=self.certificate))
-      log("key location - {{key}}".format(key=self.key))
+      log("certificate location - {certificate}".format(certificate=self.certificate))
+      log("key location - {key}".format(key=self.key))
 
    ##################################################################################
    # Step 3.1: Get bootstrap script using the certificates
    ##################################################################################
    def getBootstrapScript( self ):
       # Setting header information
-      headers = {{}}
+      headers = {}
       headers["X-Arista-SystemMAC"] = self.mibStatus.systemMacAddr
       headers["X-Arista-ModelName"] = self.mibStatus.root.modelName
       headers["X-Arista-HardwareVersion"] = self.mibStatus.root.hardwareRev
       headers["X-Arista-Serial"] = self.mibStatus.root.serialNum
 
       try:
-         tpmStatus = self.pathHelper.getEntity("cell/{{cellID}}/hardware/tpm/status".format(
+         tpmStatus = self.pathHelper.getEntity("cell/{cellID}/hardware/tpm/status".format(
             cellID=self.cellID))
          headers["X-Arista-TpmApi"] = tpmStatus.tpmVersion
          headers["X-Arista-TpmFwVersion"] = tpmStatus.firmwareVersion
          headers["X-Arista-SecureZtp"] = str(tpmStatus.boardValidated)
       except Exception as e:
-         log("Exception while getting device tpmStatus: {{err}}".format(err=e))
+         log("Exception while getting device tpmStatus: {err}".format(err=e))
 
       headers["X-Arista-SoftwareVersion"] = getKeyValueFromFile("/etc/swi-version",
                                                                   "SWI_VERSION")
@@ -553,7 +553,7 @@ class BootstrapManager(object):
       with open(BOOT_SCRIPT_PATH, "w") as f:
          f.write(response.text)
 
-      log("Step 3.1 done, bootstrap script fetched and stored at {{bootScriptPath}}".format(
+      log("Step 3.1 done, bootstrap script fetched and stored at {bootScriptPath}".format(
          bootScriptPath=BOOT_SCRIPT_PATH))
 
    ##################################################################################
@@ -569,7 +569,7 @@ class BootstrapManager(object):
       # The bootstrap script and challenge script anyway contain the required shebang for a
       # particular EOS version, hence instead of re-evaluating here, we can easily just execute
       # it from that shebang itself.
-      cmd = ["chmod +x {{bootScriptPath}}".format(bootScriptPath=BOOT_SCRIPT_PATH)]
+      cmd = ["chmod +x {bootScriptPath}".format(bootScriptPath=BOOT_SCRIPT_PATH)]
       try:
          subprocess.check_output(cmd, shell=True, stderr=subprocess.STDOUT)
       except subprocess.CalledProcessError as e:
@@ -584,7 +584,7 @@ class BootstrapManager(object):
          proc = subprocess.Popen([cmd], shell=True, stderr=subprocess.STDOUT, env=os.environ)
          proc.communicate()
          if proc.returncode:
-            log("Bootstrap script failed with return code {{rc}}".format(rc=proc.returncode))
+            log("Bootstrap script failed with return code {rc}".format(rc=proc.returncode))
             sys.exit(proc.returncode)
       except subprocess.CalledProcessError as e:
          log(e.output)
@@ -629,7 +629,7 @@ if __name__ == "__main__":
    setupLogger()
 
    # Logging the current version of the custom bootstrap script
-   log("Current Custom Bootstrap Script Version: {{version}}".format(version=VERSION))
+   log("Current Custom Bootstrap Script Version: {version}".format(version=VERSION))
 
    if cvAddr == "":
       err = "Error: address to CVP missing"
@@ -657,7 +657,7 @@ if __name__ == "__main__":
    expiryEpoch, parseSuccess = getExpiryFromToken(enrollmentToken)
    if parseSuccess and time.time() > expiryEpoch:
       expiry = datetime.datetime.fromtimestamp(expiryEpoch)
-      err = "Error: enrollment token expired. expired on: {{expiry}} GMT".format(expiry=str(expiry))
+      err = "Error: enrollment token expired. expired on: {expiry} GMT".format(expiry=str(expiry))
       log(err)
       sys.exit(err)
 

@@ -5,6 +5,7 @@ from fastapi.responses import HTMLResponse, PlainTextResponse, FileResponse, Res
 from modules.agni import AgniClient
 from modules import config
 from types import SimpleNamespace
+from jinja2 import Environment, FileSystemLoader
 
 import logging
 logging.basicConfig(level=logging.INFO)
@@ -23,14 +24,6 @@ setattr(config.args, "pods", [currentPod])
 
 podConfig = config.loadConfiguration()
 pod = podConfig[currentPod]
-logger.info(pod)
-
-#with open("tokenConfig.yml", "r") as f:
-#    tokens = yaml.safe_load(f.read())["apiToken"]
-
-#config.apiTokens[currentPod] = tokens[currentPod]
-
-#config.loadInventory()
 
 @app.get('/radsec_ca_certificate.pem', response_class=FileResponse)
 async def getRadsec(request: Request):
@@ -71,7 +64,6 @@ async def getSWI(request: Request, sn, eosVersion):
 async def bootstrap(request: Request):
     # Headers({'host': '10.0.96.20:8000', 'accept': '*/*', 'x-arista-systemmac': '2c:dd:e9:f6:f9:9b', 'x-arista-modelname': 'CCS-710P-16P', 'x-arista-serial': 'WTW23490441', 'x-arista-hardwareversion': '11.04', 'x-arista-tpmapi': '2.0', 'x-arista-tpmfwversion': '1.512', 'x-arista-secureztp': 'True', 'x-arista-softwareversion': '4.32.5.1M', 'x-arista-architecture': 'i386'})
     device = pod.findDeviceBySN(request.headers["x-arista-serial"])
-    print(pod)
     print(f" {currentPod} - {device}")
     if not device:
         print(f'could not find {request.headers["x-arista-serial"]}')
@@ -111,9 +103,7 @@ async def bootstrap(request: Request):
         }
         device.headers["agni"] = agniClient.onboardSwitch(data, nadGroupID)
 
-    with open(f'files/bootstrap.txt', 'r') as f:
-        return f.read().format(**vals)
+    jinjaEnv = Environment(loader=FileSystemLoader('files'))
+    template = jinjaEnv.get_template('bootstrap.j2').render(vals)
 
-    #print(request.headers)
-    #print(request.url)
-    raise HTTPException(status_code=503, detail="terminating")
+    return template
