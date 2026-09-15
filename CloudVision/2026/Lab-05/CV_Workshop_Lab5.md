@@ -19,7 +19,7 @@
 
 # 1. Lab Topology
 
-![Full Lab Topology](images/lab-topology.png)
+![Full Lab Topology](images/a-topology.png)
 
 ---
 # 2. Accessing Lab
