@@ -305,6 +305,26 @@ Goal - In this lab section, CampusB-Leaf2A will be simulated offline by blocking
 - After the replacement Leaf2A has booted back up, confirm that your customized device tags, and Connectivity Monitor configuration have updated.
 - 
 
+Notice, by default, the Campus Fabric studio provisioning settings will propose the first host address ass the virtual-router IP, and assign the 2nd host address to the router node.
+ - ![Overlapping IP Proposed](images/seeoverlap-h10.png)
+
+- The Campus Fabric studio allows you to change these number defaults both fabric wide and 
+Modify these by staying within your existing workspace, opening the Campus Fabric studio (click breadcrumb under Studios Modified)
+Advanced Services Settings, Services Allocations
+VLAN Gateway Address Convention - set to **Last**
+ - ![Gateway Numbering](images/gatewaynumbering-h10.png)
+
+- Rebuild your workspace and observe the gateway address has moved for ALL SVIs in both CampusA and CampusB. This is not desired.
+- Go back into your workspace and modify the Gateway Number convention in the following way
+-- Set the VLAN Gateway Address Convention back to First (the original default)
+-- Add Gateway Address Convention - Tag match on Campus-Pod: CampusB  Set this match to convention Last
+
+ - ![Gateway Numbering Tagged](images/gatewaynumbertagged-h10.png)
+
+- Finally, rebuild your workspace once more to see that only the Campus B spines have gateway address scheme modified.
+- Approve and execute the change control.
+
+- 
 ---
 
 
