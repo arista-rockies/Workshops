@@ -15,12 +15,12 @@ inputs:
                                 leafsInfo:
                                   nodeId: 1
                               tags:
-                                query: device:{{switches['CampusA-Leaf1A']['serial']}}
+                                query: device:{{switches['CampusA-Leaf1A'].sn}}
                             - inputs:
                                 leafsInfo:
                                   nodeId: 2
                               tags:
-                                query: device:{{switches['CampusA-Leaf1B']['serial']}}
+                                query: device:{{switches['CampusA-Leaf1B'].sn}}
                           leafsBgpAs: null
                           memberLeafMlagPairs: []
                           memberLeafs:
@@ -28,7 +28,7 @@ inputs:
                                 memberLeafsInfo:
                                   nodeId: 4
                               tags:
-                                query: device:{{switches['CampusA-Leaf1C']['serial']}}
+                                query: device:{{switches['CampusA-Leaf1C'].sn}}
                           nodeGroupAttributesList: []
                       tags:
                         query: Access-Pod:Pod1
@@ -39,7 +39,7 @@ inputs:
                                 leafsInfo:
                                   nodeId: 3
                               tags:
-                                query: device:{{switches['CampusA-Leaf2A']['serial']}}
+                                query: device:{{switches['CampusA-Leaf2A'].sn}}
                           leafsBgpAs: null
                           memberLeafMlagPairs: []
                           memberLeafs: []
@@ -60,12 +60,12 @@ inputs:
                         spinesInfo:
                           nodeId: 1
                       tags:
-                        query: device:{{switches['CampusA-Spine1']['serial']}}
+                        query: device:{{switches['CampusA-Spine1'].sn}}
                     - inputs:
                         spinesInfo:
                           nodeId: 2
                       tags:
-                        query: device:{{switches['CampusA-Spine2']['serial']}}
+                        query: device:{{switches['CampusA-Spine2'].sn}}
                   thirdPartyDevices: []
               tags:
                 query: Campus-Pod:CampusA

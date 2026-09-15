@@ -12,41 +12,41 @@ tags:
 assignments:
     - key: Workshop
       value: CampusA
-      devices: [ "{{switches['CampusA-Spine1']['serial']}}", "{{switches['CampusA-Spine2']['serial']}}", "{{switches['CampusA-Leaf1A']['serial']}}", "{{switches['CampusA-Leaf1B']['serial']}}", "{{switches['CampusA-Leaf1C']['serial']}}", "{{switches['CampusA-Leaf2A']['serial']}}" ]
+      devices: [ "{{switches['CampusA-Spine1'].sn}}", "{{switches['CampusA-Spine2'].sn}}", "{{switches['CampusA-Leaf1A'].sn}}", "{{switches['CampusA-Leaf1B'].sn}}", "{{switches['CampusA-Leaf1C'].sn}}", "{{switches['CampusA-Leaf2A'].sn}}" ]
     - key: Workshop
       value: Spine
-      devices: [ "{{switches['CampusA-Spine1']['serial']}}", "{{switches['CampusA-Spine2']['serial']}}" ]
+      devices: [ "{{switches['CampusA-Spine1'].sn}}", "{{switches['CampusA-Spine2'].sn}}" ]
     - key: Workshop
       value: Leaf
-      devices: [ "{{switches['CampusA-Leaf1A']['serial']}}", "{{switches['CampusA-Leaf1B']['serial']}}", "{{switches['CampusA-Leaf1C']['serial']}}", "{{switches['CampusA-Leaf2A']['serial']}}" ]
+      devices: [ "{{switches['CampusA-Leaf1A'].sn}}", "{{switches['CampusA-Leaf1B'].sn}}", "{{switches['CampusA-Leaf1C'].sn}}", "{{switches['CampusA-Leaf2A'].sn}}" ]
     - key: Workshop
       value: Leaf1
-      devices: [ "{{switches['CampusA-Leaf1A']['serial']}}", "{{switches['CampusA-Leaf1B']['serial']}}", "{{switches['CampusA-Leaf1C']['serial']}}" ]
+      devices: [ "{{switches['CampusA-Leaf1A'].sn}}", "{{switches['CampusA-Leaf1B'].sn}}", "{{switches['CampusA-Leaf1C'].sn}}" ]
     - key: Workshop
       value: Leaf1-Member-Leaf
-      devices: [ "{{switches['CampusA-Leaf1C']['serial']}}" ]
+      devices: [ "{{switches['CampusA-Leaf1C'].sn}}" ]
     - key: Workshop
       value: Leaf2
-      devices: [ "{{switches['CampusA-Leaf2A']['serial']}}" ]
+      devices: [ "{{switches['CampusA-Leaf2A'].sn}}" ]
     - key: Campus
       value: Workshop
-      devices: [ "{{switches['CampusA-Spine1']['serial']}}", "{{switches['CampusA-Spine2']['serial']}}", "{{switches['CampusA-Leaf1A']['serial']}}", "{{switches['CampusA-Leaf1B']['serial']}}", "{{switches['CampusA-Leaf1C']['serial']}}", "{{switches['CampusA-Leaf2A']['serial']}}" ]
+      devices: [ "{{switches['CampusA-Spine1'].sn}}", "{{switches['CampusA-Spine2'].sn}}", "{{switches['CampusA-Leaf1A'].sn}}", "{{switches['CampusA-Leaf1B'].sn}}", "{{switches['CampusA-Leaf1C'].sn}}", "{{switches['CampusA-Leaf2A'].sn}}" ]
     - key: Campus-Pod
       value: CampusA
-      devices: [ "{{switches['CampusA-Spine1']['serial']}}", "{{switches['CampusA-Spine2']['serial']}}", "{{switches['CampusA-Leaf1A']['serial']}}", "{{switches['CampusA-Leaf1B']['serial']}}", "{{switches['CampusA-Leaf1C']['serial']}}", "{{switches['CampusA-Leaf2A']['serial']}}" ]
+      devices: [ "{{switches['CampusA-Spine1'].sn}}", "{{switches['CampusA-Spine2'].sn}}", "{{switches['CampusA-Leaf1A'].sn}}", "{{switches['CampusA-Leaf1B'].sn}}", "{{switches['CampusA-Leaf1C'].sn}}", "{{switches['CampusA-Leaf2A'].sn}}" ]
     - key: Access-Pod
       value: Pod1
-      devices: [ "{{switches['CampusA-Leaf1A']['serial']}}", "{{switches['CampusA-Leaf1B']['serial']}}", "{{switches['CampusA-Leaf1C']['serial']}}" ]
+      devices: [ "{{switches['CampusA-Leaf1A'].sn}}", "{{switches['CampusA-Leaf1B'].sn}}", "{{switches['CampusA-Leaf1C'].sn}}" ]
     - key: Access-Pod
       value: Pod2
-      devices: [ "{{switches['CampusA-Leaf2A']['serial']}}" ]
+      devices: [ "{{switches['CampusA-Leaf2A'].sn}}" ]
     - key: Role
       value: Leaf
-      devices: [ "{{switches['CampusA-Leaf1A']['serial']}}", "{{switches['CampusA-Leaf1B']['serial']}}", "{{switches['CampusA-Leaf2A']['serial']}}" ]
+      devices: [ "{{switches['CampusA-Leaf1A'].sn}}", "{{switches['CampusA-Leaf1B'].sn}}", "{{switches['CampusA-Leaf2A'].sn}}" ]
     - key: Role
       value: Member-Leaf
-      devices: [ "{{switches['CampusA-Leaf1C']['serial']}}" ]
+      devices: [ "{{switches['CampusA-Leaf1C'].sn}}" ]
     - key: Role
       value: Spine
-      devices: [ "{{switches['CampusA-Spine1']['serial']}}", "{{switches['CampusA-Spine2']['serial']}}" ]
+      devices: [ "{{switches['CampusA-Spine1'].sn}}", "{{switches['CampusA-Spine2'].sn}}" ]
 

@@ -117,7 +117,7 @@ nodes:
       version: 4.34.5M
 
   - P###-CampusB-Leaf2A:
-      ip_addr: 192.168.2.35/22
+      ip_addr: 192.168.3.35/22
       device_model: 720XP-24Y6
       system_mac_address: 00:1c:73:###:02:35
       serial_number: P###-CampusB-Leaf2A
@@ -126,7 +126,7 @@ nodes:
       ztp: true
 
   - P###-CampusB-ZTR:
-      ip_addr: 192.168.2.40/22
+      ip_addr: 192.168.3.40/22
       device_model: 720XP-24Y6
       system_mac_address: 00:1c:73:###:02:40
       serial_number: P###-CampusB-ZTR

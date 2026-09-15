@@ -12,50 +12,6 @@
 #          this is as designed to ensure that i don't get namespace collisions due to needing so many
 #          cv apis
 
-""" example token format
-apiToken:
-  "0":
-      "name": "pod 0"
-      "cv":
-        "server": "www.arista.io"
-        "tenant": "rockies-training-00"
-        "key1": "serviceAccountToken1"
-        "key2": "serviceAccountToken2"
-      "act":
-        "resourceName": "formatString of lab resources:  eg: cv-workshop-pod{}"
-        "server": "ce.act.arista.com"
-        "key": "actKey"
-        "sshPassword": ""
-  "1":
-      "name": "pod 1"
-      "cv":
-        "tenant": "rockies-training-01"
-        "key1": "serviceAccountToken1"
-        "key2": "serviceAccountToken2"
-      "cue":
-        "tenant": "Z_ROCKIES-ATD-01"
-        "keyid": "cueKeyID"
-        "key": "cueKey"
-        "url": "https://awm11013-c4.srv.wifi.arista.com/wifi/api/"
-      "agni":
-        "tenant": "Z_ROCKIES-ATD-01"
-        "keyid": "agniKeyID"
-        "key": "agniKey"
-        "orgid": "agniOrgID"
-      "velo":
-        "tenant": "Rockies Workshop"
-        "keyid": ""
-        "key": "velokey"
-        "url": "https://veloVCO.com"
-        "sshPassword": "formatStringOfPassword"
-        "enterpriseID": int
-        "enterpriseLogicalID": uuid4
-      "act":
-        "resourceName": "formatString of lab resources:  eg: cv-workshop-pod{}"
-        "server": "ce.act.arista.com"
-        "key": "actKey"
-        "sshPassword": ""
-"""
 import os, argparse, yaml, asyncio, csv, requests, json
 
 from modules import config
@@ -93,53 +49,24 @@ config.parser.add_argument('-type', default='campus', help='type of workshop.  c
 async def main():
     config.args = config.parser.parse_args()
 
-    with open(config.args.tokenFile, "r") as f:
-        tokens = yaml.safe_load(f.read())["apiToken"]
-
-    for pod in config.args.pods:
-        config.apiTokens[pod] = tokens[pod]
-
-    config.loadInventory()
+    podConfig = config.loadConfiguration()
 
     requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
-    for pod in config.apiTokens:
-        config.currentPod = pod
-        token = tokens.get(config.currentPod, {})
+    for podStr, pod in podConfig.items():
+        actClient = ActClient(pod)
+        actClient.execute()
 
-        if config.args.act:
-            if not 'act' in token:
-                print("no act token provided, but act actions requested.  skipping")
-            else:
-                actClient = ActClient(token)
-                actClient.execute()
+        agniClient = AgniClient(pod)
+        agniClient.execute()
 
-        if config.args.agni:
-            if not 'agni' in token:
-                print("no agni token provided, but agni actions requested.  skipping")
-            else:
-                agniClient = AgniClient(token)
-                agniClient.execute()
+        cueClient = CueClient(pod)
+        cueClient.execute()
 
-        if config.args.cue:
-            if not 'cue' in token:
-                print("no cue token provided, but cue actions requested.  skipping")
-            else:
-                cueClient = CueClient(token)
-                cueClient.execute()
+        cvClient = pgfCVClient(pod)
+        await cvClient.execute()
 
-        if config.args.cv:
-            if not 'cv' in token:
-                print("no cv token provided, but cv actions requested.  skipping")
-            else:
-                cvClient = pgfCVClient(token)
-                await cvClient.execute()
-
-        if config.args.velo:
-            if not 'velo' in token:
-                print("no velo token provided, but velo actions requested.  skipping")
-            else:
-                veloClient = VeloClient(token)
-                veloClient.execute()
+        veloClient = VeloClient(pod)
+        veloClient.execute()
 
 asyncio.run(main())

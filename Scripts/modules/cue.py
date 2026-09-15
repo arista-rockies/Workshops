@@ -25,9 +25,16 @@ class CueClient():
         _addArgument('-cueCleanup', default=False, action='store_true', help='do cue cleanup steps')
         _addArgument('-cueTest', default=False, action='store_true', help='dev code')
 
-    def __init__(self, token):
-        self.token = token
+    def __init__(self, pod):
+        self.pod = pod
         self._connected = False
+
+        if not config.args.cue:
+            return
+        if not pod.tokens.cue:
+            print("no cue token provided but cue actions requested.  skipping")
+            return
+
         self._services = {}
 
         self._authenticate()
@@ -40,8 +47,8 @@ class CueClient():
 
         authData = {
             "type": "apiKeyCredentials",
-            "keyId": self.token["cue"]["keyid"],
-            "keyValue": self.token["cue"]["key"],
+            "keyId": self.pod.tokens.cue.keyid,
+            "keyValue": self.pod.tokens.cue.key, 
             "timeout": 3600,
         }
         url = f'https://launchpad.wifi.arista.com/api/v2/session'
@@ -78,8 +85,8 @@ class CueClient():
                 # do the auth
                 url = f'{self._services["gm"].baseURL}site/keylogin'
                 params = {
-                    "key_id": self.token["cue"]["keyid"],
-                    "key_value": self.token["cue"]["key"]
+                    "key_id": self.pod.tokens.cue.keyid,
+                    "key_value": self.pod.tokens.cue.key
                 }
                 resp = requests.get(url, params=params)
                 try:
@@ -106,11 +113,11 @@ class CueClient():
         return {}
 
     def _doDeleteEvents(self):
-        print(f"{config.currentPod} - cue/deleteEvents")
+        print(f"{self.pod.pod} - cue/deleteEvents")
         self._doReq(reqType='DELETE', subsystem='events/bulkdelete')
 
     def _doDeleteLocations(self):
-        print(f"{config.currentPod} - cue/deleteLocations")
+        print(f"{self.pod.pod} - cue/deleteLocations")
         locations = self._doReq(reqType='GET', subsystem='locations')
         if not locations:
             return
@@ -120,14 +127,14 @@ class CueClient():
                 self._doReq(reqType='DELETE', subsystem='locations', data=data)
 
     def _doDeleteRogueAPs(self):
-        print(f"{config.currentPod} - cue/deleteRogue")
+        print(f"{self.pod.pod} - cue/deleteRogue")
         try:
             self._doReq(reqType='DELETE', subsystem='aps/inactiveauthorized')
         except:
             pass
 
     def _doRenameAPs(self):
-        print(f"{config.currentPod} - cue/renameAPs")
+        print(f"{self.pod.pod} - cue/renameAPs")
         aps = self._doReq(reqType='GET', subsystem='manageddevices/aps')
         if not aps:
             return
@@ -142,7 +149,7 @@ class CueClient():
             self._doReq(reqType='PUT', subsystem=f'manageddevices/aps/{ap["macaddress"]}', params=params, data=data)
 
     def _doDeleteGMPortals(self):
-        print(f"{config.currentPod} - cue/delete GM Portals and users")
+        print(f"{self.pod.pod} - cue/delete GM Portals and users")
         portals = self._doReq(reqType='GET', service="gm", subsystem='portals')
         if not portals:
             return
@@ -155,6 +162,9 @@ class CueClient():
             self._doReq(reqType='DELETE', service="gm", subsystem=subsystem)
 
     def execute(self):
+        if not self._connected:
+            return
+
         if config.args.cueTest:
             self.test()
 
@@ -178,7 +188,7 @@ class CueClient():
             for child in l.get("children", []):
                 _doLocationCache(child)
 
-        print(f"{config.currentPod} - cue/deleteSSIDs")
+        print(f"{self.pod.pod} - cue/deleteSSIDs")
 
         locationCache = {}
         _doLocationCache(self._doReq(reqType='GET', subsystem='locations'))
@@ -191,7 +201,7 @@ class CueClient():
 
         ssidProfiles = self._doReq(reqType='GET', subsystem='/deviceconfiguration/ssidprofiles', params=params)
         for profile in ssidProfiles:
-            print(f'{config.currentPod}/{locationCache[profile["createdAtLocationId"]["id"]]} - {profile["templateName"]}')
+            print(f'{self.pod.pod}/{locationCache[profile["createdAtLocationId"]["id"]]} - {profile["templateName"]}')
             p = {
                 "templateid": profile["templateId"],
                 "deleteusedssidprofile": True
