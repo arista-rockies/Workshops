@@ -204,6 +204,20 @@ Notice the Change Control event is correlated and the link failures are shown wi
 - ![Related Events Uplink Failure](images/relatedevents-spinereboot.png)
 
 **This concludes the CloudVision Events and Notifications Customization Section**
+
+
+### Create a Port Profile and Assign it
+
+
+
+### Upgrade Code on a Single Switch
+
+
+### Monitor Syslog
+
+
+### Observe the Fabric
+
 ---
 
 
