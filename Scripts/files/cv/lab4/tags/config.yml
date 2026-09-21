@@ -49,4 +49,3 @@ assignments:
     - key: Role
       value: Spine
       devices: [ "{{switches['CampusA-Spine1'].sn}}", "{{switches['CampusA-Spine2'].sn}}" ]
-
