@@ -7,7 +7,7 @@ inputs:
           - interfaces: Ethernet11-12
             tagQuery:
               tags:
-                query: device:{{switches['leaf1a']['serial']}}
+                query: device:{{switches['leaf1a'].sn}}
       interfaceZtpMethod: access
   campus:
     - inputs:
@@ -30,7 +30,7 @@ inputs:
                                 leafsInfo:
                                   nodeId: 2
                               tags:
-                                query: device:{{switches['leaf1a']['serial']}}
+                                query: device:{{switches['leaf1a'].sn}}
                           memberLeafMlagPairs: []
                           memberLeafs: []
                           nodeGroupAttributesList: []

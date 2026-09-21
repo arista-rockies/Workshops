@@ -4,8 +4,6 @@ from requests.packages.urllib3.exceptions import InsecureRequestWarning
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 from modules.pgf import pgfAction, pgfBoolAction
 
-#TODO: need to move the url to the token file
-
 class AgniClient():
     def configure():
         def _addArgument(*args, **kwargs):
@@ -21,11 +19,18 @@ class AgniClient():
         _addArgument('-agniCleanup', default=False, action='store_true', help='do agni cleanup steps')
         _addArgument('-agniTest', default=False, action='store_true', help='test new agni code')
 
-    def __init__(self, token):
-        self.token = token
-        self.headers = None
+    def __init__(self, pod: Pod):
+        self.pod = pod
         self._connected = False
-        self.baseURL = 'https://beta.agni.arista.io/'
+
+        if not config.args.agni:
+            return
+        if not pod.tokens.agni:
+            print("no agni token provided, but agni actions requested.  skipping")
+            return
+
+        self.headers = None
+        self.baseURL = self.pod.tokens.agni.server
 
         self._authenticate()
 
@@ -34,8 +39,8 @@ class AgniClient():
 
     def _authenticate(self):
         authData = {
-            "keyID": self.token["agni"]["keyid"],
-            "keyValue": self.token["agni"]["key"],
+            "keyID": self.pod.tokens.agni.keyid,
+            "keyValue": self.pod.tokens.agni.key
         }
 
         url = f'{self.baseURL}cvcue/keyLogin'
@@ -53,7 +58,7 @@ class AgniClient():
         if not self._connected:
             return {}
 
-        data["orgID"] = self.token["agni"]["orgid"]
+        data["orgID"] = self.pod.tokens.agni.orgid
 
         url = f'{self.baseURL}api/{subsystem}'
 
@@ -67,7 +72,7 @@ class AgniClient():
             return {}
 
     def _doDeleteUsers(self):
-        print(f"{config.currentPod} - agni/deleteUsers")
+        print(f"{self.pod.pod} - agni/deleteUsers")
         users = self._doReq(subsystem='identity.user.list')
 
         userPattern = r'^aristaatd(0[0-9]|1[0-9]|20)$'
@@ -79,7 +84,7 @@ class AgniClient():
                 self._doReq(subsystem='identity.user.delete', data=user)
 
     def _doDeleteClients(self):
-        print(f"{config.currentPod} - agni/deleteClients")
+        print(f"{self.pod.pod} - agni/deleteClients")
         data = {
             "zoneID": 0,
         }
@@ -96,7 +101,7 @@ class AgniClient():
                 self._doReq(subsystem='identity.client.delete', data=client)
 
     def _doDeleteClientGroups(self):
-        print(f"{config.currentPod} - agni/deleteClientGroups")
+        print(f"{self.pod.pod} - agni/deleteClientGroups")
         clientGroups = self._doReq(subsystem='config.clientGroup.list')
 
         for clientGroup in clientGroups.get("data", {}).get("clientGroups", []):
@@ -104,7 +109,7 @@ class AgniClient():
             self._doReq(subsystem='config.clientGroup.delete', data=clientGroup)
 
     def _doDeleteNetworks(self):
-        print(f"{config.currentPod} - agni/deleteNetworks")
+        print(f"{self.pod.pod} - agni/deleteNetworks")
         networks = self._doReq(subsystem='config.network.list')
 
         for network in networks.get("data", {}).get("networks", []):
@@ -112,7 +117,7 @@ class AgniClient():
             self._doReq(subsystem='config.network.delete', data=network)
 
     def _doDeleteSegments(self):
-        print(f"{config.currentPod} - agni/deleteSegments")
+        print(f"{self.pod.pod} - agni/deleteSegments")
         segments = self._doReq(subsystem='config.segment.list')
 
         for segment in segments.get("data", {}).get("Records", []):
@@ -140,7 +145,7 @@ class AgniClient():
         self._doReq(subsystem='config.segment.add', data=data)
 
     def _doDeletePortals(self):
-        print(f"{config.currentPod} - agni/deletePortals")
+        print(f"{self.pod.pod} - agni/deletePortals")
         portals = self._doReq(subsystem='config.portal.list')
         for portal in portals.get("data", {}).get("portals", []):
             # going out on a limb here that name=Default shouldn't be deleted?

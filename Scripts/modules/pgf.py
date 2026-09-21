@@ -2,6 +2,7 @@ import tempfile, argparse
 from modules import config
 from cloudvision.Connector.grpc_client import GRPCClient, create_query
 from cloudvision.Connector.codec import Wildcard
+from dataclasses import dataclass
 
 import json
 
@@ -68,13 +69,12 @@ class pgfDevice():
     _hostname: str
     _interfaces: dict
 
-    def __init__(self, sn: str, model: str, mac: str, hostname: str, tok: str, token: dict[str]):
+    def __init__(self, sn: str, model: str, mac: str, hostname: str, token: config.CVToken):
         self._sn = sn
         self._model = model
         self._mac = mac
         self._hostname = hostname
         self._interfaces = {}
-        self.tok = tok
         self.token = token
 
     def __str__(self):
@@ -98,7 +98,7 @@ class pgfDevice():
 
     def fetchInterfaces(self):
         interfaceLLDP = {}
-        with GRPCClient(self.token["server"], tokenValue=self.tok) as client:
+        with GRPCClient(self.token.server, tokenValue=self.token.key1) as client:
             path = ["Sysdb", "l2discovery", "lldp", "status", "local", Wildcard(), "portStatus", Wildcard(), "remoteSystem", Wildcard() ]
             query = [ create_query([(path, []) ], self._sn) ]
             for batch in client.get(query):
@@ -111,7 +111,7 @@ class pgfDevice():
                     interface = interfaceLLDP.setdefault(path, {})
                     interface.update(notif["updates"])
 
-        with GRPCClient(self.token["server"], tokenValue=self.tok) as client:
+        with GRPCClient(self.token.server, tokenValue=self.token.key1) as client:
             path = ["Sysdb", "interface", "status", "all", "intfStatus"]
             query = [ create_query([(path, [])], self._sn) ]
             for batch in client.get(query):

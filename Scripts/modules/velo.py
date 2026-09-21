@@ -31,19 +31,23 @@ class VeloClient():
         _addArgument('-veloDump', default=False, action='store_true', help='do some test dumps')
         _addArgument('-veloTest', default=False, action='store_true', help='do velo test code')
 
-    def __init__(self, token):
-        if not (t:=token.get("velo", None)):
-            raise Exception("invalid token")
+    def __init__(self, pod):
+        self.pod = pod
+        self._connected = False
+        
+        if not config.args.velo:
+            return
+        if not pod.tokens.velo:
+            print("no velo token provided, but velo actions requested.  skipping")
+            return
 
         # let's pull some information out of the global inventory
-        d = config.globalInventory['velo'][config.currentPod]
-        self.serialNumber = d["sn"]
-        self.pod = d["Hostname"] #d["podNum"]
+        d = self.pod.velo[0]
+        self.serialNumber = d.sn
+        self.hostname = d.hostname
 
-        self.token = t
-        self.baseURL = f'https://{t["url"]}'
-        self._connected = False
-        self.headers = {"Content-Type": "application/json", "Authorization": f"Token {t['key']}"}
+        self.baseURL = f'https://{self.pod.tokens.velo.server}'
+        self.headers = {"Content-Type": "application/json", "Authorization": f"Token {self.pod.tokens.velo.key}"}
         self.edge = {}
         self._actionCounter = 0
         self._debug = False
@@ -140,7 +144,7 @@ class VeloClient():
         self.configurations = self._doPortal(method='/enterprise/getEnterpriseConfigurations')
 
     def deactivateEdge(self):
-        print(f"{config.currentPod} - deactivate")
+        print(f"{self.pod.pod} - deactivate")
 
         # to cleanup/reset the device to gold the easiets method is to deactivate it.  do to this
         #  we need to use some undocumented api calls
@@ -150,7 +154,7 @@ class VeloClient():
             "id": self.edge["id"],
         }
 
-        print(f"{config.currentPod} - deactivate - enterLiveMode")
+        print(f"{self.pod.pod} - deactivate - enterLiveMode")
         resp = self._doAction('liveMode/enterLiveMode', params=params)
 
         # that will return to us a token
@@ -167,7 +171,7 @@ class VeloClient():
             ],
             "token": deactivateToken
         }
-        print(f"{config.currentPod} - deactivate - reset")
+        print(f"{self.pod.pod} - deactivate - reset")
         resp = self._doAction('liveMode/requestLiveActions', url=url, params=params)
 
         # lastly let's leave live mode.  dunno if this is strictly required, but the ui does it
@@ -175,7 +179,7 @@ class VeloClient():
             "token": deactivateToken
         }
 
-        print(f"{config.currentPod} - deactivate - exitLiveMode")
+        print(f"{self.pod.pod} - deactivate - exitLiveMode")
         self._doAction('liveMode/clientExitLiveMode', url=url, params=params)
 
     def deleteEdge(self, wait=False, timeout=120):
@@ -193,7 +197,7 @@ class VeloClient():
                     break
 
             print("", flush=True, end='\n')
-        print(f"{config.currentPod} - deleteEdge")
+        print(f"{self.pod.pod} - deleteEdge")
         data = {
             "id": self.edge["id"]
         }
@@ -201,7 +205,7 @@ class VeloClient():
         
     def cleanup(self):
         if "id" not in self.edge:
-            print(f"{config.currentPod} - skipping cleanup, device not found")
+            print(f"{self.pod.pod} - skipping cleanup, device not found")
             return
 
         self.deactivateEdge()
@@ -268,7 +272,7 @@ class VeloClient():
                 "orchestratorServiceReachableBackup": True,
             })
 
-        print(f"{config.currentPod} - provisionEdge")
+        print(f"{self.pod.pod} - provisionEdge")
 
         self._getLicenses()
         edgeConfig = self._getConfiguration('Workshop-Branch')
@@ -281,7 +285,7 @@ class VeloClient():
             "endpointPkiMode": "CERTIFICATE_OPTIONAL",
             "haEnabled": False,
             "modelNumber": "edge710",
-            "name": self.pod,
+            "name": self.hostname,
             "serialNumber": self.serialNumber,
             "site": {
                 "contactEmail": "pfelt@arista.com",
@@ -328,7 +332,7 @@ class VeloClient():
                     newInterface.setLagSlave()
                 else:
                     base = "240" if interface["name"] == "GE1" else "248"
-                    newInterface.setL3(f"10.0.{100+int(config.currentPod)}.{base}/29")
+                    newInterface.setL3(f"10.0.{100+int(self.pod.pod)}.{base}/29")
 
                 newRoutedInterfaces.append(newInterface.interface)
             elif interface["name"] == "LAG1":
@@ -336,7 +340,7 @@ class VeloClient():
                 newInterface.setLag([])
                 if config.args.veloReconfigure:
                     newInterface.setLag([{"name":"GE1"},{"name": "GE2"}])
-                    newInterface.setL3(f"10.0.{100+int(config.currentPod)}.0/25")
+                    newInterface.setL3(f"10.0.{100+int(self.pod.pod)}.0/25")
 
                 newRoutedInterfaces.append(newInterface.interface)
             elif interface["name"] == "LAG2":
@@ -395,9 +399,9 @@ class VeloClient():
             self.activate(activationKey["activationKey"])
 
     def activate(self, activationKey):
-        print(f"{config.currentPod} - activating edge")
+        print(f"{self.pod.pod} - activating edge")
         ssid = f"velocloud-{self.serialNumber[-3:]}"
-        url = f'http://192.168.2.1/?activation_key={activationKey}&custom_vco={self.token["url"]}'
+        url = f'http://192.168.2.1/?activation_key={activationKey}&custom_vco={self.pod.tokens.velo.server}'
         print(f"  connecting to ssid: {ssid}")
         connected = False
         while not connected:
@@ -442,10 +446,10 @@ class VeloClient():
         nmcli.connection.down(ssid)
         nmcli.connection.delete(ssid)
 
-        sshServer = f'10.1.{100+int(config.currentPod)}.2'
+        sshServer = f'10.1.{100+int(self.pod.pod)}.2'
         print(f"   connecting to {sshServer} via ssh")
         sshUser = "root"
-        sshPassword = self.token["sshPassword"].format(self.serialNumber[-3:])
+        sshPassword = self.pod.tokens.velo.sshPassword.format(self.serialNumber[-3:])
 
         pmClient = paramiko.SSHClient()
         pmClient.set_missing_host_key_policy(paramiko.AutoAddPolicy())
@@ -470,12 +474,15 @@ class VeloClient():
         self._getEdgeBySerial()
 
         if "id" in self.edge:
-            print(f"{config.currentPod} - skipping provision, device already there")
+            print(f"{self.pod.pod} - skipping provision, device already there")
             return
 
         self.provisionEdge()
 
     def execute(self):
+        if not self._connected:
+            return
+
         if config.args.veloTest:
             print("inside veloTest")
 

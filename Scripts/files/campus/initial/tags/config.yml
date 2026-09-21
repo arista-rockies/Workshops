@@ -10,13 +10,13 @@ tags:
 assignments:
     - key: Campus
       value: Workshop
-      devices: [ "{{switches['leaf1a']['serial']}}" ]
+      devices: [ "{{switches['leaf1a'].sn}}" ]
     - key: Campus-Pod
       value: IT-Bldg
-      devices: [ "{{switches['leaf1a']['serial']}}" ]
+      devices: [ "{{switches['leaf1a'].sn}}" ]
     - key: Access-Pod
       value: IDF1
-      devices: [ "{{switches['leaf1a']['serial']}}" ]
+      devices: [ "{{switches['leaf1a'].sn}}" ]
     - key: Role
       value: Leaf
-      devices: [ "{{switches['leaf1a']['serial']}}" ] 
+      devices: [ "{{switches['leaf1a'].sn}}" ] 
