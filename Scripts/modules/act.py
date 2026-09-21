@@ -598,7 +598,7 @@ class ActClient():
             #hostname here is really the sn
             # let's look through the device inventory for this act device so we can get the ID.  we'll want that
             #  for the jinja substituions to work globally
-            if (inventoryDev := self.pod.findDeviceBySerial(actDev["hostname"])):
+            if (inventoryDev := self.pod.findDeviceBySN(actDev["hostname"])):
                 devList["switches"][inventoryDev.id] = { "ip": actDev["internal_ip"], "serial": actDev["hostname"]}
             
         blockScript = io.BytesIO(Environment(loader=FileSystemLoader('files')).get_template('workshopIPTables.j2').render(devList).encode('utf-8'))

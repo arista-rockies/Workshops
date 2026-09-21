@@ -742,6 +742,35 @@ class pgfCVClient():
         print(resp.text)
         
 
+    async def doActionCleanup(self, client):
+        print(f"{self.pod.pod} - doActionCleanup")
+        # let's pull all the current actions
+        url = f'{self.baseURL}/api/resources/action/v1/Action/all'
+        resp = requests.post(url, data={}, verify=False, timeout=300, headers={'Authorization': f'Bearer {self.tok}'})
+        actions = json_decoder(resp.text)
+
+        # i've had some apis return a single item when there is only 1 instead of a list of one.  just hack around that..
+        if not isinstance(actions, list):
+            actions = [actions]
+
+
+        for action in actions:
+            audit = action.get("result", {}).get("value", {}).get("audit", None)
+
+            # there are specific actions we don't want to delete. generally 
+            if (audit 
+                and not audit.get("fromPackage", None) ## fromPackage will be blank if this is *not* installed via packaging
+                and audit.get("createdBy", None) ## createdBy will be blank for some builtins
+                and audit.get("createdBy") != 'provisioning'): ## createdBy will be 'provisioning' for other builtins
+
+                print(f'  - {action["result"]["value"]["key"]["id"]}/{action["result"]["value"]["core"]["name"]}/{audit.get("createdBy")}')
+
+                params = {
+                    "key.id" : action["result"]["value"]["key"]["id"]
+                }
+                url = f'{self.baseURL}/api/resources/action/v1/ActionConfig'
+                resp = requests.delete(url, params=params, timeout=300, headers={'Authorization': f'Bearer {self.tok}'})
+
     async def studios(self):
         cvpRacClient = CvpClient()
         cvpRacClient.connect(nodes=[self.server], username='', password='', is_cvaas=True, api_token=self.tok)
@@ -755,6 +784,8 @@ class pgfCVClient():
         expectCC = True
 
         if config.args.cvTest:
+            await self.doActionCleanup(c)
+            return
             p = 13
             if p == 20:
                 workspaceID = "99863f52-0bd3-4bc4-97b3-b8e86a6cc7d7" # pod 20 campus
@@ -813,6 +844,7 @@ class pgfCVClient():
 
             ###### cleanup steps
             await self.cleanupDashboards(cvpRacClient)
+            await self.doActionCleanup(c)
             await self.tagsCleanup(c, workspaceID)
             await self.scsCleanup(c, workspaceID)
             for studio in ['studio-avd-campus-fabric', 'studio-campus-access-interfaces', 'studio-software-management', 'studio-authentication', 'studio-date-time', 'studio-dns-settings', 'studio-management-connectivity', 'studio-telemetry-config', 'studio-connectivity']:
