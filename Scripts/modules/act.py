@@ -9,9 +9,19 @@ from jinja2 import Environment, FileSystemLoader
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 class LabState(Enum):
+    READY = 0
+    PENDING = 1
     RUNNING = 2
     STOPPING = 3
     STOPPED = 4
+    DEPLOYING = 5
+    UNDEPLOYING = 6
+    REBOOTING = 7
+    STARTING = 8
+    FAILED = 9
+    DEPLOYFAILED = 10
+    QUOTAREACHED = 11
+    CONFIGURING = 12
 
 class actException(Exception):
     pass
@@ -49,10 +59,18 @@ class ActClient():
         _addArgument('-actUnblockCampusB', action='store_true', default=False)
         _addArgument('-actUnblockZTR', action='store_true', default=False)
             
-    def __init__(self, token):
-        self.token = token
-        self.apiKey = token["act"]["key"]
-        self.baseURL = f'https://{token["act"]["server"]}'
+    def __init__(self, pod: Pod):
+        self.pod = pod
+        self._connected = False
+
+        if not config.args.act:
+            return
+        if not pod.tokens.act:
+            print("no act token provided, but act actions requested.  skipping")
+            return
+
+        self.apiKey = self.pod.tokens.act.key
+        self.baseURL = f'https://{self.pod.tokens.act.server}'
 
         if config.args.actProxy:
             self.proxies = { "http": f"socks5://{config.args.actProxy}", "https": f"socks5://{config.args.actProxy}" }
@@ -60,10 +78,9 @@ class ActClient():
             self.proxies = None
 
         self.headers = {}
-        self.connected = False
         self.topologies = None
         self.labs = None
-        self.resourceName = token["act"]["resourceName"]
+        self.resourceName = self.pod.tokens.act.resourceName
 
         self.connect()
         labs = self.getLabs(nameFilter=self.resourceName.format("")) # our filter is a startsWith.  just string substitute empty
@@ -76,8 +93,11 @@ class ActClient():
         return False
 
     def execute(self):
+        if not self._connected:
+            return
+
         if config.args.actTest:
-            name = self.resourceName.format(config.currentPod)
+            name = self.resourceName.format(self.pod.pod)
 
             # not sure why getLabByName doesn't return devices but getLabByID does
             lab = self.getLabByName(name)
@@ -133,7 +153,7 @@ class ActClient():
         if 'Authorization' not in self.headers:
             self._getToken()
 
-        self.connected = True
+        self._connected = True
 
     def _getToken(self):
         key = { "api_key": self.apiKey }
@@ -150,7 +170,7 @@ class ActClient():
         self.headers["Authorization"] = f"Bearer {self.apiKey['token']}"
 
     def _executeRequest(self, requestType='GET', url=None, data=None, timeout=None):
-        if not self.connected:
+        if not self._connected:
             raise actConnectException("Not connected, please call the connect method first")
 
         if not url:
@@ -326,23 +346,23 @@ class ActClient():
         return resp
 
     def doStopLab(self):
-        print(f"{config.currentPod} - doStopLab")
+        print(f"{self.pod.pod} - doStopLab")
 
-        name = self.resourceName.format(config.currentPod)
+        name = self.resourceName.format(self.pod.pod)
         lab = self.getLabByName(name)
         if LabState(lab["state"]) == LabState.RUNNING:
             self.stopLab(lab["id"])
 
     def doStartLab(self):
-        print(f"{config.currentPod} - doStartLab")
-        name = self.resourceName.format(config.currentPod)
+        print(f"{self.pod.pod} - doStartLab")
+        name = self.resourceName.format(self.pod.pod)
         lab = self.getLabByName(name)
         if LabState(lab["state"]) == LabState.STOPPED:
             res = self.startLab(lab["id"])
 
     def doUndeployLab(self):
-        print(f"{config.currentPod} - doUndeployLab")
-        name = self.resourceName.format(config.currentPod)
+        print(f"{self.pod.pod} - doUndeployLab")
+        name = self.resourceName.format(self.pod.pod)
         lab = self.getLabByName(name)
         self.undeployLab(lab["id"])
 
@@ -358,8 +378,8 @@ class ActClient():
         # make sure we have the update topologies
         self.getTopologies()
 
-        print(f"{config.currentPod} - doDeployAndStart ")
-        name = self.resourceName.format(config.currentPod)
+        print(f"{self.pod.pod} - doDeployAndStart ")
+        name = self.resourceName.format(self.pod.pod)
 
         lab = self.getLabByName(name)
         if lab:
@@ -373,7 +393,7 @@ class ActClient():
             resp = self.deleteTopology(topology["id"])
             resp = self.waitOnOperation(resp["id"], sleep=10, timeout=None, statusChar=".")
 
-        newTopology = yaml.safe_load(s.replace("###", f"{config.currentPod:0>2}"))
+        newTopology = yaml.safe_load(s.replace("###", f"{self.pod.pod:0>2}"))
         # act doesn't allow metadata fields, nor does it ignore unused data.  we need the id
         #  later in the cv.  let's loop over the topology and delete any id tags
         for dev in newTopology["nodes"]:
@@ -409,16 +429,16 @@ class ActClient():
             return
 
         topologies = self.getTopologies()
-        name = self.resourceName.format(config.currentPod)
+        name = self.resourceName.format(self.pod.pod)
         topology = self._findByName(topologies["result"], name)
 
         if not topology:
             print(f"did not find topology {name}, continuing")
             return
 
-        print(f"{config.currentPod} - doUpdateTopology ")
+        print(f"{self.pod.pod} - doUpdateTopology ")
 
-        newTopology = yaml.safe_load(s.replace("###", f"{config.currentPod:0>2}"))
+        newTopology = yaml.safe_load(s.replace("###", f"{self.pod.pod:0>2}"))
         try:
 
             print(f"  updating topology ", end="", flush=True)
@@ -433,21 +453,24 @@ class ActClient():
 
     def doGetLab(self, quiet=False):
         if not quiet:
-            print(f"{config.currentPod} - doGetLab ")
+            print(f"{self.pod.pod} - doGetLab ")
 
-        name = self.resourceName.format(config.currentPod)
+        name = self.resourceName.format(self.pod.pod)
         lab = self.getLabByName(name)
         if not lab:
             print("could not find lab, skipping")
             return None
 
         lab = self.getLabByID(lab['id'])
+
+        if not quiet:
+            print(LabState(lab["state"]))
+
         if not lab.get('devices', None):
             if not quiet:
                 print("could not find any devices.  has this lab deployed?")
             return None
 
-        print(LabState(lab["state"]))
         # i want to print out the ip of the bootstrap boxes
         for dev in lab['devices']['generic']:
             if 'bootstrap' in dev['hostname']:
@@ -495,8 +518,8 @@ class ActClient():
 
     def _iptables(self, operation):
         if operation in ["reset", "blockAll", "unBlockAll", "unBlockCampusB", "unBlockZTR"]:
-            print(f"{config.currentPod} - {operation}IPTables")
-            name = self.resourceName.format(config.currentPod)
+            print(f"{self.pod.pod} - {operation}IPTables")
+            name = self.resourceName.format(self.pod.pod)
             # not sure why getLabByName doesn't return devices but getLabByID does
             lab = self.getLabByName(name)
             l = self.getLabByID(lab["id"])
@@ -508,14 +531,14 @@ class ActClient():
             for host in l["devices"]["generic"]:
                 if "bootstrap" in host["hostname"]:
                     sshUser = "administrator"
-                    sshPassword = self.token["act"]["sshPassword"]
+                    sshPassword = self.pod.tokens.act.sshPassword
                     pmClient = self._setupSSH(host["internal_ip"], sshUser, sshPassword)
 
                     pmClient.exec_command(f"sudo bash workshopIPTables.sh {operation}")
 
     def doSetupHost(self):
-        print(f"{config.currentPod} - doSetupHost")
-        name = self.resourceName.format(config.currentPod)
+        print(f"{self.pod.pod} - doSetupHost")
+        name = self.resourceName.format(self.pod.pod)
 
         while not self.doGetLab(quiet=True):
             print(".", flush=True, end="")
@@ -534,7 +557,7 @@ class ActClient():
         for host in l["devices"]["generic"]:
             if "host" in host["hostname"]:
                 sshUser = "administrator"
-                sshPassword = self.token["act"]["sshPassword"]
+                sshPassword = self.pod.tokens.act.sshPassword
                 pmClient = self._setupSSH(host["internal_ip"], sshUser, sshPassword)
 
                 scp = pmClient.open_sftp()
@@ -561,8 +584,8 @@ class ActClient():
             pbar.update(val)
             lastUpdate = transferred
 
-        print(f"{config.currentPod} - doSetupLinux ")
-        name = self.resourceName.format(config.currentPod)
+        print(f"{self.pod.pod} - doSetupLinux ")
+        name = self.resourceName.format(self.pod.pod)
 
         while not self.doGetLab(quiet=True):
             print(".", flush=True, end="")
@@ -577,7 +600,10 @@ class ActClient():
             print("could not find any devices in this lab.  has it finished being deployed?")
             return
 
-        deviceInventory = config.globalInventory.get(str(int(config.currentPod)), -1)
+        deviceInventory = self.pod.switches
+        print("**")
+        print(deviceInventory)
+        print("**")
 
         # this could be built with a crafty comprehension.   not doing that in an effort of... comprehension
         devList = {"switches": {}}
@@ -585,8 +611,8 @@ class ActClient():
             #hostname here is really the sn
             # let's look through the device inventory for this act device so we can get the ID.  we'll want that
             #  for the jinja substituions to work globally
-            inventoryDev = config.findDeviceBySerial(deviceInventory, actDev["hostname"])
-            devList["switches"][inventoryDev["id"]] = { "ip": actDev["internal_ip"], "serial": actDev["hostname"]}
+            if (inventoryDev := self.pod.findDeviceBySN(actDev["hostname"])):
+                devList["switches"][inventoryDev.id] = { "ip": actDev["internal_ip"], "serial": actDev["hostname"]}
             
         blockScript = io.BytesIO(Environment(loader=FileSystemLoader('files')).get_template('workshopIPTables.j2').render(devList).encode('utf-8'))
 
@@ -594,7 +620,7 @@ class ActClient():
         for host in l["devices"]["generic"]:
             if "bootstrap" in host["hostname"]:
                 sshUser = "administrator"
-                sshPassword = self.token["act"]["sshPassword"]
+                sshPassword = self.pod.tokens.act.sshPassword
                 pmClient = self._setupSSH(host["internal_ip"], sshUser, sshPassword)
 
                 scp = pmClient.open_sftp()
@@ -627,8 +653,8 @@ class ActClient():
                 pmClient.close()
 
     def doUpdateLinux(self):
-        print(f"{config.currentPod} - doUpdateLinux ")
-        name = self.resourceName.format(config.currentPod)
+        print(f"{self.pod.pod} - doUpdateLinux ")
+        name = self.resourceName.format(self.pod.pod)
 
         while not self.doGetLab(quiet=True):
             print(".", flush=True, end="")
@@ -647,7 +673,7 @@ class ActClient():
         for host in l["devices"]["generic"]:
             if "bootstrap" in host["hostname"]:
                 sshUser = "administrator"
-                sshPassword = self.token["act"]["sshPassword"]
+                sshPassword = self.pod.tokens.act.sshPassword
                 pmClient = self._setupSSH(host["internal_ip"], sshUser, sshPassword)
 
                 stdin, stdout, stderr = pmClient.exec_command("cd Projects/Workshops/Scripts/ && git pull && sudo systemctl restart bootstrap", get_pty=True)

@@ -20,22 +20,22 @@ assignments:
   #################
   - container: "Leaf1A_A"
     configlets: [ "mgmt_Leaf1a" ]
-    query: "device: {{switches['CampusA-Leaf1A']['serial']}}"
+    query: "device: {{switches['CampusA-Leaf1A'].sn}}"
   - container: "Leaf1B_A"
     configlets: [ "mgmt_Leaf1b" ]
-    query: "device: {{switches['CampusA-Leaf1B']['serial']}}"
+    query: "device: {{switches['CampusA-Leaf1B'].sn}}"
   - container: "Leaf1C_A"
     configlets: [ "mgmt_Leaf1c" ]
-    query: "device: {{switches['CampusA-Leaf1C']['serial']}}"
+    query: "device: {{switches['CampusA-Leaf1C'].sn}}"
   - container: "Leaf2A_A"
     configlets: [ "mgmt_Leaf2a" ]
-    query: "device: {{switches['CampusA-Leaf2A']['serial']}}"
+    query: "device: {{switches['CampusA-Leaf2A'].sn}}"
   - container: "Spine1_A"
     configlets: [ "mgmt_Spine1" ]
-    query: "device: {{switches['CampusA-Spine1']['serial']}}"
+    query: "device: {{switches['CampusA-Spine1'].sn}}"
   - container: "Spine2_A"
     configlets: [ "mgmt_Spine2" ]
-    query: "device: {{switches['CampusA-Spine2']['serial']}}"
+    query: "device: {{switches['CampusA-Spine2'].sn}}"
   
  ########
   - container: "Leaf2"

@@ -68,28 +68,29 @@ class pgfCVClient():
         config.parser.add_argument('-cvAddCCStuff', default=False, action='store_true', help='this option is only required for already provisioned pods and will add actionBundles and ccTemplates only.  these steps are automatically done on pods as they are provisioned moving forward')
         config.parser.add_argument('-cvCheckpoint', default=None, help='string name of the checkpoint you wish to load.  is based off the specified workshop type')
 
-    def __init__(self, token):
-        self.token = token
-        self.tok = token["cv"]["key1"]
-        self.tok2 = token["cv"].get("key2", self.tok)
-        self.server = token["cv"]["server"]
+    def __init__(self, pod):
+        self.pod = pod
+        self._connected = False # we have lots of different kinds of connecteds here.  this is just to make this look like the rest of the modules
+
+        if not config.args.cv:
+            return
+
+        if not pod.tokens.cv:
+            print("no cv token provided, but cv actions requested.  skipping")
+            return
+
+        self._connected = True
+        # i'm going to keep this because of the check for tok2
+        self.tok = self.pod.tokens.cv.key1
+
+        tmp = self.pod.tokens.cv.key2
+        self.tok2 = tmp if tmp else self.tok
+
+        self.server = self.pod.tokens.cv.server
         self.baseURL = f'https://{self.server}'
 
-    # not a huge fan, but i'm out of time
-    def findDeviceBySerial(self, deviceInventory, sn):
-        for device in deviceInventory:
-            if device["sn"] == sn:
-                return device
-        return None
-
-    def findDeviceByName(self, deviceInventory, hostname):
-        for device in deviceInventory:
-            if device["hostname"] == hostname:
-                return device
-        return None
-
-    async def cvCheckpoint(self, c, workspaceID, deviceInventory):
-        print(f"{config.currentPod} - cvCheckpoint")
+    async def cvCheckpoint(self, c, workspaceID):
+        print(f"{self.pod.pod} - cvCheckpoint")
         # let's try to load the config for this checkpoint type
         #  this isn't safe code as it uses un-sanitized cli data
         basePath = f'files/{config.args.type}/{config.args.cvCheckpoint}'
@@ -103,18 +104,16 @@ class pgfCVClient():
         # right now we only really support scs, let's get that set up
         for module in checkpointConfig:
             if module['name'] == 'configlets':
-                await self._cvCheckpointConfiglets(c, workspaceID, deviceInventory, basePath)
+                await self._cvCheckpointConfiglets(c, workspaceID, basePath)
             elif module['name'] == 'topology':
-                await self._cvCheckpointTopology(c, workspaceID, deviceInventory, basePath)
+                await self._cvCheckpointTopology(c, workspaceID, basePath)
             elif module['name'] == 'tags':
-                await self._cvCheckpointTags(c, workspaceID, deviceInventory, basePath)
+                await self._cvCheckpointTags(c, workspaceID, basePath)
             elif module['name'] == "studios":
-                await self._cvCheckpointStudios(c, workspaceID, deviceInventory, basePath)
+                await self._cvCheckpointStudios(c, workspaceID, basePath)
 
-    async def _cvCheckpointStudios(self, c, workspaceID, deviceInventory, basePath):
-        print(f"{config.currentPod} - cvCheckpointStudios")
-        vals = config.globalSubstitutions[config.currentPod]
-
+    async def _cvCheckpointStudios(self, c, workspaceID, basePath):
+        print(f"{self.pod.pod} - cvCheckpointStudios")
         # let's load the topology config
         #  also, unsafe code
         try:
@@ -130,16 +129,15 @@ class pgfCVClient():
             print(f"  - {studio['name']}")
             if (filename := studio.get("filename", None)):
                 studioTemplate = jinjaEnv.get_template(filename)
-                studio["text"] = yaml.safe_load(studioTemplate.render(vals))["inputs"]
+                studio["text"] = yaml.safe_load(studioTemplate.render(self.pod.substitutions))["inputs"]
 
             await self._doStudio(c, workspaceID, studio)
             
-    async def _cvCheckpointTags(self, c, workspaceID, deviceInventory, basePath):
-        print(f"{config.currentPod} - cvCheckpointTags")
-        vals = config.globalSubstitutions[config.currentPod]
+    async def _cvCheckpointTags(self, c, workspaceID, basePath):
+        print(f"{self.pod.pod} - cvCheckpointTags")
 
         jinjaEnv = Environment(loader=FileSystemLoader(f'{basePath}/tags/'))
-        tagConfig = yaml.safe_load(jinjaEnv.get_template("config.yml").render(vals))
+        tagConfig = yaml.safe_load(jinjaEnv.get_template("config.yml").render(self.pod.substitutions))
 
         newTags = []
         for tag in tagConfig.get("tags", []):
@@ -154,7 +152,7 @@ class pgfCVClient():
         await c.set_tags(workspaceID, newTags, "device", 300)
         await c.set_tag_assignments(workspaceID, newAssignments, "device", 300)
 
-    async def _cvCheckpointTopology(self, c, workspaceID, deviceInventory, basePath):
+    async def _cvCheckpointTopology(self, c, workspaceID, basePath):
         def _buildCache(currentTopology):
             result = {}
             for dev in currentTopology.get("devices", []):
@@ -169,11 +167,10 @@ class pgfCVClient():
 
             return result
             
-        print(f"{config.currentPod} - cvCheckpointTopology")
-        vals = config.globalSubstitutions[config.currentPod]
+        print(f"{self.pod.pod} - cvCheckpointTopology")
 
         jinjaEnv = Environment(loader=FileSystemLoader(f'{basePath}/topology/'))
-        topologyConfig = yaml.safe_load(jinjaEnv.get_template("config.yml").render(vals))
+        topologyConfig = yaml.safe_load(jinjaEnv.get_template("config.yml").render(self.pod.substitutions))
 
         # this code is a little complex.  we need to pull the currently onboarded devices and onboard any
         #  that are missing
@@ -195,9 +192,9 @@ class pgfCVClient():
             else:
                 # the new device isn't already onboarded. we need to add it
                 #  we need some information out of the deviceInventory that we don't already have
-                inventoryDevice = self.findDeviceBySerial(deviceInventory, newDevice["serial"])
+                inventoryDevice = self.pod.findDeviceBySN(newDevice["serial"])
 
-                tmpDevice = pgf.pgfDevice(inventoryDevice["sn"], newDevice["model"], inventoryDevice["mac"], inventoryDevice["hostname"], self.tok, self.token["cv"])
+                tmpDevice = pgf.pgfDevice(inventoryDevice.sn, newDevice["model"], inventoryDevice.mac, inventoryDevice.hostname, self.pod.tokens.cv)
                 tmpDevice.fetchInterfaces()
 
                 # this is absolutely the worst possible way to do this, but i'll need to rewrite the device class somewhat to support doing this the smart way.  quite literally, there is likely no worse way to do this.....
@@ -209,20 +206,19 @@ class pgfCVClient():
                 inputs=currentTopology)
 
 
-    async def _cvCheckpointConfiglets(self, c, workspaceID, deviceInventory, basePath):
-        print(f"{config.currentPod} - cvCheckpointConfiglets")
+    async def _cvCheckpointConfiglets(self, c, workspaceID, basePath):
+        print(f"{self.pod.pod} - cvCheckpointConfiglets")
         # let's load the configlets config
         #  also, unsafe code
-        vals = config.globalSubstitutions[config.currentPod]
         jinjaEnv = Environment(loader=FileSystemLoader(f'{basePath}/configlets/'))
 
-        configletsConfig = yaml.safe_load(jinjaEnv.get_template("config.yml").render(vals))
+        configletsConfig = yaml.safe_load(jinjaEnv.get_template("config.yml").render(self.pod.substitutions))
 
         # first let's upload all the configlets
         for configlet in configletsConfig.get("configlets", []):
             try:
                 configletTemplate = jinjaEnv.get_template(configlet["filename"])
-                configlet["text"] = configletTemplate.render(vals)
+                configlet["text"] = configletTemplate.render(self.pod.substitutions)
                 print(f"  - pushing {configlet['name']}")
                 await self._doConfiglet(c, workspaceID, configlet)
             except Exception as e:
@@ -240,7 +236,7 @@ class pgfCVClient():
         await c.set_studio_inputs(studio_id='studio-static-configlet', workspace_id=workspaceID, inputs={"configletAssignmentRoots": rootContainers})
 
     async def scsCleanup(self, c, workspaceID):
-        print(f"{config.currentPod} - scsCleanup")
+        print(f"{self.pod.pod} - scsCleanup")
         # cleanup here is a bit of a mess because we can't just use the configlet rapi
         #  we need to use the studios api too
         rootContainers = await c.get_studio_inputs(studio_id='studio-static-configlet', workspace_id=workspaceID)
@@ -266,11 +262,11 @@ class pgfCVClient():
         ###################### scs cleanup ####################
 
     async def inventoryCleanup(self, c, workspaceID):
-        print(f"{config.currentPod} - inventoryCleanup")
+        print(f"{self.pod.pod} - inventoryCleanup")
         topologyInventory = await c.set_studio_inputs(studio_id="TOPOLOGY", workspace_id=workspaceID, inputs={'devices': []})
 
     async def tagsCleanup(self, c, workspaceID):
-        print(f"{config.currentPod} - tagsCleanup")
+        print(f"{self.pod.pod} - tagsCleanup")
         # first let's unassign all tags from both interfaces and devices
         tagAssignments = await c.get_tag_assignments(workspace_id=workspaceID, creator_type="user")
 
@@ -364,7 +360,7 @@ class pgfCVClient():
             )
 
     async def studioCleanup(self, c, workspaceID, studioID):
-        print(f"{config.currentPod} - studioCleanup({studioID})")
+        print(f"{self.pod.pod} - studioCleanup({studioID})")
 
         client = pyavd._cv.api.arista.studio.v1.AssignedTagsConfigServiceStub(c._channel)
         req = pyavd._cv.api.arista.studio.v1.AssignedTagsConfigSetRequest(
@@ -387,24 +383,24 @@ class pgfCVClient():
         await c.set_studio_inputs(studio_id=studioID, workspace_id=workspaceID, inputs={})
 
     async def buildAndSubmitWorkspace(self, c, workspaceID, expectCC=True):
-        print(f"{config.currentPod} - buildAndSubmit")
+        print(f"{self.pod.pod} - buildAndSubmit")
         result = await c.build_workspace(workspaceID)
         print("building workspace")
         buildResult, workspace = await c.wait_for_workspace_response(workspaceID, result.request_params.request_id)
         if buildResult.status != 1: # SUCCESS
-            raise Exception(f"build failed for pod: {config.currentPod} {workspaceID}: {buildResult.status}")
+            raise Exception(f"build failed for pod: {self.pod.pod} {workspaceID}: {buildResult.status}")
 
         result = await c.submit_workspace(workspaceID, force=True)
         print("submitting workspace")
         submitResult, workspace = await c.wait_for_workspace_response(workspaceID, result.request_params.request_id)
 
         if submitResult.status != 1: #SUCCESS
-            raise Exception(f"submit failed for pod: {config.currentPod} {workspaceID}: {submitResult.status}")
+            raise Exception(f"submit failed for pod: {self.pod.pod} {workspaceID}: {submitResult.status}")
 
         return workspace.cc_ids.values[0] if len(workspace.cc_ids) else None
 
     async def executeChangeControl(self, c, ccID, wait=True):
-        print(f"{config.currentPod} - executeChangeControl")
+        print(f"{self.pod.pod} - executeChangeControl")
         # now that we were a success let's execute the cc
         changeControl = await c.get_change_control(change_control_id=ccID)
 
@@ -436,8 +432,8 @@ class pgfCVClient():
         print(workspaces)
         pass
 
-    async def unprovisionDevicesCV(self, c, cvpRacClient, deviceInventory):
-        print(f"{config.currentPod} - unprovisionDevices")
+    async def unprovisionDevicesCV(self, c, cvpRacClient):
+        print(f"{self.pod.pod} - unprovisionDevices")
         #finishedCCID = "EdIgccX4e84nQanTqu731"
         #finishedChangeControl = await c.get_change_control(change_control_id=finishedCCID)
 
@@ -518,20 +514,16 @@ class pgfCVClient():
             print(f"decomming {device['hostname']}")
             cvpRacClient.api.device_decommissioning(device["serialNumber"], str(uuid.uuid4()))
 
-    async def unprovisionDevicesCampus(self, c, cvpRacClient, deviceInventory):
-        print(f"{config.currentPod} - unprovisionDevices")
-        #finishedCCID = "EdIgccX4e84nQanTqu731"
-        #finishedChangeControl = await c.get_change_control(change_control_id=finishedCCID)
+    async def unprovisionDevicesCampus(self, c, cvpRacClient):
+        print(f"{self.pod.pod} - unprovisionDevices")
 
         with open("files/campusWorkshopDecomTemplate.txt", "r") as f:
             newCC = f.read()
 
         leaf1aStageUUID = str(uuid.uuid4())
-        leaf1a = self.findDeviceByName(deviceInventory, f"campus-pod{config.currentPod:0>2}-leaf1a")
+        leaf1a = self.pod.findDeviceByHostname(f"campus-pod{self.pod.pod:0>2}-leaf1a")
         leaf1bStageUUID = str(uuid.uuid4())
-        leaf1b = self.findDeviceByName(deviceInventory, f"campus-pod{config.currentPod:0>2}-leaf1b")
-        #leaf1cStageUUID = str(uuid.uuid4())
-        #leaf1c = self.findDeviceByName(deviceInventory, f"campus-pod{config.currentPod:0>2}-leaf1c")
+        leaf1b = self.pod.findDeviceByHostname(f"campus-pod{self.pod.pod:0>2}-leaf1b")
 
         ccID = str(uuid.uuid4())
         vals = {
@@ -539,10 +531,8 @@ class pgfCVClient():
             "rootID": str(uuid.uuid4()),
             "leaf1aStage": str(uuid.uuid4()),
             "leaf1bStage": str(uuid.uuid4()),
-            #"leaf1cStage": str(uuid.uuid4()),
-            "leaf1aSN": leaf1a["sn"],
-            "leaf1bSN": leaf1b["sn"],
-            #"leaf1cSN": leaf1c["sn"]
+            "leaf1aSN": leaf1a.sn,
+            "leaf1bSN": leaf1b.sn,
         }
         cc = json.loads(newCC.format(**vals))
 
@@ -566,7 +556,7 @@ class pgfCVClient():
             cvpRacClient.api.device_decommissioning(device["serialNumber"], str(uuid.uuid4()))
 
     async def notificationReceiverCleanup(self, c):
-        print(f"{config.currentPod} - notificationReceiver")
+        print(f"{self.pod.pod} - notificationReceiver")
         request = pyavd._cv.api.arista.alert.v1.AlertConfigStreamRequest()
         client = pyavd._cv.api.arista.alert.v1.AlertConfigServiceStub(c._channel)
 
@@ -586,24 +576,6 @@ class pgfCVClient():
             )
         )
         await client.set(newRequest, metadata=c._metadata, timeout=10.0)
-
-    async def deleteDevices(self, client):
-        return
-        print(f"{config.currentPod} - deleteDevices")
-        devices = client.api.get_inventory(provisioned=False)
-
-        for device in devices:
-            res = client.api.reset_device('cleanup', device)
-            print(device)
-            print(res)
-            for task in res.get('data', {}).get('taskIds', []):
-                res = client.api.execute_task(task)
-                print(res)
-            print("****")
-
-        time.sleep(60)
-        for device in devices:
-            client.api.device_decommissioning(device["serialNumber"], str(uuid.uuid4()))
 
     async def createRootPath(self, client, path):
         ccPtrs = getCcPath(client)
@@ -634,7 +606,7 @@ class pgfCVClient():
             publish(client, 'cvp', pathElts[:-1], ptrData)
 
     async def doActionBundles(self, client):
-        print(f"{config.currentPod} - doActionBundles")
+        print(f"{self.pod.pod} - doActionBundles")
         try:
             f = open("files/campusWorkshop_actionBundles.json", "r")
             bundles = yaml.safe_load(f.read())
@@ -651,7 +623,7 @@ class pgfCVClient():
             publish(client, 'cvp', pathElts[:-1], ptrData)
 
     async def doAddImages(self):
-        print(f"{config.currentPod} - doAddImages")
+        print(f"{self.pod.pod} - doAddImages")
         headers = {
             'Authorization': f'Bearer {self.tok}',
         }
@@ -695,7 +667,7 @@ class pgfCVClient():
                 resp.raise_for_status()
 
     async def doAdminUsers(self):
-        print(f"{config.currentPod} - doAdminUsers")
+        print(f"{self.pod.pod} - doAdminUsers")
         url = f'{self.baseURL}/cvpservice/user/addUser.do'
 
         for user in config.args.cvAddAdmins:
@@ -720,14 +692,14 @@ class pgfCVClient():
             resp.raise_for_status()
 
     async def doPackage(self, package):
-        print(f"{config.currentPod} - doPackage")
+        print(f"{self.pod.pod} - doPackage")
         with open(package, "rb") as file:
             url = f'{self.baseURL}/cvpservice/packaging/v1/packages?dry-run=false&force=true'
             resp = requests.post(url, files={'file': file}, verify=False, timeout=300, headers={'Authorization': f"Bearer {self.tok}"})
             resp.raise_for_status()
 
     async def cleanupDashboards(self, client):
-        print(f"{config.currentPod} - cleanupDashboards")
+        print(f"{self.pod.pod} - cleanupDashboards")
         url = f'{self.baseURL}/api/resources/dashboard/v1/Dashboard/all'
 
         resp = requests.post(url, data={}, verify=False, timeout=300, headers={'Authorization': f'Bearer {self.tok}'})
@@ -770,50 +742,72 @@ class pgfCVClient():
         print(resp.text)
         
 
-    async def studios(self):
-        # first get all the devices in the inventory
-        deviceInventory = config.globalInventory.get(str(int(config.currentPod)), -1)
-        #if deviceInventory == -1:
-            #return
+    async def doActionCleanup(self, client):
+        print(f"{self.pod.pod} - doActionCleanup")
+        # let's pull all the current actions
+        url = f'{self.baseURL}/api/resources/action/v1/Action/all'
+        resp = requests.post(url, data={}, verify=False, timeout=300, headers={'Authorization': f'Bearer {self.tok}'})
+        actions = json_decoder(resp.text)
 
+        # i've had some apis return a single item when there is only 1 instead of a list of one.  just hack around that..
+        if not isinstance(actions, list):
+            actions = [actions]
+
+
+        for action in actions:
+            audit = action.get("result", {}).get("value", {}).get("audit", None)
+
+            # there are specific actions we don't want to delete. generally 
+            if (audit 
+                and not audit.get("fromPackage", None) ## fromPackage will be blank if this is *not* installed via packaging
+                and audit.get("createdBy", None) ## createdBy will be blank for some builtins
+                and audit.get("createdBy") != 'provisioning'): ## createdBy will be 'provisioning' for other builtins
+
+                print(f'  - {action["result"]["value"]["key"]["id"]}/{action["result"]["value"]["core"]["name"]}/{audit.get("createdBy")}')
+
+                params = {
+                    "key.id" : action["result"]["value"]["key"]["id"]
+                }
+                url = f'{self.baseURL}/api/resources/action/v1/ActionConfig'
+                resp = requests.delete(url, params=params, timeout=300, headers={'Authorization': f'Bearer {self.tok}'})
+
+    async def studios(self):
         cvpRacClient = CvpClient()
         cvpRacClient.connect(nodes=[self.server], username='', password='', is_cvaas=True, api_token=self.tok)
 
         c = pyavd._cv.client.CVClient(self.server, token=self.tok)
         c._connect()
 
-        fp = tempfile.NamedTemporaryFile(mode="w")
-        fp.write(self.tok)
-        fp.flush()
-        grpcClient = GRPCClient(self.server, token=fp.name)
-        fp.close()
+        grpcClient = GRPCClient(self.server, tokenValue=self.tok)
 
         workToDo = False
         expectCC = True
 
         if config.args.cvTest:
-            p = 20
+            await self.doActionCleanup(c)
+            return
+            p = 13
             if p == 20:
                 workspaceID = "99863f52-0bd3-4bc4-97b3-b8e86a6cc7d7" # pod 20 campus
                 basePath = f'files/{config.args.type}/initial'
-            elif p == 12:
-                workspaceID = "c0a32daa-a067-4b71-a0a0-7390e3981382" # pod 12 cv
+            elif p == 13:
+                workspaceID = "c329dd67-6c69-4fd7-96a6-00fb59c7e2d5"
                 basePath = f'files/{config.args.type}/lab4'
 
-            await self._cvCheckpointTopology(c, workspaceID, deviceInventory, basePath)
-            await self._cvCheckpointTags(c, workspaceID, deviceInventory, basePath)
-            await self._cvCheckpointConfiglets(c, workspaceID, deviceInventory, basePath)
-            await self._cvCheckpointStudios(c, workspaceID, deviceInventory, basePath)
+            await self._cvCheckpointTopology(c, workspaceID, basePath)
+            await self._cvCheckpointTags(c, workspaceID, basePath)
+            await self._cvCheckpointConfiglets(c, workspaceID, basePath)
+            await self._cvCheckpointStudios(c, workspaceID, basePath)
             return
 
             print("connected")
-            await self.unprovisionDevicesCV(c, cvpRacClient, deviceInventory)
+            await self.unprovisionDevicesCV(c, cvpRacClient)
             return
 
             await self.smsUploadImage("./files/images/act-vEOS-4.29.7M.swi")
             return
 
-            await self.doOAuthConfig(deviceInventory)
+            await self.doOAuthConfig()
             return
 
         if config.args.cvAddImages:
@@ -850,6 +844,7 @@ class pgfCVClient():
 
             ###### cleanup steps
             await self.cleanupDashboards(cvpRacClient)
+            await self.doActionCleanup(c)
             await self.tagsCleanup(c, workspaceID)
             await self.scsCleanup(c, workspaceID)
             for studio in ['studio-avd-campus-fabric', 'studio-campus-access-interfaces', 'studio-software-management', 'studio-authentication', 'studio-date-time', 'studio-dns-settings', 'studio-management-connectivity', 'studio-telemetry-config', 'studio-connectivity']:
@@ -857,9 +852,6 @@ class pgfCVClient():
 
             await self.inventoryCleanup(c, workspaceID)
             await self.notificationReceiverCleanup(c)
-            #done below
-            #await self.buildAndSubmitWorkspace(c, workspaceID, expectCC=False)
-            #await self.unprovisionDevices(c, cvpRacClient, deviceInventory)
 
             ######
 
@@ -882,7 +874,7 @@ class pgfCVClient():
 
             # this is a bit of a hack here
             setattr(config.args, "cvCheckpoint", "initial")
-            await self.cvCheckpoint(c, workspaceID, deviceInventory)
+            await self.cvCheckpoint(c, workspaceID)
             config.args.cvCheckpoint = None
 
         if config.args.cvCheckpoint:
@@ -896,7 +888,7 @@ class pgfCVClient():
             # sometimes the api is slow in actually setting up the workspace, so the next op would fail.
             #  lame solution here, i know
             time.sleep(1)
-            await self.cvCheckpoint(c, workspaceID, deviceInventory)
+            await self.cvCheckpoint(c, workspaceID)
 
         if workToDo:
             ccID = await self.buildAndSubmitWorkspace(c, workspaceID, expectCC=expectCC)
@@ -910,11 +902,13 @@ class pgfCVClient():
                 await self.executeChangeControl(c, ccID, wait=False)
 
             if config.args.cvCleanup:
-                #await self.deleteDevices(cvpRacClient)
                 if config.args.type.lower() == 'campus':
-                    await self.unprovisionDevicesCampus(c, cvpRacClient, deviceInventory)
+                    await self.unprovisionDevicesCampus(c, cvpRacClient)
                 elif config.args.type.lower() == 'cv':
-                    await self.unprovisionDevicesCV(c, cvpRacClient, deviceInventory)
+                    await self.unprovisionDevicesCV(c, cvpRacClient)
 
     async def execute(self):
+        if not self._connected:
+            return
+
         await self.studios()

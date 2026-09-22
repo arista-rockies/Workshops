@@ -193,7 +193,7 @@ sudo -i -u administrator bash << EOF
 	git clone https://github.com/arista-rockies/Workshops
 
         cd Workshops
-	git checkout fatpeltscripting
+	#git checkout fatpeltscripting
 
 	echo "installing uv `date`"
 	# install uv as this is the easiest way to get a recent python
