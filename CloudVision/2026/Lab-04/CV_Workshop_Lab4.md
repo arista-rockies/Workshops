@@ -90,7 +90,7 @@ The following is all of the information you will need to complete this lab. Feel
 	1. 172.31.0.0/24
 	2. Click Continue
 
-testing
+testing123
 
 ![I&T Hostnames](images/iandt-hostnames.png)
 
