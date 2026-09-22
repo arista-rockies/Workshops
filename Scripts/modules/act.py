@@ -9,9 +9,19 @@ from jinja2 import Environment, FileSystemLoader
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 class LabState(Enum):
+    READY = 0
+    PENDING = 1
     RUNNING = 2
     STOPPING = 3
     STOPPED = 4
+    DEPLOYING = 5
+    UNDEPLOYING = 6
+    REBOOTING = 7
+    STARTING = 8
+    FAILED = 9
+    DEPLOYFAILED = 10
+    QUOTAREACHED = 11
+    CONFIGURING = 12
 
 class actException(Exception):
     pass
@@ -452,12 +462,15 @@ class ActClient():
             return None
 
         lab = self.getLabByID(lab['id'])
+
+        if not quiet:
+            print(LabState(lab["state"]))
+
         if not lab.get('devices', None):
             if not quiet:
                 print("could not find any devices.  has this lab deployed?")
             return None
 
-        print(LabState(lab["state"]))
         # i want to print out the ip of the bootstrap boxes
         for dev in lab['devices']['generic']:
             if 'bootstrap' in dev['hostname']:
