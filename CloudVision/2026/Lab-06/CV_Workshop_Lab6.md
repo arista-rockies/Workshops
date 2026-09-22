@@ -92,16 +92,16 @@ Modify these by staying within your existing workspace, navigate to **Provisioni
 
     - ![Gateway Numbering Tagged](images/gatewaynumbertagged-h10.png)
 
-    - Rebuild your workspace once more to see that only the Campus B Spines have gateway address scheme modified to use the upper range IPs for the gateway address.
+5. Rebuild your workspace once more to see that only the Campus B Spines have gateway address scheme modified to use the upper range IPs for the gateway address.
   
-5. Next, use the Access Interface Configuration studio to provision the host ports CampusB-Leaf1C Ethernet7 and CampusB-Leaf2A Ethernet7 as **switchport access** within your host VLAN.
+6. Next, use the Access Interface Configuration studio to provision the host ports CampusB-Leaf1C Ethernet7 and CampusB-Leaf2A Ethernet7 as **switchport access** within your host VLAN.
     - _Note-CloudVision provides several ways to configure interfaces including Quick Actions. The Access Interface Configuration Studio provides granular interface settings where they may be required and also acts as the source of truth when provisioning via Quick Actions submissions. This method is used within this lab section to showcase using these advanced settings._
 
     - Within your active workspace, Navigate to Provisioning, Studios, and open the **Access Interface Configuration** studio
 
     - ![Navigate Access Interface Studio](images/openaccintstudio-h10.png)
 
-    - Within the Access Pod Interfaces section, expand the **Campus: Workshop** row
+7. Within the Access Pod Interfaces section, expand the **Campus: Workshop** row
     - ![Expand Campus Workshop](images/expaccesspod-h10.png)
 
     - Then Expand CampusB
@@ -111,84 +111,104 @@ Modify these by staying within your existing workspace, navigate to **Provisioni
     - ![Expand Pod1](images/exppod1-h10.png)
     - Find Ethernet7 on CampusB-Leaf1C and expand it
     - ![Expand Eth7](images/expeth7-h10.png)
-    - Add a description and Set **Enabled = Yes**, Set **Mode = Access**, Set VLAN to your **host VLAN ID**
+      
+8. Add a description and Set **Enabled = Yes**, Set **Mode = Access**, Set VLAN to your **host VLAN ID**
     - ![Leaf1C config](images/l1ceth7config-h10.png)
 
-6. Repeat the steps for CampusB-Leaf2A Ethernet7 and put the interface in the same VLAN
+9. Repeat the steps for CampusB-Leaf2A Ethernet7 and put the interface in the same VLAN
     - Submit your workspace and verify that the host ports are both configured as access ports in the host VLAN
     - ![Host port config](images/hostaccessports-h10.png)
-    - Submit your workspace, review change control for the following elements:
+      
+10. Submit your workspace, review change control for the following elements:
     - Leaf1C and Leaf2A - trunk allowed list includes host vlan, Ethernet7 switchport access vlan id
     - Spines - VLAN interface with ip virtual-rotuer address occupying high number IPs to avoid conflicting with existing host IP config
     - ![Verify Leaf](images/verifyleaf-cm.png)
     - ![Verify Spines](images/verifyspines-cm.png)
-    - Approve and Execute the change control to complete pushing out host VLAN changes.  
+
+11. Approve and Execute the change control to complete pushing out host VLAN changes.  
 
 ---
 
 **Setup In-band Management VLAN**
    
-7. Repeat the Network Hierarchy steps for adding a VLAN to add your in-band management VLAN-ID and subnet
+12. Repeat the Network Hierarchy steps for adding a VLAN to add your in-band management VLAN-ID and subnet
     - ![Add in-band mgmt VLAN](images/addvlan-cm.png)
-    - Next, select the **In-band Management** function under Device Management Menu and click **Edit**
+
+13. Next, select the **In-band Management** function under Device Management Menu and click **Edit**
     - Enable the in-band management toggle
     - Specify **Automatic** Address Allocation and select **Front-to-Back** Allocation Order
     - Specify your VLAN ID and IP subnet in CIDR notation of the routed VLAN in Campus B
     - Click Save
     - ![Add VLAN](images/editinband-cm.png)
-    - Review your Workspace for the following changes:
+
+14. Review your Workspace for the following changes:
     - Leaf switches have trunk allowed list updated and receive a unique SVI IP address within the VLAN subnet
     - Spine switches receive unique IP addresses and a shared **ip virtual-router address** which is common among the spines
     - Note down the virtual router address - e.g. 10.0.201.1 and spine-1 and spine-2's unique addresses, e.g. 10.0.201.2 and 10.0.201.3 in this example. These spine addresses will be the probe destination addresses for Connectivity Monitor.
     - ![Verify Inband](images/inbandverify-cm.png)
-    - Submit the workspace and Approve and Execute the Change Control to push out the in-band VLAN changes to Campus B 
+
+15. Submit the workspace and Approve and Execute the Change Control to push out the in-band VLAN changes to Campus B 
 
 ---
 
-8. Configure Connectivity Monitor
+16. Configure Connectivity Monitor
     - Navigate to **Provisioning** then **Studios**
     - Deselect the Active Studios filter to show all available studios, select **Connectivity Monitoring**
     - ![Connectivity Monitoring](images/selectcmstudio-cm.png)
-    - Within the Connectivity Monitoring Studio set the following configuration:
+
+17. Within the Connectivity Monitoring Studio set the following configuration:
     - Add Hosts entries for each of the spine IP addresses in the routed VLAN and click the **Add Host Monitoring**
     - Add Host Monitoring tags which select **Campus-Pod: CampusB** and **Role: Leaf** then click into the rule to modify it
     - ![Add Hosts](images/addmontags-cm.png)
-    - Verify your tag match includes the top-level leaf switches in Campus B by hovering your mouse over the hint, spines and other downstream member-leaf are excluded in this example.
+
+18. Verify your tag match includes the top-level leaf switches in Campus B by hovering your mouse over the hint, spines and other downstream member-leaf are excluded in this example.
     - ![Add Hosts](images/verifytags-cm.png)
-    - Within the Monitoring Hosts list, add all three addresses the VLAN Gateway and each spine.
+    
+19. Within the Monitoring Hosts list, add all three addresses the VLAN Gateway and each spine.
     - ![Add Host Entries](images/addhostentries-cm.png)
-    - Repeat these steps to add entires for the host NICs in 10.2.2.0/24 subnet.
+      
+20. Repeat these steps to add entires for the host NICs in 10.2.2.0/24 subnet.
     - Create a corresponding rule to probe the host IPs **from the spine switches** in Campus B
     - ![All CM Rules](images/allcmrules-cm.png)
     - ![Exp Spine Rules](images/expspinerule-cm.png)
-    - Review your workspace for the following configuration
+
+21. Review your workspace for the following configuration:
     - Leaf Switches are modified to enable the feature **monitor connectivity** with a host entry for each Spine IP address to be probed.
     - Spine Switches are modified to enable **monitor connectivity** and each spine has a host entry for each of the host NIC IPs, 10.2.2.1 and 10.2.2.2
     - ![Review CM Workspace](images/reviewcmws-cm.png)
-    - Approve and Execute the corresponding change control to enable the feature on the leaf switches in Campus B.
+    
+22. Approve and Execute the corresponding change control to enable the feature on the leaf switches in Campus B.
     - ![Execute CM Change Control](images/execcmcc-cm.png)
 
 ---
 
-9. Navigate to **Devices** then **Connectivity Monitor** menu
+23. Navigate to **Devices** then **Connectivity Monitor** menu
     - Select Metric Packet Loss and Connectivity probes as all three leaf switches
     - ![Packet Loss Dashboard](images/cmdashboard-cm.png)
-    - Next, use previous lab instructions to execute a reboot change control on either Campus-B Spine device. Watch this Connectivity Monitor dashboard in another browser tab while the spine device reboots.
-    - Note - some probes to the Gateway virtual address may initially fail and render as brief loss as the VARP IP address resolves by the probe.
+    
+24. Next, use previous lab instructions to execute a reboot change control on either Campus-B Spine device. Watch this Connectivity Monitor dashboard in another browser tab while the spine device reboots.
+
+25. Some probes to the Gateway virtual address may initially fail and render as brief loss as the VARP IP address resolves by the probe.
     - ![Packet Loss Impact](images/packetlossprerecovery-cm.png)
-    - For the remaining duration of Spine reboot we should see the network converged to only the unique Spine IP address is affected, the other Spine and Gateway addresses remain reachable
+
+26. For the remaining duration of Spine reboot we should see the network converged to only the unique Spine IP address is affected, the other Spine and Gateway addresses remain reachable
     - ![Packet Loss Synchronized](images/packetlossrecover-cm.png)
     - After the Spine device recovers, the dashboard should render back to healthy
-    - Clicking into the boxes reveals the time-series statistics for the probe
+
+27. Clicking into the boxes reveals the time-series statistics for the probe
     - ![Probe Popup](images/probepopup-cm.png)
-    - Explore the Jitter and Latency probes similarly
+
+28. Explore the Jitter and Latency probes similarly
     - ![Other Probes](images/otherprobes-cm.png)
-    - Finally navigate to Network Hierarchy then select your **CampusB** to reveal the scoped dashboard.
+
+29. Finally navigate to Network Hierarchy then select your **CampusB** to reveal the scoped dashboard.
     - Note that Connectivity Monitor Anomalies are now summarized where this data is available to CloudVision.
     - ![NH Dashboard CM](images/nhdash-cm.png)
-    - Next, explore the Packet Loss and other probes from the Spine to the host by selecting the Spine switches
+    
+30. Next, explore the Packet Loss and other probes from the Spine to the host by selecting the Spine switches
     - ![Host probes](images/hostprobes-cm.png)
-    - Recapping this lab section, Connectivity Monitor is now setup to probe both the leaf-to-spine fabric connectivity as well as Spine to end host in a separate subnet.
+
+**Recapping this lab section, Connectivity Monitor is now setup to probe both the leaf-to-spine fabric connectivity as well as Spine to end host in a separate subnet.**
 
 **This Concludes the Connectivity Monitor lab section**
   
@@ -208,26 +228,30 @@ Stop and wait here until the lab instructor informs the class when CampusB-Leaf2
 Goal - In this lab section, CampusB-Leaf2A will be simulated offline by blocking its management connection to CloudVision. A fresh virtual device Leaf-ZTR will be unblocked to replace it. Due to the nature of the virtual lab environment, the port connections must remain in-place while the topology is deployed. Therefore you will see the new ZTR replacement device is connected to different interfaces within the environment versus the original Leaf2A and how the ZTR process accommodates updating the fabric configurations to the new connections.
 
 
-10. From the **Devices** menu **Inventory** page click on the offline CampusB-Leaf2A's device page by clicking on the Hostname
+31. From the **Devices** menu **Inventory** page click on the offline CampusB-Leaf2A's device page by clicking on the Hostname
     - ![Select Leaf2A](images/selectleaf2a-ztr.png)
-    - Within the device page, scroll down and click the **Replace Device** button.
+
+32. Within the device page, scroll down and click the **Replace Device** button.
     - ![Replace Device](images/clickreplace-ztr.png)
-    - In the Replace Device Dialog, check the Leaf2A failed device to select it, then click the drop-down for Replacement Device and select the ZTP-status DHCP IP address device (look for the green indicator)
+
+33. In the Replace Device Dialog, check the Leaf2A failed device to select it, then click the drop-down for Replacement Device and select the ZTP-status DHCP IP address device (look for the green indicator)
     - ![Select Replacement](images/selectreplacement-ztr.png)
     - CloudVision will display a status window while the process is in-flight.
     - ![Status](images/qastatus-ztr.png)
-    - Next, CloudVision presents you with changes it has detected:
-        - Spine connections are different since the ZTR device is pre-connected to ports adjacent to Leaf2A
-        - Copies over the existing configuration from Leaf2A.
+
+34. Next, CloudVision presents you with changes it has detected:
+    - Spine connections are different since the ZTR device is pre-connected to ports adjacent to Leaf2A
+    - Copies over the existing configuration from Leaf2A.
     - ![Spine Config](images/spineadjust-ztr.png)
     - ![Leaf Config](images/leafztrcfg-ztr.png)
-    - Once you have reviewed the changes, select **Continue to Replace** button
+
+35. Once you have reviewed the changes, select **Continue to Replace** button
     - ![Continue Replace](images/continuereplace-ztr.png)
     - Note - the device replacement Change Control will execute automatically for you at this stage. The replacement device will need to go through the Zero Touch Provisioning reboot process after configuration is updated. Please give the replacement Leaf2A device to go offline and reboot after replacement is initiated.
 
 
 
-11. After the replacement Leaf2A has booted back up, confirm that your customized device tags, interface configuration, and connectivity monitor probes are working on the new replacement switch.
+36. After the replacement Leaf2A has booted back up, confirm that your customized device tags, interface configuration, and connectivity monitor probes are working on the new replacement switch.
     - Throughout this replacement, the Spines have been probing to the host IPs and recorded the duration of packet loss.
     - Browse to CloudVision Events and look for event named **Common Device Connectivity Monitor Events** or similar named events generated from CampusB Spine devices.
     - Clicking on the event will open detailed context
@@ -263,15 +287,16 @@ switch(config)#monitor session TEST destination cpu
 
  ## Data Plane Capture Lab Instructions
 
-12. Navigate to **Provisioning**, **Actions**, **New Action** button
+37. Navigate to **Provisioning**, **Actions**, **New Action** button
     - ![New Action](images/newaction-cap.png)
     - Name the action "tcpdump" with default Action type of Change Control and click Save.
     - ![Name Action](images/createtcpdump-cap.png)
-    - First, add a Dynamic Argument to take a device as input by clicking **Manage Arguments** then click **+ Dynamic Argument**
+38. Add a Dynamic Argument to take a device as input by clicking **Manage Arguments** then click **+ Dynamic Argument**
     - ![Add Argument](images/addargument-cap.png)
     - Name the argument(case sensitive): **DeviceID**
     - ![DeviceID Argument](images/deviceidargument-cap.png)
-    - Next select the **Edit Script** Menu and paste in the Script below:
+
+39. Select the **Edit Script** Menu and paste in the Script below:
     - ![TCPdump Save](images/tcpdumpsave-cap.png)
 ---
 
@@ -294,7 +319,7 @@ ctx.info(str(cmdResponses[0]))
 
 ---
 
-13. Now, let's execute this action directly in this menu using the **Execute** button
+40. Now, let's execute this action directly in this menu using the **Execute** button
     - ![Execute](images/executefirst-cap.png)
     - Expand Dynamic Argument Values and select your **CampusB-Leaf1C** device
     - ![Execute On Device](images/executesec-cap.png)
