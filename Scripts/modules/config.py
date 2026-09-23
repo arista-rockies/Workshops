@@ -1,4 +1,5 @@
 import argparse, yaml, csv, json
+from jinja2 import Environment, FileSystemLoader
 from dataclasses import dataclass, field
 
 ####  TODO: should this have values for non-arista gear?
@@ -166,14 +167,17 @@ def loadCSVInventory(tokens):
 def loadACTInventory(tokens):
     result = Pods()
 
-    with open("files/actTopology.yml", "r") as f:
-        s = f.read()
+    # with open("files/actTopology.yml", "r") as f:
+    #     s = f.read()
 
     for podStr, podToken in tokens.items():
         switches = [] 
         substitutions = {"podInt": int(podStr), "podStr": f"{podStr:>02}", "switches": {}}
 
-        topology = yaml.safe_load(s.replace("###", f"{str(podStr):0>2}"))
+        # topology = yaml.safe_load(s.replace("###", f"{str(podStr):0>2}"))
+        s = Environment(loader=FileSystemLoader('files')).get_template('actTopology.yml').render({"pod": f"{str(podStr):0>2}"})
+        topology = yaml.safe_load(s)
+
 
         for node in topology.get("nodes", []):
             # because of how the yaml node is set up i have to do this funny

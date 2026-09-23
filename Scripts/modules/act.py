@@ -368,10 +368,11 @@ class ActClient():
 
     def doDeployAndStart(self):
         try:
-            s = ""
-            with open("files/actTopology.yml", "r") as f:
-                s = f.read()
-        except:
+            # s = ""
+            # with open("files/actTopology.yml", "r") as f:
+            #     s = f.read()
+            s = Environment(loader=FileSystemLoader('files')).get_template('actTopology.yml').render({"pod": f"{self.pod.pod:0>2}"})
+        except Exception:
             print("  could not deploy and start, terminating")
             return
 
@@ -393,7 +394,8 @@ class ActClient():
             resp = self.deleteTopology(topology["id"])
             resp = self.waitOnOperation(resp["id"], sleep=10, timeout=None, statusChar=".")
 
-        newTopology = yaml.safe_load(s.replace("###", f"{self.pod.pod:0>2}"))
+        # newTopology = yaml.safe_load(s.replace("###", f"{self.pod.pod:0>2}"))
+        newTopology = yaml.safe_load(s)
         # act doesn't allow metadata fields, nor does it ignore unused data.  we need the id
         #  later in the cv.  let's loop over the topology and delete any id tags
         for dev in newTopology["nodes"]:
@@ -421,10 +423,11 @@ class ActClient():
 
     def doUpdateTopology(self):
         try:
-            s = ""
-            with open("files/actTopology.yml", "r") as f:
-                s = f.read()
-        except:
+            # s = ""
+            # with open("files/actTopology.yml", "r") as f:
+            #     s = f.read()
+            s = Environment(loader=FileSystemLoader('files')).get_template('actTopology.yml').render({"pod": f"{self.pod.pod:0>2}"})
+        except Exception:
             print("  could not update topology, terminating")
             return
 
@@ -438,7 +441,8 @@ class ActClient():
 
         print(f"{self.pod.pod} - doUpdateTopology ")
 
-        newTopology = yaml.safe_load(s.replace("###", f"{self.pod.pod:0>2}"))
+        # newTopology = yaml.safe_load(s.replace("###", f"{self.pod.pod:0>2}"))
+        newTopology = yaml.safe_load(s)
         try:
 
             print(f"  updating topology ", end="", flush=True)
