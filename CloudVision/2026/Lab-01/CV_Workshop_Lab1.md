@@ -100,6 +100,8 @@ The following is all of the information you will need to complete this lab. Feel
 
 ![Submit Workspace](images/iandt-submit.png)
 
+10. Select **Exit Workspace**
+
 ![Exit Workspace](images/exit-workspace.png)
 
 ---
