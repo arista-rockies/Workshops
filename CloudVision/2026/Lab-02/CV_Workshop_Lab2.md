@@ -89,13 +89,13 @@ There is no right or wrong way to design this hierarchy, and each organization m
 ![Static Configuration Workshop Hierarchy](images/ws-add-all-dev-configlet.png)
 
 9. Locate and select the configlet **allUsers**.
-    - Select **Assign**
+   - Select **Assign**
 
 ![Static Configuration Workshop Hierarchy](images/ws-assign-all-dev-configlet.png)
 
 10. Select the container **Workshop:CampusA**
-   - On the right side of the screen, select **+Configlet**
-   - Select **Configlet Library**
+    - On the right side of the screen, select **+Configlet**
+    - Select **Configlet Library**
 
 ![Static Configuration Add Base Configlet](images/ws-add-configlet.png)
 
@@ -106,9 +106,9 @@ There is no right or wrong way to design this hierarchy, and each organization m
 
 
 12. Assign each devices to their intended containers.
-   - Locate the device's intended container.
-   - Select the **3 dots** next to the container.
-   - Select **Add Device**
+    - Locate the device's intended container.
+    - Select the **3 dots** next to the container.
+    - Select **Add Device**
 
    > [!NOTE]
    > **THE IMAGE DISPLAYED MAY NOT MATCH YOUR CONFIGURED HIERARCHY. BE SURE TO ADD THE DEVICES TO THE INTENDED CONTAINER STRUCTURE IN YOUR HIERARCHY**
@@ -116,7 +116,7 @@ There is no right or wrong way to design this hierarchy, and each organization m
  ![Static Configuration Add Device](images/scs-add-device1.png)     
 
 13. Select the intended device.
-   - Select **Add**
+    - Select **Add**
 
  ![Static Configuration Add Device](images/scs-add-device2.png)     
 
