@@ -299,6 +299,7 @@ The following is all of the information you will need to complete this lab. Feel
 	2. Click **Add Access Pod**
 
 ![I&T Hostnames](images/image41.png)
+![I&T Hostnames](images/image42.1.png)
 
 37. On **Device Assignment**
 	1. In the dashed box, click **"+ Add Device"**
