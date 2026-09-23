@@ -111,6 +111,8 @@ class pgfCVClient():
                 await self._cvCheckpointTags(c, workspaceID, basePath)
             elif module['name'] == "studios":
                 await self._cvCheckpointStudios(c, workspaceID, basePath)
+            elif module['name'] == 'actions':
+                await self._cvCheckpointActions(c, basePath)
 
     async def _cvCheckpointStudios(self, c, workspaceID, basePath):
         print(f"{self.pod.pod} - cvCheckpointStudios")
@@ -234,6 +236,18 @@ class pgfCVClient():
             await self._doConfiglet(c, workspaceID, container)
     
         await c.set_studio_inputs(studio_id='studio-static-configlet', workspace_id=workspaceID, inputs={"configletAssignmentRoots": rootContainers})
+
+    async def _cvCheckpointActions(self, c, basePath):
+        print(f"{self.pod.pod} - cvCheckpointActions")
+
+        jinjaEnv = Environment(loader=FileSystemLoader(f'{basePath}/actions/'))
+        actionsConfig = yaml.safe_load(jinjaEnv.get_template("config.yml").render(self.pod.substitutions))
+
+        for action in actionsConfig.get("actions", []):
+            print(f"   - pushing {action['name']}")
+            actionTemplate = jinjaEnv.get_template(action["filename"]).render(self.pod.substitutions)
+            url = f'{self.baseURL}/api/resources/action/v1/ActionConfig'
+            resp = requests.post(url, data=actionTemplate, timeout=300, headers={'Authorization': f'Bearer {self.tok}'})
 
     async def scsCleanup(self, c, workspaceID):
         print(f"{self.pod.pod} - scsCleanup")
@@ -784,7 +798,9 @@ class pgfCVClient():
         expectCC = True
 
         if config.args.cvTest:
-            await self.doActionCleanup(c)
+            return
+            basePath = f'files/{config.args.type}/lab5'
+            await self._cvCheckpointActions(c, basePath)
             return
             p = 13
             if p == 20:
