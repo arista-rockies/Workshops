@@ -210,6 +210,14 @@ Notice the Change Control event is correlated and the link failures are shown wi
 
 Navigate to Network Hierarchy
 
+- ![Network Hierarchy](images/network-hierarchy.png)
+
+Expand the dropdowns and click on Campus B / Pod 1
+
+- ![Hierarchy Campus B Pod1](images/hierarchy-campusb-pod1.png)
+
+
+
 ### Upgrade Code on a Single Switch
 
 
