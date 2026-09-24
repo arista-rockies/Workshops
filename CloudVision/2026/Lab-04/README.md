@@ -4,7 +4,7 @@
 
 ## This Lab Guide:
 
-[CloudVision Workshop Lab Guide 04 - Network Hierarchy Provisioning](https://github.com/arista-rockies/Workshops/blob/jdarrish-labs/CloudVision/2026/Lab-04/CV_Workshop_Lab4.md)
+[CloudVision Workshop Lab Guide 04 - Network Hierarchy Provisioning](https://github.com/arista-rockies/Workshops/blob/jdarrish-labs/CloudVision/2026/Lab-04/README.md)
 
 ---
 
