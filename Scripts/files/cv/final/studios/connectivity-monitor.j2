@@ -1,0 +1,59 @@
+path: []
+inputs:
+  hosts:
+    - description: null
+      ipAddr: 10.0.201.1
+      ipHostName: null
+      localIntf: null
+      name: VLAN201Gateway
+      preferredAddressFamily: null
+      url: null
+      vrf: default
+    - description: null
+      ipAddr: 10.0.201.2
+      ipHostName: null
+      localIntf: null
+      name: Spine1B
+      preferredAddressFamily: null
+      url: null
+      vrf: default
+    - description: null
+      ipAddr: 10.0.201.3
+      ipHostName: null
+      localIntf: null
+      name: Spine2B
+      preferredAddressFamily: null
+      url: null
+      vrf: default
+    - description: null
+      ipAddr: 10.2.2.1
+      ipHostName: null
+      localIntf: null
+      name: host-pod1
+      preferredAddressFamily: null
+      url: null
+      vrf: default
+    - description: null
+      ipAddr: 10.2.2.2
+      ipHostName: null
+      localIntf: null
+      name: host-pod2
+      preferredAddressFamily: null
+      url: null
+      vrf: default
+  networkConfig:
+    - inputs:
+        config:
+          monitoredHosts:
+            - host: VLAN201Gateway
+            - host: Spine1B
+            - host: Spine2B
+      tags:
+        query: ( Campus-Pod:CampusB ) AND ( Role:Leaf )
+    - inputs:
+        config:
+          monitoredHosts:
+            - host: host-pod1
+            - host: host-pod2
+      tags:
+        query: ( Campus-Pod:CampusB ) AND ( Role:Spine )
