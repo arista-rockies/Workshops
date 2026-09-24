@@ -646,7 +646,7 @@ class ActClient():
                     scp.put(f'images/{image}', f'/home/administrator/images/{image}', callback=updateBar)
                     pbar.close()
 
-                scp.put('tokenConfig.yml', '/home/administrator/tokenConfig.yml')
+                scp.put(config.args.tokenFile, '/home/administrator/tokenConfig.yml')
                 scp.put('setupACTGateway.sh', '/home/administrator/setupACTGateway.sh')
                 scp.putfo(blockScript, '/home/administrator/workshopIPTables.sh')
                 #scp.put('workshopIPTables.sh', '/home/administrator/workshopIPTables.sh')
