@@ -326,10 +326,41 @@ Click on **View Details** and explore the popup that shows the completed upgrade
 
 **This completes the switch upgrade section of the Lab Guide**
 
-### Monitor Syslog
+### Monitor The Fabric
 
+#### Lab Overview
 
-### Observe the Fabric
+In this lab we will learn where we can find important information about the fabric
+
+##### Explore Syslog
+
+From the device inventory page, select any switch and naviagte to the **System** -> **Log Messages** section of the device
+
+- ![Syslog First Step](images/syslog-first-nav.png)
+
+Click on Message and type in stp - to search for Spanning Tree relatged events
+
+- ![Syslog Second Step](images/syslog-second-nav.png)
+
+##### Dashbaords
+
+Click on the Dashboards section of Cloud Vision and then on **Campus Health Dashboard**
+
+- ![Dashbaord First Step](images/Dashbaord-first-nav.png)
+
+Under the Compliance section of the Dashbaord, click on **Configuration**
+
+- ![Dashboard Second Step](images/dashboard-second-nav.png)
+
+Click on the device we want to clear our Configuration Compliance issue for
+
+- ![Dashboard Third Step](images/dashboard-third-nav.png)
+
+Click **Sync Config** and complete the Change Control process to resolve the compliance issue
+
+- ![Dashbaord Fourth Step](images/dashboard-fourth-nav.png)
+
+**This completes the Monitoring Section of the Lab Guide**
 
 ---
 
