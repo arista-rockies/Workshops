@@ -216,7 +216,61 @@ Expand the dropdowns and click on Campus B / Pod 1
 
 - ![Hierarchy Campus B Pod1](images/hierarchy-campusb-pod1.png)
 
+Navigate to the Front Panel View and Click on **Manage Profiles**
 
+- ![Front Panel Pod1](images/hierarchy-front-panel.png)
+
+Click **Add Profile**
+
+- ![Add Profile](images/hierarchy-add-profile.png)
+
+Create a Port Profile with the following attributes
+  - **Name** = Your Choice
+  - **Description** = Your Choice
+  - **Enabled** = Yes
+  - **Mode** = Access
+  - **VLAN** = 1
+  - **Spanning Tree Portfast** = Edge
+  - **BPDU Filter** = Enabled
+  - **BPDU Guard** = Enabled 
+
+- ![Create Port Profile](images/hierarchy-port-profile-create.png)
+
+Review your workspace
+
+- ![Workspace Review](images/hierarchy-port-profile-review.png)
+
+Submit your workspace and complete the Change Control
+
+- ![Change Control Workspace](images/hierarchy-workspace-submit.png)
+
+Click on **Network Hierarchy** and verify your port profile has been created
+
+- ![Completed Port Profile](images/hierarchy-port-profile-completed.png)
+
+Navigate to **Campus B**, **POD 1**, **Front Pannel**
+  - For switch **CampusB-Leaf1C** click on port **7**
+  - Click **Configure** next to **Interface Configuration**
+
+- ![Port Profile Pre-Assign](images/hierarchy-port-profile-preassign.png)
+
+Under **Profile** seclect your profile you just created and hit **Save**
+
+- ![Assign Profile](images/hierarchy-port-profile-assign.png)
+
+A Change Control should have been created
+
+- ![Port Profile Assign PreCC](images/hierarchy-port-profile-assign-precc.png)
+
+Validate the changes, submit workspace, and execute change control
+
+- ![Validate Changes](images/hierarchy-port-profile-validate-changes.png)
+
+Naviagte Back to Network Hierarchy and check to make sure your port profile has been applied
+
+- ![Port Profile Check](images/hierarchy-port-profile-check.png)
+
+**This completes the Port Profile Section of the Lab Guide**
 
 ### Upgrade Code on a Single Switch
 
