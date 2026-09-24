@@ -17,10 +17,12 @@ app = FastAPI()
 
 currentPod = os.getenv("POD")
 inventory = os.getenv("INVENTORY")
+tokenFile = os.getenv("TOKENFILE")
 
 config.args = SimpleNamespace()
 setattr(config.args, "i", inventory)
 setattr(config.args, "pods", [currentPod])
+setattr(config.args, "tokenFile", tokenFile)
 
 podConfig = config.loadConfiguration()
 pod = podConfig[currentPod]

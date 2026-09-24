@@ -24,6 +24,7 @@ PODPAD=${HOSTNAME: -2}
 cat << EOF > /usr/local/etc/bootstrap.conf
 POD=$POD
 INVENTORY=act
+TOKENFILE=tokenConfig.yml
 EOF
 
 cat <<EOF > /etc/systemd/system/bootstrap.service
