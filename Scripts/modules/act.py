@@ -99,7 +99,7 @@ class ActClient():
         if config.args.actTest:
             name = self.resourceName.format(self.pod.pod)
 
-            # not sure why getLabByName doesn't return devices but getLabByID does
+            # getLabByName uses the local cache, getLabByID hits the api
             lab = self.getLabByName(name)
             l = self.getLabByID(lab["id"])
             if not l.get("devices", None):
@@ -337,6 +337,8 @@ class ActClient():
         url = f'/rest/v1/labs/{id}/undeploy'
         resp = self._executeRequest(requestType='POST', url=url)
 
+        return resp
+
     def createLab(self, name):
         url = f'/rest/v1/labs'
 
@@ -383,6 +385,18 @@ class ActClient():
 
         lab = self.getLabByName(name)
         if lab:
+            print(f"  undeploying lab {name}", end="", flush=True)
+            resp = self.undeployLab(lab["id"])
+            resp = self.waitOnOperation(resp["id"], sleep=10, timeout=None, statusChar=".")
+
+            # we need to hang here until the lab shows as ready
+            while LabState(lab["state"]) != LabState.READY:
+                print(".", flush=True, end="")
+                time.sleep(10)
+                self.getLabs()
+                lab = self.getLabByID(lab["id"])
+
+            print("")
             print(f"  deleting lab {name}", end="", flush=True)
             resp = self.deleteLab(lab["id"])
             resp = self.waitOnOperation(resp["id"], sleep=10, timeout=None, statusChar=".")
@@ -417,7 +431,7 @@ class ActClient():
 
         print(f"  deploying lab {name}", end="", flush=True)
         resp = self.deployLab(labID)
-        resp = self.waitOnOperation(resp["id"], sleep=10, timeout=None, statusChar='!', debug=True)
+        resp = self.waitOnOperation(resp["id"], sleep=10, timeout=None, statusChar='!')
 
     def doUpdateTopology(self):
         try:
@@ -520,7 +534,7 @@ class ActClient():
         if operation in ["reset", "blockAll", "unBlockAll", "unBlockCampusB", "unBlockZTR"]:
             print(f"{self.pod.pod} - {operation}IPTables")
             name = self.resourceName.format(self.pod.pod)
-            # not sure why getLabByName doesn't return devices but getLabByID does
+            # getLabByName uses the local cache, getLabByID hits the api
             lab = self.getLabByName(name)
             l = self.getLabByID(lab["id"])
             if not l.get("devices", None):
@@ -546,7 +560,7 @@ class ActClient():
 
         print("", flush=True)
 
-        # not sure why getLabByName doesn't return devices but getLabByID does
+        # getLabByName uses the local cache, getLabByID hits the api
         lab = self.getLabByName(name)
         l = self.getLabByID(lab["id"])
         if not l.get("devices", None):
@@ -593,7 +607,7 @@ class ActClient():
 
         print("", flush=True)
 
-        # not sure why getLabByName doesn't return devices but getLabByID does
+        # getLabByName uses the local cache, getLabByID hits the api
         lab = self.getLabByName(name)
         l = self.getLabByID(lab["id"])
         if not l.get("devices", None):
@@ -662,7 +676,7 @@ class ActClient():
 
         print("", flush=True)
 
-        # not sure why getLabByName doesn't return devices but getLabByID does
+        # getLabByName uses the local cache, getLabByID hits the api
         lab = self.getLabByName(name)
         l = self.getLabByID(lab["id"])
         if not l.get("devices", None):
