@@ -19,7 +19,7 @@
 
 # 1. Lab Topology
 
-![Full Lab Topology](images/a-topology.png)
+![Full Lab Topology](images/lab-topology.png)
 
 ---
 
@@ -46,7 +46,7 @@ After succesfully authenticated you will should see **CVaaS** avaialble under Se
 
 ## Lab Overview
 
-In this lab, we will setup CloudVision's tags and Events system to create a customized email alert when leaf to spine uplinks or specific devices go offline.
+In this lab, we will setup CloudVision's tags and Events system to create a customized email alert when leaf to spine uplinks or specific devices go offline, create a port profile using Network Hierarchy, Upgrade Code on a switch, and monitor our fabric.
 
 ### Customize Events and Notifications
 
@@ -208,7 +208,7 @@ Notice the Change Control event is correlated and the link failures are shown wi
 
 ### Create a Port Profile and Assign it
 
-
+Navigate to Network Hierarchy
 
 ### Upgrade Code on a Single Switch
 
