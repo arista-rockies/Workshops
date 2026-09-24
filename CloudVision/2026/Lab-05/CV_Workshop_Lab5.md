@@ -252,7 +252,7 @@ Click on **Network Hierarchy** and verify your port profile has been created
 
 - ![Completed Port Profile](images/hierarchy-port-profile-completed.png)
 
-Navigate to **Campus B**, **POD 1**, **Front Pannel**
+Navigate to **Campus B**, **POD 1**, **Front Panel**
   - For switch **CampusB-Leaf1C** click on port **7**
   - Click **Configure** next to **Interface Configuration**
 
