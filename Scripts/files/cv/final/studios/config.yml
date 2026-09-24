@@ -1,0 +1,28 @@
+studios:
+  - name: Authentication
+    id: studio-authentication
+    filename: authentication.j2
+  - name: CampusL2L3EVPN
+    id: studio-avd-campus-fabric
+    filename: campus.j2
+  - name: DateTime
+    id: studio-date-time
+    filename: date_time.j2
+  - name: DNS
+    id: studio-dns-settings
+    filename: dns.j2
+  - name: Management
+    id: studio-management-connectivity
+    filename: management.j2
+  - name: Telemetry
+    id: studio-telemetry-config
+    filename: telemetry.j2
+  - name: StreamingTelemetry
+    id: studio-telemetry-config
+    selector: "device: *"
+  - name: ConnectivityMonitoring
+    id:  studio-connectivity
+    filename: connectivity-monitor.j2
+  - name: AccessInterfaces
+    id: studio-campus-access-interfaces
+    filename: interfaces.j2

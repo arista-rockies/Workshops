@@ -1,0 +1,19 @@
+{
+"language":2,
+    "body":"# Grab TCPdump from command line\n\nfrom typing import List, Dict\nfrom cloudvision.cvlib import ActionFailed\n\nctx.info(\"Running TCPdump\")\ncmds = [\n \"tcpdump interface any packet-count 7 filter net 10.2.2.0/24\",\n]\ncmdResponses: List[Dict] = ctx.runDeviceCmds(cmds)\nctx.info(str(cmdResponses[0]))\n# end",
+    "key": {
+        "id": "94f3ac12-fa88-4c3e-8927-236234d4f7f1"
+    },
+    "core":{
+        "name":"tcpdump",
+        "type":1,
+        "dynamicArgs":{
+            "values":{
+                "DeviceID":{
+                    "required":false,
+                    "hidden":false
+                }
+            }
+        }
+    }
+}
