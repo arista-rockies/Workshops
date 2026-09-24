@@ -128,7 +128,6 @@ def loadConfiguration():
 
     return config
 
-#TODO: FIXME
 def loadCSVInventory(tokens):
     result = Pods()
 
@@ -202,7 +201,7 @@ def loadTokens():
     # we are going to filter the tokens here and just not create the tokens for pods we don't care
     #  about
     result = {}
-    with open('tokenConfig.yml', 'r') as f:
+    with open(args.tokenFile, 'r') as f:
         tokenConfig = yaml.safe_load(f.read())
         for podStr, pod in tokenConfig["apiToken"].items():
             if not podStr in args.pods:

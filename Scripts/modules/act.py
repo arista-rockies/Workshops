@@ -615,9 +615,6 @@ class ActClient():
             return
 
         deviceInventory = self.pod.switches
-        print("**")
-        print(deviceInventory)
-        print("**")
 
         # this could be built with a crafty comprehension.   not doing that in an effort of... comprehension
         devList = {"switches": {}}
