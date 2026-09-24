@@ -4,7 +4,7 @@
 
 ## This Lab Guide:
 
-[CloudVision Workshop Lab Guide 01 - Inventory and Topology](https://github.com/arista-rockies/Workshops/blob/main/CloudVision/2026/Lab-01/CV_Workshop_Lab1.md)
+[CloudVision Workshop Lab Guide 01 - Inventory and Topology](https://github.com/arista-rockies/Workshops/blob/main/CloudVision/2026/Lab-01/README.md)
 
 ---
 
