@@ -208,6 +208,10 @@ Notice the Change Control event is correlated and the link failures are shown wi
 
 ### Create a Port Profile and Assign it
 
+#### Lab Overview
+
+In this lab we will create a custom port profile and assign it to an interface using the Network Hierarchy portion of Cloud Vision.
+
 Navigate to Network Hierarchy
 
 - ![Network Hierarchy](images/network-hierarchy.png)
@@ -274,6 +278,53 @@ Naviagte Back to Network Hierarchy and check to make sure your port profile has 
 
 ### Upgrade Code on a Single Switch
 
+#### Lab Overview
+
+In this lab we will be upgrading the image on a single device in our fabric, **CampusB-Leaf1C** All software has been prestaged for you in this lab.
+
+Navigate to Network Hierarchy, CampusB, Pod 1
+
+- ![Upgrade First Step](images/upgrade-first-nav.png)
+
+Click on the 3 dots next to Pod1 and click Upgrade
+
+- ![Upgrade Second Step](images/upgrade-second-nav.png)
+
+In the **Image** dropdown, select **EOS-4.35.4M.swi**
+  - Note how the list of devices changes to just Leaf1C
+
+- ![Upgrade Third Step](images/upgrade-third-nav.png)
+
+Configure your preferred method of upgrade, for this example we will use the following
+  - MLAG ISSU
+  - Non-MLAG Pair
+  - SSU Fall Back to Normal, On Error Only
+
+- ![Upgrade Fourth Step](images/upgrade-fourth-nav.png)
+
+Verify the information is correct and click **Upgrade**
+
+- ![Upgrade Fifth Step](images/upgrade-fifth-nav.png)
+
+Click on View Change Control and watch the switch upgrade
+
+- ![Upgrade Sixth Step](images/upgrade-sixth-nav.png)
+
+**This Reload will take roughly 5-10 minutes to complete**
+
+Check for successful completion
+
+- ![Upgrade Seventh Step](images/upgrade-seventh-nav.png)
+
+Naviagte back to Network Hierarchy and verify the upgrade has been completed successfully
+
+- ![Upgrade Eigth Step](images/upgrade-eigth-nav.png)
+
+Click on **View Details** and explore the popup that shows the completed upgrade
+
+- ![Upgrade Ninth Step](images/upgrade-ninth-nav.png)
+
+**This completes the switch upgrade section of the Lab Guide**
 
 ### Monitor Syslog
 
