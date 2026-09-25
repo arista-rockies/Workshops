@@ -1,0 +1,163 @@
+path: []
+inputs:
+  campus:
+    - inputs:
+        campusPod:
+          - inputs:
+              accessPod:
+                - inputs:
+                    interfaces:
+                      - inputs:
+                          adapterDetails:
+                            description: null
+                            enabled: null
+                            mode: null
+                            portChannel:
+                              portChannel: null
+                              portChannelId: null
+                            portProfile: Profile
+                            vlans:
+                              nativeVlan: null
+                              phoneVlan: null
+                              vlans: null
+                        tags:
+                          query: interface:Ethernet7@{{switches['CampusB-Leaf1C'].sn}}
+                  tags:
+                    query: Access-Pod:Pod1
+                - inputs:
+                    interfaces: []
+                  tags:
+                    query: Access-Pod:Pod2
+            tags:
+              query: Campus-Pod:CampusB
+          - inputs:
+              accessPod:
+                - inputs:
+                    interfaces: []
+                  tags:
+                    query: Access-Pod:Pod1
+                - inputs:
+                    interfaces: []
+                  tags:
+                    query: Access-Pod:Pod2
+            tags:
+              query: Campus-Pod:CampusA
+      tags:
+        query: Campus:Workshop
+  portProfiles:
+    - description: Profile
+      dot1x:
+        authenticationFailure:
+          action: null
+          allowVlan: null
+        enabled: null
+        hostMode:
+          mode: null
+          multiHostAuthenticated: null
+        macBasedAuthentication:
+          always: null
+          enable: null
+          hostModeCommon: null
+        pae:
+          mode: null
+        portControl: null
+        portControlForceAuthorizedPhone: null
+        reauthentication: null
+        reauthorizationRequestLimit: null
+        timeouts:
+          idleHost: null
+          quietPeriod: null
+          reauthenticationPeriod: null
+          reauthenticationTimeoutIgnore: null
+          txPeriod: null
+        unauthorized:
+          accessVlanMembershipEgress: null
+          nativeVlanMembershipEgress: null
+      enabled: 'Yes'
+      eosCli: null
+      flowControl:
+        received: null
+      mode: access
+      mtu: null
+      name: Profile
+      parentProfile: null
+      phone:
+        trunk: null
+      poe:
+        linkDownAction: null
+        priority: null
+        rebootAction: null
+        shutdownAction: null
+      portChannel:
+        description: null
+        eosCli: null
+        lacpFallback:
+          lacpFallbackMode: null
+          timeout: null
+        mlag: null
+        portChannel: null
+        portChannelEnabled: null
+        portChannelMode: null
+      ptp:
+        enabled: null
+        endpointRole: null
+        profile: null
+      qosProfile: null
+      spanningTree:
+        bpduFilter: enabled
+        bpduGuard: enabled
+        portfast: edge
+      speed: null
+      stormControl:
+        all:
+          level: null
+          unit: null
+        broadcast:
+          level: null
+          unit: null
+        multicast:
+          level: null
+          unit: null
+        unknownUnicast:
+          level: null
+          unit: null
+      vlans:
+        nativeVlan: null
+        phoneVlan: null
+        vlans: '1'
+  spineCampus:
+    - inputs:
+        spineCampusDetails:
+          campusPod:
+            - inputs:
+                spineCampusPodDetails:
+                  spine:
+                    - inputs:
+                        spineDetails:
+                          interfaces: []
+                      tags:
+                        query: device:{{switches['CampusA-Spine1'].sn}}
+                    - inputs:
+                        spineDetails:
+                          interfaces: []
+                      tags:
+                        query: device:{{switches['CampusA-Spine2'].sn}}
+              tags:
+                query: Campus-Pod:CampusA
+            - inputs:
+                spineCampusPodDetails:
+                  spine:
+                    - inputs:
+                        spineDetails:
+                          interfaces: []
+                      tags:
+                        query: device:{{switches['CampusB-Spine1'].sn}}
+                    - inputs:
+                        spineDetails:
+                          interfaces: []
+                      tags:
+                        query: device:{{switches['CampusB-Spine2'].sn}}
+              tags:
+                query: Campus-Pod:CampusB
+      tags:
+        query: Campus:Workshop

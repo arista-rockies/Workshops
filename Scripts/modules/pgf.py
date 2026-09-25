@@ -6,32 +6,6 @@ from dataclasses import dataclass
 
 import json
 
-# this is a convenience class to set a 3rd variable to true, allowing
-#  us to figure out if we have any options set for a given module.
-#  this makes spawning the clients smarter
-class pgfAction(argparse.Action):
-    def __init__(self, option_strings, dest, module=None, **kwargs):
-        if module == None:
-            raise ValueError("must specify a module")
-        super().__init__(option_strings, dest, **kwargs)
-        self.module = module
-
-    def __call__(self, parser, namespace, values, option_string=None):
-        setattr(namespace, self.dest, values)
-        setattr(namespace, self.module, True)
-
-class pgfBoolAction(argparse.BooleanOptionalAction):
-    def __init__(self, option_strings, dest, module=None, **kwargs):
-        if module == None:
-            raise ValueError("must specify a module")
-        super().__init__(option_strings, dest, **kwargs)
-        self.module = module
-
-    def __call__(self, parser, namespace, values, option_string=None):
-        setattr(namespace, self.module, True)
-        super().__call__(parser, namespace, values, option_string)
-        
-
 class pgfInterface():
     _name: str
     _peer: dict
