@@ -1,0 +1,54 @@
+tags:
+  - key: Workshop
+    values: [ CampusA, Leaf, Leaf1, Leaf1-Member-Leaf, Leaf2, Spine ]
+  - key: Campus
+    values: [ Workshop ]
+  - key: Campus-Pod
+    values: [ CampusA, CampusB ]
+  - key: Access-Pod
+    values: [ Pod1, Pod2 ]
+  - key: Role
+    values: [ Leaf, Member-Leaf, Spine ]
+assignments:
+    - key: Workshop
+      value: CampusA
+      devices: [ "{{switches['CampusA-Spine1'].sn}}", "{{switches['CampusA-Spine2'].sn}}", "{{switches['CampusA-Leaf1A'].sn}}", "{{switches['CampusA-Leaf1B'].sn}}", "{{switches['CampusA-Leaf1C'].sn}}", "{{switches['CampusA-Leaf2A'].sn}}" ]
+    - key: Workshop
+      value: Spine
+      devices: [ "{{switches['CampusA-Spine1'].sn}}", "{{switches['CampusA-Spine2'].sn}}" ]
+    - key: Workshop
+      value: Leaf
+      devices: [ "{{switches['CampusA-Leaf1A'].sn}}", "{{switches['CampusA-Leaf1B'].sn}}", "{{switches['CampusA-Leaf1C'].sn}}", "{{switches['CampusA-Leaf2A'].sn}}" ]
+    - key: Workshop
+      value: Leaf1
+      devices: [ "{{switches['CampusA-Leaf1A'].sn}}", "{{switches['CampusA-Leaf1B'].sn}}", "{{switches['CampusA-Leaf1C'].sn}}" ]
+    - key: Workshop
+      value: Leaf1-Member-Leaf
+      devices: [ "{{switches['CampusA-Leaf1C'].sn}}" ]
+    - key: Workshop
+      value: Leaf2
+      devices: [ "{{switches['CampusA-Leaf2A'].sn}}" ]
+    - key: Campus
+      value: Workshop
+      devices: [ "{{switches['CampusA-Spine1'].sn}}", "{{switches['CampusA-Spine2'].sn}}", "{{switches['CampusA-Leaf1A'].sn}}", "{{switches['CampusA-Leaf1B'].sn}}", "{{switches['CampusA-Leaf1C'].sn}}", "{{switches['CampusA-Leaf2A'].sn}}", "{{switches['CampusB-Spine1'].sn}}", "{{switches['CampusB-Spine2'].sn}}", "{{switches['CampusB-Leaf1A'].sn}}", "{{switches['CampusB-Leaf1B'].sn}}", "{{switches['CampusB-Leaf1C'].sn}}", "{{switches['CampusB-Leaf2A'].sn}}" ]
+    - key: Campus-Pod
+      value: CampusA
+      devices: [ "{{switches['CampusA-Spine1'].sn}}", "{{switches['CampusA-Spine2'].sn}}", "{{switches['CampusA-Leaf1A'].sn}}", "{{switches['CampusA-Leaf1B'].sn}}", "{{switches['CampusA-Leaf1C'].sn}}", "{{switches['CampusA-Leaf2A'].sn}}" ]
+    - key: Campus-Pod
+      value: CampusB
+      devices: [ "{{switches['CampusB-Spine1'].sn}}", "{{switches['CampusB-Spine2'].sn}}", "{{switches['CampusB-Leaf1A'].sn}}", "{{switches['CampusB-Leaf1B'].sn}}", "{{switches['CampusB-Leaf1C'].sn}}", "{{switches['CampusB-Leaf2A'].sn}}" ]
+    - key: Access-Pod
+      value: Pod1
+      devices: [ "{{switches['CampusA-Leaf1A'].sn}}", "{{switches['CampusA-Leaf1B'].sn}}", "{{switches['CampusA-Leaf1C'].sn}}", "{{switches['CampusB-Leaf1A'].sn}}", "{{switches['CampusB-Leaf1B'].sn}}", "{{switches['CampusB-Leaf1C'].sn}}" ]
+    - key: Access-Pod
+      value: Pod2
+      devices: [ "{{switches['CampusA-Leaf2A'].sn}}", "{{switches['CampusB-Leaf2A'].sn}}" ]
+    - key: Role
+      value: Leaf
+      devices: [ "{{switches['CampusA-Leaf1A'].sn}}", "{{switches['CampusA-Leaf1B'].sn}}", "{{switches['CampusA-Leaf2A'].sn}}", "{{switches['CampusB-Leaf1A'].sn}}", "{{switches['CampusB-Leaf1B'].sn}}", "{{switches['CampusB-Leaf2A'].sn}}" ]
+    - key: Role
+      value: Member-Leaf
+      devices: [ "{{switches['CampusA-Leaf1C'].sn}}", "{{switches['CampusB-Leaf1C'].sn}}" ]
+    - key: Role
+      value: Spine
+      devices: [ "{{switches['CampusA-Spine1'].sn}}", "{{switches['CampusA-Spine2'].sn}}", "{{switches['CampusB-Spine1'].sn}}", "{{switches['CampusB-Spine2'].sn}}" ]

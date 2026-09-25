@@ -1,0 +1,34 @@
+path: []
+inputs:
+  dnsProfileAssignment:
+    - inputs:
+        dnsProfileAssignmentSettings:
+          profileName: DNS-Servers
+      tags:
+        query: Campus:Workshop
+  dnsProfiles:
+    - dns_domain: ''
+      domain_list: []
+      name: DNS-Servers
+      servers:
+        - ip_address: 1.1.1.1
+        - ip_address: 8.8.8.8
+  dnsSourceAssignment:
+    - inputs:
+        dnsSourceSettings:
+          source_interface: Use OOB Management Interface
+          vrf: MGMT
+      tags:
+        query: ( Campus:Workshop ) AND ( Campus-Pod:CampusB ) AND ( Role:Spine )
+    - inputs:
+        dnsSourceSettings:
+          source_interface: Use OOB Management Interface
+          vrf: MGMT
+      tags:
+        query: ( Campus:Workshop ) AND ( Campus-Pod:CampusB ) AND ( Role:Leaf )
+    - inputs:
+        dnsSourceSettings:
+          source_interface: Use OOB Management Interface
+          vrf: MGMT
+      tags:
+        query: ( Campus:Workshop ) AND ( Campus-Pod:CampusB ) AND ( Role:Member-Leaf )
