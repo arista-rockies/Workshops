@@ -4,7 +4,7 @@
 
 ## This Lab Guide:
 
-[CloudVision Workshop Lab Guide 04 - Network Hierarchy Provisioning](https://github.com/arista-rockies/Workshops/blob/jdarrish-labs/CloudVision/2026/Lab-04/README.md)
+[CloudVision Workshop Lab Guide 04 - Network Hierarchy Provisioning](https://github.com/arista-rockies/Workshops/CloudVision/2026/Lab-04/README.md)
 
 ---
 
@@ -23,17 +23,27 @@
 
 # 2. Accessing the Lab
 
-To authenticate to CloudVision you will need to visit the following page:
+To authenticate to CloudVision, you will need to visit the following page. Please select the correct event you are currently in:
 
-[CloudVision Auth](https://labs.arista.com/ignition/event/9gk8a4d3)
+**UVU: October 1st-2nd**
+[CloudVision Auth](https://labs.arista.com/ignition/event/g7nwnc9c)
+
+**UofU: October 8th-9th**
+[CloudVision Auth](https://labs.arista.com/ignition/event/ehnenmpn)
+
+**Idaho: October 14th-15th**
+[CloudVision Auth](https://labs.arista.com/ignition/event/kpd99dy8)
+
+**Colorado: Oct 21st-22nd**
+[CloudVision Auth](https://labs.arista.com/ignition/event/kxpd9ttr)
 
 
-Each attendee will be provided with a unique access key. Enter you access key and select the Blue Arrow
+Each attendee will be provided with a unique access key. Enter your access key and select the Blue Arrow
 
 ![Ignition Login](images/ignition-login.png)
 
 
-After successfully authenticated you will should see **CVaaS** available under Services. Selecting the CVaaS tile will authenticate you directly to the Lab CVaaS environment
+After successfully authenticating, you should see **CVaaS** available under Services. Selecting the CVaaS tile will authenticate you directly to the Lab CVaaS environment
 
 ![Ignition Login](images/cvaas-tile.png)
 
