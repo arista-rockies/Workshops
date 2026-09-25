@@ -378,7 +378,8 @@ In this lab we will be upgrading the image on a single device in our fabric, **C
 
 ![Upgrade Sixth Step](images/upgrade-sixth-nav.png)
 
-> [!NOTE] **This Reload will take roughly 5-10 minutes to complete** 
+> [!NOTE] 
+> **This Reload will take roughly 5-10 minutes to complete** 
 
 7. Check for successful completion
 
