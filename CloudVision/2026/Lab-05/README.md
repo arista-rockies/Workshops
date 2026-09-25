@@ -53,6 +53,8 @@ After succesfully authenticated you will should see **CVaaS** avaialble under Se
 
 In this lab, we will setup CloudVision's tags and Events system to create a customized email alert when leaf to spine uplinks or specific devices go offline, create a port profile using Network Hierarchy, Upgrade Code on a switch, and monitor our fabric.
 
+---
+
 ### Customize Events and Notifications
 
 1. Navigate to **Provisioning > Tags**
@@ -337,6 +339,8 @@ In this lab we will create a custom port profile and assign it to an interface u
 
 **This completes the Port Profile Section of the Lab Guide**
 
+---
+
 ### Code Upgrade
 In this lab we will be upgrading the image on a single device in our fabric, **CampusB-Leaf1C** All software has been prestaged for you in this lab.
 
@@ -389,6 +393,8 @@ In this lab we will be upgrading the image on a single device in our fabric, **C
 ![Upgrade Ninth Step](images/upgrade-ninth-nav.png)
 
 **This completes the switch upgrade section of the Lab Guide**
+
+---
 
 ### Syslog
 In this lab we will learn where we can find important information about the fabric
