@@ -1,0 +1,31 @@
+path: []
+inputs:
+  ntpSourceInterfaceResolver:
+    - inputs:
+        ntpSourceInterfaceGroup:
+          managementVrf: MGMT
+          sourceAddress: ''
+          sourceInterface: Use OOB Management Interface
+      tags:
+        query: ( Campus:Workshop ) AND ( Campus-Pod:CampusB ) AND ( Role:Spine )
+    - inputs:
+        ntpSourceInterfaceGroup:
+          managementVrf: MGMT
+          sourceAddress: ''
+          sourceInterface: Use OOB Management Interface
+      tags:
+        query: ( Campus:Workshop ) AND ( Campus-Pod:CampusB ) AND ( Role:Leaf )
+    - inputs:
+        ntpSourceInterfaceGroup:
+          managementVrf: MGMT
+          sourceAddress: ''
+          sourceInterface: Use OOB Management Interface
+      tags:
+        query: ( Campus:Workshop ) AND ( Campus-Pod:CampusB ) AND ( Role:Member-Leaf )
+  timezoneResolver:
+    - inputs:
+        timezoneGroup:
+          otherTimezone: null
+          timezone: PST8PDT
+      tags:
+        query: Campus-Pod:CampusA

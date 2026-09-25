@@ -56,3 +56,8 @@ systemctl daemon-reload
 systemctl enable pingjob
 systemctl start pingjob
 
+# Reboot the host to reset network stack with these settings
+echo "trying reboot `date`"
+/sbin/shutdown -r +1 rebooting in 1m
+exit
+

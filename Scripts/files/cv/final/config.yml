@@ -1,0 +1,10 @@
+- name: topology
+  directory: topology
+- name: tags
+  directory: tags
+- name: configlets
+  directory: configlets
+- name: studios
+  directory: studios
+- name: actions
+  directory: actions

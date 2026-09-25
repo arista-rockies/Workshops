@@ -4,7 +4,7 @@
 
 ## This Lab Guide:
 
-[CloudVision Workshop Lab Guide 01 - Inventory and Topology](https://github.com/arista-rockies/Workshops/blob/main/CloudVision/2026/Lab-01/CV_Workshop_Lab1.md)
+[CloudVision Workshop Lab Guide 01 - Inventory and Topology](https://github.com/arista-rockies/Workshops/blob/main/CloudVision/2026/Lab-01/README.md)
 
 ---
 
@@ -99,6 +99,8 @@ The following is all of the information you will need to complete this lab. Feel
 9. After the workspace builds, there should be no device configuration changes within the lab. However, we have added the devices to the Inventory and Topology Studio. Select **Submit Workspace** to save those changes.
 
 ![Submit Workspace](images/iandt-submit.png)
+
+10. Select **Exit Workspace**
 
 ![Exit Workspace](images/exit-workspace.png)
 

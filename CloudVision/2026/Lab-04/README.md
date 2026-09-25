@@ -4,7 +4,7 @@
 
 ## This Lab Guide:
 
-[CloudVision Workshop Lab Guide 01 - Inventory and Topology](https://github.com/arista-rockies/Workshops/blob/jdarrish-labs/CloudVision/2026/Lab-04/CV_Workshop_Lab4.md)
+[CloudVision Workshop Lab Guide 04 - Network Hierarchy Provisioning](https://github.com/arista-rockies/Workshops/blob/jdarrish-labs/CloudVision/2026/Lab-04/README.md)
 
 ---
 
@@ -17,7 +17,7 @@
 
 # 1. Lab Topology
 
-![Full Lab Topology](images/a-topology.png)
+![Full Lab Topology](images/lab-topology.png)
 
 ---
 
@@ -84,11 +84,11 @@ The following is all of the information you will need to complete this lab. Feel
 	1. Create a **DNS Profile** by
 		1. Click in the Profile field
 		2. Type a name for your profile: **DNS-Servers**
-			1.  After you've typed the name, click the **"+Create "DNS-Servers"** option below or it will not create the profile
+			1.  After you've typed the name, click the **"+Create DNS-Servers"** option below or it will not create the profile
 		3. Options will appear below. Click the **"+ Add Server"** option
 			1. In the **"Server IP Address"** field, enter: **1.1.1.1**
-			2. Leave the Priority as Default
-			3. Click Add
+			2. Leave the Priority as **Default**
+			3. Click **Add**
 			4. Add another DNS server: **8.8.8.8**
 		4. Click **Save** at the top right
 
@@ -103,7 +103,7 @@ The following is all of the information you will need to complete this lab. Feel
 		1. Name: **superuser**
 		2. Create a **"Assigned User Groups"**
 			1. Name: **ug-superuser**
-			2. Once you've typed the name, **ensure you click the "+ Create "ug-superuser"" sign below or it won't actually create the User Group**
+			2. Once you've typed the name, **ensure you click the "+ Create ug-superuser" sign below or it won't actually create the User Group**
 			3. Role: **network-admin**
 			4. Privilege: **15**
 			5. Password Type: **Plain Text**

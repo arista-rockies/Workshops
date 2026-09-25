@@ -1,0 +1,43 @@
+path: []
+inputs:
+  dnsAssignment:
+    - inputs:
+        value:
+          managementVrf: MGMT
+          sourceInterface: Use OOB Management Interface
+      tags:
+        query: ( Campus:Workshop ) AND ( Campus-Pod:CampusB ) AND ( Role:Spine )
+    - inputs:
+        value:
+          managementVrf: MGMT
+          sourceInterface: Use OOB Management Interface
+      tags:
+        query: ( Campus:Workshop ) AND ( Campus-Pod:CampusB ) AND ( Role:Leaf )
+    - inputs:
+        value:
+          managementVrf: MGMT
+          sourceInterface: Use OOB Management Interface
+      tags:
+        query: ( Campus:Workshop ) AND ( Campus-Pod:CampusB ) AND ( Role:Member-Leaf )
+  managementProfiles:
+    - defaultGateway: {}
+      dnsDomainList: []
+      dnsServers: {}
+      ipConfiguration:
+        ipv4Configuration:
+          defaultRouteFromDhcp: Accept
+          dhcp: Enabled
+      managementVrf: MGMT
+      profileName: CampusB_OOB
+  profileAssignment:
+    - inputs:
+        networkProfile: CampusB_OOB
+      tags:
+        query: ( Campus:Workshop ) AND ( Campus-Pod:CampusB )
+  subnetConfigAssignment:
+    - inputs:
+        assignments:
+          iPv4AddressConfig:
+            ipv4Gateways: []
+      tags:
+        query: ( Campus:Workshop ) AND ( Campus-Pod:CampusB )

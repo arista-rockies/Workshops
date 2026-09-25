@@ -6,7 +6,7 @@
 
 ## This Lab Guide:
 
-[CloudVision Workshop Lab Guide 03 - Inventory and Topology](https://github.com/arista-rockies/Workshops/blob/main/CloudVision/2026/Lab-03/CV_Workshop_Lab3.md)
+[CloudVision Workshop Lab Guide 03 - Inventory and Topology](https://github.com/arista-rockies/Workshops/blob/main/CloudVision/2026/Lab-03/README.md)
 
 ---
 
@@ -259,6 +259,7 @@ In this lab we will demonstrate the use of the Campus Fabric Studio. We will bui
 
 ![Complete Change Control](images/cc-complete.png)
 
+**LAB SECTION COMPLETE**
 ---
 
 ### Order of Operations
@@ -303,7 +304,7 @@ In this lab section, we are going to demonstrate an example of how the order of 
 
 8. Select the top container in your hierarchy structure where the configlet **CampusA_Base** is applied.
 
-   - Locate the **clock timezone** command in the static configuration **Line14**
+   - Locate the **clock timezone** command in the static configuration **Line13**
 
    - Add a **!** to the beginning of that line to comment out the command
 

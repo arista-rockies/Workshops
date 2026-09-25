@@ -1,0 +1,25 @@
+path: []
+inputs:
+  customFlags:
+    - inputs:
+        custom_flags_group: {}
+      tags:
+        query: Campus:Workshop
+  disableAAAResolver:
+    - inputs:
+        disableAAA: true
+      tags:
+        query: Campus:Workshop
+  vrfAssignment:
+    - inputs:
+        vrf: MGMT
+      tags:
+        query: ( Campus:Workshop ) AND ( Campus-Pod:CampusB ) AND ( Role:Spine )
+    - inputs:
+        vrf: MGMT
+      tags:
+        query: ( Campus:Workshop ) AND ( Campus-Pod:CampusB ) AND ( Role:Leaf )
+    - inputs:
+        vrf: MGMT
+      tags:
+        query: ( Campus:Workshop ) AND ( Campus-Pod:CampusB ) AND ( Role:Member-Leaf )

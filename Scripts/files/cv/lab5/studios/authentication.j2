@@ -1,0 +1,39 @@
+path: []
+inputs:
+  localAuthentication:
+    localUsers:
+      - name: superuser
+        password: 'aristarocks!'
+        passwordType: '0'
+        privilege: 15
+        role: network-admin
+    userRoles: []
+  localUserGroups:
+    - groupUsers:
+        - superuser
+      userGroupName: ug-superuser
+  sourceVRFInterfaces:
+    - inputs:
+        sourceVRFInterfacesGroup:
+          authenticationSourceVrf: MGMT
+          sourceInterface: Use OOB Management Interface
+      tags:
+        query: ( Campus:Workshop ) AND ( Campus-Pod:CampusB ) AND ( Role:Spine )
+    - inputs:
+        sourceVRFInterfacesGroup:
+          authenticationSourceVrf: MGMT
+          sourceInterface: Use OOB Management Interface
+      tags:
+        query: ( Campus:Workshop ) AND ( Campus-Pod:CampusB ) AND ( Role:Leaf )
+    - inputs:
+        sourceVRFInterfacesGroup:
+          authenticationSourceVrf: MGMT
+          sourceInterface: Use OOB Management Interface
+      tags:
+        query: ( Campus:Workshop ) AND ( Campus-Pod:CampusB ) AND ( Role:Member-Leaf )
+  userAssignments:
+    - inputs:
+        userAssignment:
+          userGroup: ug-superuser
+      tags:
+        query: Campus:Workshop

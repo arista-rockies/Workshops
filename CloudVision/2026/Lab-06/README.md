@@ -308,7 +308,7 @@ from cloudvision.cvlib import ActionFailed
 
 ctx.info("Running TCPdump")
 cmds = [
- "tcpdump interface any packet-count 7 filter icmp",
+ "tcpdump interface any packet-count 7 filter net 10.2.2.0/24",
 ]
 cmdResponses: List[Dict] = ctx.runDeviceCmds(cmds)
 ctx.info(str(cmdResponses[0]))

@@ -1,0 +1,26 @@
+path: []
+inputs:
+  campus:
+    - inputs:
+        campusPod:
+          - inputs:
+              accessPod:
+                - inputs:
+                    interfaces:
+                      - inputs:
+                          adapterDetails:
+                            description: host-port
+                            enabled: 'Yes'
+                            mode: access
+                            vlans:
+                              vlans: '202'
+                        tags:
+                          query: interface:Ethernet7@{{switches['CampusB-Leaf1C'].sn}}
+                  tags:
+                    query: Access-Pod:Pod1
+            tags:
+              query: Campus-Pod:CampusB
+      tags:
+        query: Campus:Workshop
+  connectedEndpointNetworkResolver: []
+  spineCampus: []
