@@ -368,10 +368,7 @@ class ActClient():
 
     def doDeployAndStart(self):
         try:
-            # s = ""
-            # with open("files/actTopology.yml", "r") as f:
-            #     s = f.read()
-            s = Environment(loader=FileSystemLoader('files')).get_template('actTopology.yml').render({"pod": f"{self.pod.pod:0>2}"})
+            s = Environment(loader=FileSystemLoader('files')).get_template('actTopology.yml').render(self.pod.substitutions)
         except Exception:
             print("  could not deploy and start, terminating")
             return
@@ -423,10 +420,7 @@ class ActClient():
 
     def doUpdateTopology(self):
         try:
-            # s = ""
-            # with open("files/actTopology.yml", "r") as f:
-            #     s = f.read()
-            s = Environment(loader=FileSystemLoader('files')).get_template('actTopology.yml').render({"pod": f"{self.pod.pod:0>2}"})
+            s = Environment(loader=FileSystemLoader('files')).get_template('actTopology.yml').render(self.pod.substitutions)
         except Exception:
             print("  could not update topology, terminating")
             return

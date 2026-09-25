@@ -167,15 +167,12 @@ def loadCSVInventory(tokens):
 def loadACTInventory(tokens):
     result = Pods()
 
-    # with open("files/actTopology.yml", "r") as f:
-    #     s = f.read()
-
     for podStr, podToken in tokens.items():
         switches = [] 
         substitutions = {"podInt": int(podStr), "podStr": f"{podStr:>02}", "switches": {}}
 
         # topology = yaml.safe_load(s.replace("###", f"{str(podStr):0>2}"))
-        s = Environment(loader=FileSystemLoader('files')).get_template('actTopology.yml').render({"pod": f"{str(podStr):0>2}"})
+        s = Environment(loader=FileSystemLoader('files')).get_template('actTopology.yml').render(substitutions)
         topology = yaml.safe_load(s)
 
 
