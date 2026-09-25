@@ -21,11 +21,27 @@ inputs:
                               phoneVlan: null
                               vlans: null
                         tags:
-                          query: interface:Ethernet7@{{switches['CampusA-Leaf1C'].sn}}
+                          query: interface:Ethernet7@{{switches['CampusB-Leaf1C'].sn}}
                   tags:
                     query: Access-Pod:Pod1
+                - inputs:
+                    interfaces: []
+                  tags:
+                    query: Access-Pod:Pod2
             tags:
               query: Campus-Pod:CampusB
+          - inputs:
+              accessPod:
+                - inputs:
+                    interfaces: []
+                  tags:
+                    query: Access-Pod:Pod1
+                - inputs:
+                    interfaces: []
+                  tags:
+                    query: Access-Pod:Pod2
+            tags:
+              query: Campus-Pod:CampusA
       tags:
         query: Campus:Workshop
   portProfiles:
@@ -63,7 +79,7 @@ inputs:
         received: null
       mode: access
       mtu: null
-      name: Lab5-Profile
+      name: Profile
       parentProfile: null
       phone:
         trunk: null
@@ -109,3 +125,39 @@ inputs:
         nativeVlan: null
         phoneVlan: null
         vlans: '1'
+  spineCampus:
+    - inputs:
+        spineCampusDetails:
+          campusPod:
+            - inputs:
+                spineCampusPodDetails:
+                  spine:
+                    - inputs:
+                        spineDetails:
+                          interfaces: []
+                      tags:
+                        query: device:{{switches['CampusA-Spine1'].sn}}
+                    - inputs:
+                        spineDetails:
+                          interfaces: []
+                      tags:
+                        query: device:{{switches['CampusA-Spine2'].sn}}
+              tags:
+                query: Campus-Pod:CampusA
+            - inputs:
+                spineCampusPodDetails:
+                  spine:
+                    - inputs:
+                        spineDetails:
+                          interfaces: []
+                      tags:
+                        query: device:{{switches['CampusB-Spine1'].sn}}
+                    - inputs:
+                        spineDetails:
+                          interfaces: []
+                      tags:
+                        query: device:{{switches['CampusB-Spine2'].sn}}
+              tags:
+                query: Campus-Pod:CampusB
+      tags:
+        query: Campus:Workshop
