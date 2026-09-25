@@ -96,7 +96,8 @@ In this lab, we will setup CloudVision's tags and Events system to create a cust
 
 ![Uplink Tag Verified](images/uplink-verified.png)
 
-> [!NOTE] -- if you desire, your can create your own custom interface tags to further customize filtering events and dashboards by interface tags--for example you may wish to tag an application which uses these infrastructure components. In this Lab we are using one of the automatically provisioned interface tags. We know this tag will get configured for us on all future devices following the same provisioning procedure.
+> [!NOTE] 
+> If you desire, your can create your own custom interface tags to further customize filtering events and dashboards by interface tags--for example you may wish to tag an application which uses these infrastructure components. In this Lab we are using one of the automatically provisioned interface tags. We know this tag will get configured for us on all future devices following the same provisioning procedure.
 
 10. Now that you have verified the custom device tag and the auto-assigned interface tags are in place, **review and submit your workspace**. No studios are modified, only a single device tag update.
 
@@ -236,7 +237,8 @@ Next, let's configure an email alert to send when our customized events are dete
 
 ![Approve Reboot CC](images/eventstream-events.png)
 
-> [!NOTE]  CloudVision also recorded all of the default events for events and device reboots in the Events menu. However only the customized uplink alert is set to generate email alerts. Also note that even though many uplink interfaces went down, the only email alert received for this event type is for the uplinks failure occuring on Leaf2A because it is the only device matching the device tag configured for the custom event.
+> [!NOTE]  
+> CloudVision also recorded all of the default events for events and device reboots in the Events menu. However only the customized uplink alert is set to generate email alerts. Also note that even though many uplink interfaces went down, the only email alert received for this event type is for the uplinks failure occuring on Leaf2A because it is the only device matching the device tag configured for the custom event.
 
 39. Check for alert emails sent from **cvaas-alerts@arista.com** After a few minutes you should receive the uplink failure email alert containing additional information and a link to the event in CloudVision viewport date/time
 
