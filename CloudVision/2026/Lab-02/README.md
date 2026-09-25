@@ -64,7 +64,7 @@ There is no right or wrong way to design this hierarchy, and each organization m
 
 ![Static Configuration Container](images/scs-container.png)
 
-4. Under Device Tag, select **Device: All Devices**
+4. Select the **New Container** you just created. To the right, **Under Device Tag**, select **Device: All Devices**
 
 ![Static Configuration Container](images/scs-all-devices.png)
 
