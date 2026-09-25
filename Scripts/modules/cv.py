@@ -2,7 +2,7 @@ from modules import config
 from modules import pgf
 import uuid, requests, time, yaml, tempfile
 from requests_toolbelt import MultipartEncoder
-from modules.pgf import pgfAction, pgfBoolAction
+from modules.argparseActions import pgfAction, pgfBoolAction
 from os.path import basename
 from jinja2 import Environment, FileSystemLoader
 

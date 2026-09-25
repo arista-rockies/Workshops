@@ -10,7 +10,7 @@ from modules import veloDataModel
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from nmcli._exception import NotExistException
-from modules.pgf import pgfAction, pgfBoolAction
+from modules.argparseActions import pgfAction, pgfBoolAction
 
 # *very* basic velo client
 class VeloClient():

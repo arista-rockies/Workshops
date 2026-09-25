@@ -34,6 +34,7 @@ from modules.act import ActClient
 ActClient.configure()
 
 from modules.pgf import pgfDevice
+from modules.argparseActions import ParseRangeAction
 
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
@@ -42,7 +43,7 @@ os.environ["GLOG_minloglevel"] = "2"
 
 config.parser.add_argument('-test', default=False, action='store_true', help='testing new code')
 config.parser.add_argument('-tokenFile', default="tokenConfig.yml", help="Contains the tokens we should use along with the defined pods")
-config.parser.add_argument('-pods', required=True, nargs='+', help='specify a space delimited list of pods to run against, by default all pods will be operated on')
+config.parser.add_argument('-pods', required=True, action=ParseRangeAction, nargs='+', help='specify a space delimited list of pods to run against.  items may also be specified in eos cli style ranges: 1-10,20')
 config.parser.add_argument('-i', default="2026CampusWorkshopHardware.csv", help="hardware inventory")
 config.parser.add_argument('-type', default='campus', help='type of workshop.  can be campus or cv')
 

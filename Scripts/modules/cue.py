@@ -1,7 +1,7 @@
 #TODO: need to move the cue server to the tokenFile
 from modules import config
 import requests, json
-from modules.pgf import pgfAction, pgfBoolAction
+from modules.argparseActions import pgfAction, pgfBoolAction
 
 class CueService():
     def __init__(self, serviceType, serviceServer, serviceURI):

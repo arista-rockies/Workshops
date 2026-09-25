@@ -1,7 +1,7 @@
 from modules import config
 import requests, argparse, json, yaml, time, paramiko, socks, urllib
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
-from modules.pgf import pgfAction, pgfBoolAction
+from modules.argparseActions import pgfAction, pgfBoolAction
 from enum import Enum
 import tqdm, io
 from jinja2 import Environment, FileSystemLoader
