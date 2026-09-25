@@ -12,8 +12,13 @@
 
 ## Table of Contents
 1. [Lab Topology](#1-lab-topology)
-2. [Lab Topology](#2-accessing-lab)
-
+2. [Accessing The LAb](#2-accessing-lab)
+3. [Labs](#3-lab-details)
+4. [Lab Customize Events and Notification](#customize-events-and-notifications)
+5. [Port Profiles](#port-profiles)
+6. [Code Upgrade](#code-upgrade)
+7. [Monitor The Fabric](#syslog)
+8. [Dashboards](#dashbaords)
 
 ---
 
@@ -49,8 +54,6 @@ After succesfully authenticated you will should see **CVaaS** avaialble under Se
 In this lab, we will setup CloudVision's tags and Events system to create a customized email alert when leaf to spine uplinks or specific devices go offline, create a port profile using Network Hierarchy, Upgrade Code on a switch, and monitor our fabric.
 
 ### Customize Events and Notifications
-
-#### Set customized tags 
 
 1. Navigate to **Provisioning > Tags**
 
@@ -93,7 +96,7 @@ In this lab, we will setup CloudVision's tags and Events system to create a cust
 
 ![Uplink Tag Verified](images/uplink-verified.png)
 
-> [!NOTE] -- if you desire, your can create your won custom interface tags to further customize filtering events and dashboards by interface tags--for example you may wish to tag an application which uses these infrastructure components. In this Lab we are using one of the automatically provisioned interface tags. We know this tag will get configured for us on all future devices following the same provisioning procedure.
+> [!NOTE] -- if you desire, your can create your own custom interface tags to further customize filtering events and dashboards by interface tags--for example you may wish to tag an application which uses these infrastructure components. In this Lab we are using one of the automatically provisioned interface tags. We know this tag will get configured for us on all future devices following the same provisioning procedure.
 
 10. Now that you have verified the custom device tag and the auto-assigned interface tags are in place, **review and submit your workspace**. No studios are modified, only a single device tag update.
 
@@ -260,160 +263,159 @@ Next, let's configure an email alert to send when our customized events are dete
 
 **This concludes the CloudVision Events and Notifications Customization Section**
 
+---
 
-### Create a Port Profile and Assign it
-
-#### Lab Overview
+### Port Profiles 
 
 In this lab we will create a custom port profile and assign it to an interface using the Network Hierarchy portion of Cloud Vision.
 
-Navigate to Network Hierarchy
 
-- ![Network Hierarchy](images/network-hierarchy.png)
+1. Navigate to Network Hierarchy
 
-Expand the dropdowns and click on Campus B / Pod 1
+![Network Hierarchy](images/network-hierarchy.png)
 
-- ![Hierarchy Campus B Pod1](images/hierarchy-campusb-pod1.png)
+2. Expand the dropdowns and click on Campus B / Pod 1
 
-Navigate to the Front Panel View and Click on **Manage Profiles**
+![Hierarchy Campus B Pod1](images/hierarchy-campusb-pod1.png)
 
-- ![Front Panel Pod1](images/hierarchy-front-panel.png)
+3. Navigate to the Front Panel View and Click on **Manage Profiles**
 
-Click **Add Profile**
+![Front Panel Pod1](images/hierarchy-front-panel.png)
 
-- ![Add Profile](images/hierarchy-add-profile.png)
+4. Click **Add Profile**
 
-Create a Port Profile with the following attributes
-  - **Name** = Your Choice
-  - **Description** = Your Choice
-  - **Enabled** = Yes
-  - **Mode** = Access
-  - **VLAN** = 1
-  - **Spanning Tree Portfast** = Edge
-  - **BPDU Filter** = Enabled
-  - **BPDU Guard** = Enabled 
+![Add Profile](images/hierarchy-add-profile.png)
 
-- ![Create Port Profile](images/hierarchy-port-profile-create.png)
+5. Create a Port Profile with the following attributes
+   - **Name** = Your Choice
+   - **Description** = Your Choice
+   - **Enabled** = Yes
+   - **Mode** = Access
+   - **VLAN** = 1
+   - **Spanning Tree Portfast** = Edge
+   - **BPDU Filter** = Enabled
+   - **BPDU Guard** = Enabled 
+   - Select **Create**
 
-Review your workspace
+![Create Port Profile](images/hierarchy-port-profile-create.png)
 
-- ![Workspace Review](images/hierarchy-port-profile-review.png)
+6. Review your workspace
 
-Submit your workspace and complete the Change Control
+![Workspace Review](images/hierarchy-port-profile-review.png)
 
-- ![Change Control Workspace](images/hierarchy-workspace-submit.png)
+7. Submit your workspace and complete the Change Control
 
-Click on **Network Hierarchy** and verify your port profile has been created
+![Change Control Workspace](images/hierarchy-workspace-submit.png)
 
-- ![Completed Port Profile](images/hierarchy-port-profile-completed.png)
+8. Click on **Network Hierarchy** and verify your port profile has been created
 
-Navigate to **Campus B**, **POD 1**, **Front Panel**
-  - For switch **CampusB-Leaf1C** click on port **7**
-  - Click **Configure** next to **Interface Configuration**
+![Completed Port Profile](images/hierarchy-port-profile-completed.png)
 
-- ![Port Profile Pre-Assign](images/hierarchy-port-profile-preassign.png)
+9. Navigate to **Campus B**, **POD 1**, **Front Panel**
+   - For switch **CampusB-Leaf1C** click on port **7**
+   - Click **Configure** next to **Interface Configuration**
 
-Under **Profile** seclect your profile you just created and hit **Save**
+![Port Profile Pre-Assign](images/hierarchy-port-profile-preassign.png)
 
-- ![Assign Profile](images/hierarchy-port-profile-assign.png)
+10. Under **Profile** seclect your profile you just created and hit **Save**
 
-A Change Control should have been created
+![Assign Profile](images/hierarchy-port-profile-assign.png)
 
-- ![Port Profile Assign PreCC](images/hierarchy-port-profile-assign-precc.png)
+11. A Worksapce should have been created showing a single change
 
-Validate the changes, submit workspace, and execute change control
+![Port Profile Assign PreCC](images/hierarchy-port-profile-assign-precc.png)
 
-- ![Validate Changes](images/hierarchy-port-profile-validate-changes.png)
+12. Validate the changes, submit workspace, and execute change control
 
-Naviagte Back to Network Hierarchy and check to make sure your port profile has been applied
+![Validate Changes](images/hierarchy-port-profile-validate-changes.png)
 
-- ![Port Profile Check](images/hierarchy-port-profile-check.png)
+13. Naviagte Back to Network Hierarchy and check to make sure your port profile has been applied
+
+![Port Profile Check](images/hierarchy-port-profile-check.png)
 
 **This completes the Port Profile Section of the Lab Guide**
 
-### Upgrade Code on a Single Switch
-
-#### Lab Overview
-
+### Code Upgrade
 In this lab we will be upgrading the image on a single device in our fabric, **CampusB-Leaf1C** All software has been prestaged for you in this lab.
 
-Navigate to Network Hierarchy, CampusB, Pod 1
+1. Navigate to **Network Hierarchy > CampusB > Pod 1**
 
-- ![Upgrade First Step](images/upgrade-first-nav.png)
+![Upgrade First Step](images/upgrade-first-nav.png)
 
-Click on the 3 dots next to Pod1 and click Upgrade
+2. Click on the **3 dots** next to Pod1 and click **Upgrade**
 
-- ![Upgrade Second Step](images/upgrade-second-nav.png)
+![Upgrade Second Step](images/upgrade-second-nav.png)
 
-In the **Image** dropdown, select **EOS-4.35.4M.swi**
-  - Note how the list of devices changes to just Leaf1C
+3. In the **Image** dropdown, select **EOS-4.35.4M.swi**
+    - Note how the list of devices changes to just Leaf1C
+    - Select **Continue**
 
-- ![Upgrade Third Step](images/upgrade-third-nav.png)
+![Upgrade Third Step](images/upgrade-third-nav.png)
 
-Configure your preferred method of upgrade, for this example we will use the following
-  - MLAG ISSU
-  - Non-MLAG Pair
-  - SSU Fall Back to Normal, On Error Only
+4. Configure your preferred method of upgrade, for this example we will use the following
+   - Under **MLAG Pair** Seelect **MLAG ISSU** *(This will not be used in this section but is a required selection)*
+   - Under **Non-MLAG Pair**
+   - Select **SSU**
+   - In the Dropdown Select **Fall Back to Normal**, **On Error Only**
+   - Select **Apply**
+   - Select **Continue**
 
-- ![Upgrade Fourth Step](images/upgrade-fourth-nav.png)
+![Upgrade Fourth Step](images/upgrade-fourth-nav.png)
 
-Verify the information is correct and click **Upgrade**
+5. Verify the information is correct and click **Upgrade**
 
-- ![Upgrade Fifth Step](images/upgrade-fifth-nav.png)
+*This will build and submit your workspace, generate and start a change control to upgrade the device all in a single selection*
 
-Click on View Change Control and watch the switch upgrade
+![Upgrade Fifth Step](images/upgrade-fifth-nav.png)
 
-- ![Upgrade Sixth Step](images/upgrade-sixth-nav.png)
+6. Click on View Change Control and watch the switch upgrade
 
-**This Reload will take roughly 5-10 minutes to complete**
+![Upgrade Sixth Step](images/upgrade-sixth-nav.png)
 
-Check for successful completion
+> [!NOTE] **This Reload will take roughly 5-10 minutes to complete** 
 
-- ![Upgrade Seventh Step](images/upgrade-seventh-nav.png)
+7. Check for successful completion
 
-Naviagte back to Network Hierarchy and verify the upgrade has been completed successfully
+![Upgrade Seventh Step](images/upgrade-seventh-nav.png)
 
-- ![Upgrade Eigth Step](images/upgrade-eigth-nav.png)
+8. Navigate back to the Network Hierarchy Overview tab and verify the upgrade has been completed successfully
 
-Click on **View Details** and explore the popup that shows the completed upgrade
+![Upgrade Eigth Step](images/upgrade-eigth-nav.png)
 
-- ![Upgrade Ninth Step](images/upgrade-ninth-nav.png)
+9. Click on **View Details** and explore the popup that shows the completed upgrade
+
+![Upgrade Ninth Step](images/upgrade-ninth-nav.png)
 
 **This completes the switch upgrade section of the Lab Guide**
 
-### Monitor The Fabric
-
-#### Lab Overview
-
+### Syslog
 In this lab we will learn where we can find important information about the fabric
 
-##### Explore Syslog
+1. From the device inventory page, select any switch and naviagte to the **System** -> **Log Messages** section of the device
 
-From the device inventory page, select any switch and naviagte to the **System** -> **Log Messages** section of the device
+![Syslog First Step](images/syslog-first-nav.png)
 
-- ![Syslog First Step](images/syslog-first-nav.png)
+2. Click on Message and type in stp - to search for Spanning Tree relatged events
 
-Click on Message and type in stp - to search for Spanning Tree relatged events
+![Syslog Second Step](images/syslog-second-nav.png)
 
-- ![Syslog Second Step](images/syslog-second-nav.png)
+### Dashbaords
 
-##### Dashbaords
+1. Click on the Dashboards section of Cloud Vision and then on **Campus Health Dashboard**
 
-Click on the Dashboards section of Cloud Vision and then on **Campus Health Dashboard**
+![Dashbaord First Step](images/Dashbaord-first-nav.png)
 
-- ![Dashbaord First Step](images/Dashbaord-first-nav.png)
+2. Under the Compliance section of the Dashbaord, click on **Configuration**
 
-Under the Compliance section of the Dashbaord, click on **Configuration**
+![Dashboard Second Step](images/dashboard-second-nav.png)
 
-- ![Dashboard Second Step](images/dashboard-second-nav.png)
+3. Click on the device we want to clear our Configuration Compliance issue for
 
-Click on the device we want to clear our Configuration Compliance issue for
+![Dashboard Third Step](images/dashboard-third-nav.png)
 
-- ![Dashboard Third Step](images/dashboard-third-nav.png)
+4. Click **Sync Config** and complete the Change Control process to resolve the compliance issue
 
-Click **Sync Config** and complete the Change Control process to resolve the compliance issue
-
-- ![Dashbaord Fourth Step](images/dashboard-fourth-nav.png)
+![Dashbaord Fourth Step](images/dashboard-fourth-nav.png)
 
 **This completes the Monitoring Section of the Lab Guide**
 
