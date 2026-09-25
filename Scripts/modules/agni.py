@@ -2,7 +2,7 @@ from modules import config
 import requests, json, re
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
-from modules.pgf import pgfAction, pgfBoolAction
+from modules.argparseActions import pgfAction, pgfBoolAction
 
 class AgniClient():
     def configure():
