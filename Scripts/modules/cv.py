@@ -54,6 +54,7 @@ class pgfCVClient():
         _addArgument('-cvAddPackages', default=False, action='store_true', help='this option is only required for alraedy provisioned pods and will add the required packages.  these steps are automatically done on pods as they are provisioned moving forward')
         _addArgument('-cvAddCCStuff', default=False, action='store_true', help='this option is only required for already provisioned pods and will add actionBundles and ccTemplates only.  these steps are automatically done on pods as they are provisioned moving forward')
         _addArgument('-cvCheckpoint', default=None, help='string name of the checkpoint you wish to load.  is based off the specified workshop type')
+        _addArgument('-cvDryrun', default=False, action='store_true', help='build any resultant workspace, but do not submit it.  note, subsequent ops will create new workspaces and orphan the produced workspace')
 
     def configure1():
         config.parser.add_argument('-cvCleanup', default=False, action='store_true', help='do cleanup steps')
@@ -403,6 +404,9 @@ class pgfCVClient():
         buildResult, workspace = await c.wait_for_workspace_response(workspaceID, result.request_params.request_id)
         if buildResult.status != 1: # SUCCESS
             raise Exception(f"build failed for pod: {self.pod.pod} {workspaceID}: {buildResult.status}")
+
+        if config.args.cvDryrun:
+            return
 
         result = await c.submit_workspace(workspaceID, force=True)
         print("submitting workspace")
@@ -908,6 +912,10 @@ class pgfCVClient():
 
         if workToDo:
             ccID = await self.buildAndSubmitWorkspace(c, workspaceID, expectCC=expectCC)
+
+            if config.args.cvDryrun:
+                return
+
 
             # from here on out, let's reconnect with the second token
             #  this allows for us to complete even if four-eyes is set
