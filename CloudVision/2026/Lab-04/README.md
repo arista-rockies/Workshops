@@ -89,7 +89,7 @@ The following is all of the information you will need to complete this lab. Feel
    
 6. On **DNS**
 	1. Create a **DNS Profile** by
-		1. Click in the Profile field
+		1. Clicking in the Profile field
 		2. Type a name for your profile: **DNS-Servers**
 			1.  After you've typed the name, click the **"+Create DNS-Servers"** option below or it will not create the profile
 		3. Options will appear below. Click the **"+ Add Server"** option
@@ -108,15 +108,15 @@ The following is all of the information you will need to complete this lab. Feel
 8. On **Local Users** (left side):
 	1. Select **"+Add User"**
 		1. Name: **superuser**
-		2. Create a **"Assigned User Groups"**
+		2. Create an **"Assigned User Groups"**
 			1. Name: **ug-superuser**
-			2. Once you've typed the name, **ensure you click the "+ Create ug-superuser" sign below or it won't actually create the User Group**
+			2. After you've typed the name, **ensure you click the "+ Create ug-superuser" sign below or it won't actually create the User Group**
 			3. Role: **network-admin**
 			4. Privilege: **15**
 			5. Password Type: **Plain Text**
 			6. Password: **aristarocks!**
 		3. Click **Add**
-	2. Select the dropdown menu under **"User Group"**
+	2. Select the drop-down menu under **"User Group"**
 		1. **Select the User Group (ug-superuser)** you just created in the drop-down menu
 	3. Click **Save**
 
@@ -167,13 +167,13 @@ The following is all of the information you will need to complete this lab. Feel
 ![I&T Hostnames](images/image17.png)
 
 17. On **In-Band Management**: 
-	1. **Disable** it using the "Enable in-band management and configure its default settings" Toggle
+	1. **Disable** it using the "Enable in-band management and configure its default settings" toggle
 	2. Click **Continue**
 
 ![I&T Hostnames](images/image18.png)
 
 18. On **Out-of-Band Management**: 
-	1. **Enable** it using the "Enable out-of-band management and configure its default settings" Toggle
+	1. **Enable** it using the "Enable out-of-band management and configure its default settings" toggle
 	2. Create a **Profile**
 		1. Name: **CampusB_OOB**
 		2. Management VRF Name: **MGMT**
@@ -366,7 +366,7 @@ The following is all of the information you will need to complete this lab. Feel
 
 45. On Next Steps (**Next Steps for this Access Pod**)
 	1. **Don't** click  "Review and Submit"
-		1. If you do though, no worries. Just hit the X at the top right of the Workspace window and you'll be right back were you were.
+		1. If you do, though, no worries. Just select the X at the top right of the Workspace window, and you'll be right back where you were.
 		2. Instead, **we need to add the 2nd Access Pod**
 	2. Next, **hover over the CampusB Campus** in the menu on the left. Three dots should appear to the right. Select those dots and click **Add Access Pod**.
 		1. Name this Access-Pod: **Pod2**
@@ -384,7 +384,7 @@ The following is all of the information you will need to complete this lab. Feel
 		1. **CampusB-Leaf2A**
 			1. Select Role: **Leaf**
 	5. Click **Add Devices**
-		1. Confirm the Hostname look correct
+		1. Confirm the hostname looks correct
 			1. If they didn't take, select the pencil to the right of each of them and rename them accordingly 
 	6. Click **Continue**
 
@@ -428,12 +428,12 @@ The following is all of the information you will need to complete this lab. Feel
 ![I&T Hostnames](images/image60.png)
 
 54. You will be presented with the **Workspace Review page**, with a summation of all of the things you have done.
-	1. Review the **Proposed Configuration** Changes below
+	1. Review the **Proposed Configuration** changes below
 		1. Text with a **Green Highlight** = Configuration that will be **added**
 		2. Text with a **Blue Highlight** = Configuration that will be **modified**
 		3. Text with a **Red Highlight** = Configuration that will be **removed**
-			1. Question: Why is there so much Red Highlighted text?
-				1. Answer: This is because, as we proceed to put these switches into production, we are taking them out of ZTP mode and therefore removing many of the no-longer needed Factory Default configuration settings. 
+			1. Question: Why is there so much red-highlighted text?
+				1. Answer: This is because, as we proceed to put these switches into production, we are taking them out of ZTP mode and therefore removing many of the no-longer-needed Factory Default configuration settings. 
 		4. After reviewing the proposed changes, **scroll up in the Workspace window**
 			1. At the top right, select **Submit Workspace**
 
@@ -443,10 +443,10 @@ The following is all of the information you will need to complete this lab. Feel
 55. Click **View Change Control**
 
 56. **You will be taken to the Change Control, where your changes will be deployed**
-	1. There will be changes to both the CampusA and CampusB network. This is expected.
+	1. There will be changes to both the CampusA and CampusB networks. This is expected.
 	2. Then click **Review and Approve** at the top right
 	3. Review the details of your Change Control one last time
-	4. Turn on the t**oggle at the bottom right "Execute immediately"** and **click Approve and Execute** at the bottom right to tell CloudVision to push the configuration to the devices
+	4. Turn on the **toggle at the bottom right "Execute immediately"** and **click Approve and Execute** at the bottom right to tell CloudVision to push the configuration to the devices
 	5. The **Change Control has now been activated**
 
 ![I&T Hostnames](images/image63.png)
