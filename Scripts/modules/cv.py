@@ -901,7 +901,7 @@ class pgfCVClient():
             workspaceID = str(uuid.uuid4())
             workspace = await c.create_workspace(
                 workspace_id=workspaceID,
-                display_name="automation - checkpoint")
+                display_name=f"automation - checkpoint {config.args.cvCheckpoint}{' -cvDryrun' if config.args.cvDryrun else ''}")
 
             workToDo = True
 
