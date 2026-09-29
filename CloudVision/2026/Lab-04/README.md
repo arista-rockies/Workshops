@@ -78,14 +78,17 @@ The following is all of the information you will need to complete this lab. Feel
 
 ![Studio Inventory and Topology](images/image2.png)
 
+
 4. On the left side, click on the existing Campus: **Workshop**. Let's modify some Campus-wide configuration elements.
 
 > [!NOTE]
 > We will be utilizing Universal Cloud Network Architecture to identify device types in future lab guides (Leaf, Spine, Member Leaf, Border Leaf), so try to make it easy for yourself to identify those device types in your naming convention.
 
+
 5. Select the **Configuration** tab
 
 ![I&T Hostnames](images/Campus_Config_Tab.png)
+
 
 6. On **DNS**
 	1. Create a **DNS Profile** by
@@ -103,7 +106,9 @@ The following is all of the information you will need to complete this lab. Feel
 ![I&T Hostnames](images/Add_DNS_Server.png)
 ![I&T Hostnames](images/image4.png)
 
+
 7. Skip past **NTP**
+
 
 8. On **Local Users** (left side):
 	1. Select **"+Add User"**
@@ -123,14 +128,17 @@ The following is all of the information you will need to complete this lab. Feel
 ![I&T Hostnames](images/Add_Local_Users.png)
 ![I&T Hostnames](images/Add_Local_User_Attributes.png)
 
+
 9. Skip past **AAA**
+
 
 10. On Streaming Agent
 	1. Click the **"+ Configure"** option below 
 	2. Select **Disabled**
 	3. Click **Save**
 
-![I&T Hostnames](images/image9.png)
+![I&T Hostnames](images/Streaming_Agent_Disabled.png)
+
 
 11. On **VRFs**
 	1. Click the **"+ Configure"** option below 
@@ -140,10 +148,10 @@ The following is all of the information you will need to complete this lab. Feel
 
 ![I&T Hostnames](images/VRF_Configure.png)
 ![I&T Hostnames](images/Name_VRF.png)
-![I&T Hostnames](images/image12.png)
 
 
 12. Skip **Static Configuration**
+
 
 13. Now, let's deploy a new **Campus-Pod** under **Workshop**
 	1. Next, **hover over the Campus named Workshop** in the Network Hierarchy menu on the left. **Three dots should appear** to the right. Select those dots and click **Add Campus Pod**.
@@ -151,15 +159,18 @@ The following is all of the information you will need to complete this lab. Feel
 
 ![I&T Hostnames](images/Name_Access_Pod.png)
 
+
 14. For **Topology Type**, select: **L2 - L2 Leaf Spine**
 	1. Click **Continue**
 
 ![I&T Hostnames](images/image15.png)
 
+
 15. On **Protocols**: Do nothing
 	1. Click **Continue**
 
 ![I&T Hostnames](images/image16.png)
+
 	
 16. On **IP Addressing**:
 	1. Enter **172.31.0.0/24**
@@ -167,11 +178,13 @@ The following is all of the information you will need to complete this lab. Feel
 
 ![I&T Hostnames](images/Campus-Pod_IPAddressing.png)
 
+
 17. On **In-Band Management**: 
 	1. **Disable** it using the "Enable in-band management and configure its default settings" toggle
 	2. Click **Continue**
 
 ![I&T Hostnames](images/Disable_InBand.png)
+
 
 18. On **Out-of-Band Management**:
 	1. **Enable** it using the "Enable out-of-band management and configure its default settings" toggle
@@ -184,6 +197,7 @@ The following is all of the information you will need to complete this lab. Feel
 ![I&T Hostnames](images/Enable_OOB.png)
 ![I&T Hostnames](images/Populate_OOB.png)
 
+
 19. On **Source Interface**:
 	1. **Spine Source Interface**:
 		1. Source Type: **Out-of-band**
@@ -195,6 +209,7 @@ The following is all of the information you will need to complete this lab. Feel
 	4. Click **Continue**
 
 ![I&T Hostnames](images/image21.png)
+
 
 20. On **Spanning Tree**:
 	1. **Spine** Spanning Tree: 
@@ -209,30 +224,36 @@ The following is all of the information you will need to complete this lab. Feel
 
 ![I&T Hostnames](images/image22.png)
 
+
 21. On **MLAG**:
 	1. Click **Continue**
 
 ![I&T Hostnames](images/image23.png)
+
 
 22. On **802.1X:**
 	1. Click **Continue**
 
 ![I&T Hostnames](images/image24.png)
 
+
 23. On **Multicast**:
 	1. Click **Continue**
 
 ![I&T Hostnames](images/image25.png)
+
 
 24. On **IP Locking**:
 	1. Click **Continue**
 
 ![I&T Hostnames](images/image26.png)
 
+
 25. On **PTP**:
 	1. Click **Continue**
 
 ![I&T Hostnames](images/image27.png)
+
 
 26. On **VLANs**
 	1. Create **VLAN 10, 20, 30**
@@ -246,16 +267,19 @@ The following is all of the information you will need to complete this lab. Feel
 ![I&T Hostnames](images/image29.png)
 ![I&T Hostnames](images/image30.png)
 
+
 27. On **Static Configuration**
 	1. Click **Continue**
 
 ![I&T Hostnames](images/image31.png)
+
 
 28. On **"Next Steps for this Campus Pod"**
 	1. Click **Continue** under **"Add Spines Devices"**
 
 ![I&T Hostnames](images/image32.png)
   
+
 29. On **Device Assignment**
 	1. In the dashed box, click **"+ Add Device"**
 	2. **Find and select** both of the **Spine switches** for **CampusB**
@@ -271,35 +295,42 @@ The following is all of the information you will need to complete this lab. Feel
 ![I&T Hostnames](images/Select_Spine_Devices.png)
 ![I&T Hostnames](images/Name_Spine_Devices_Role.png)
 
+
 30. On **Software Version**
 	1. Click **Continue**
 
 ![I&T Hostnames](images/image35.png)
   
+
 31. On **Protocols**
 	1. Click **Continue**
 
 ![I&T Hostnames](images/image36.png)
+
 
 32. On **External Devices**
 	1. Click **Continue**
 
 ![I&T Hostnames](images/image37.png)
 
+
 33. On **Static Routes**
 	1. Click **Continue**
 
 ![I&T Hostnames](images/image38.png)
+
 
 34. On **Transit SVIs**
 	1. Click **Continue**
 
 ![I&T Hostnames](images/image39.png)
 
+
 35. On **Static Configuration**
 	1. Click **Continue**
 
 ![I&T Hostnames](images/image40.png)
+
 
 36. On **Next Steps**
 	1. Under **"Add and Configure an Access Pod"** to the right
@@ -309,6 +340,7 @@ The following is all of the information you will need to complete this lab. Feel
 
 ![I&T Hostnames](images/image41.png)
 ![I&T Hostnames](images/image42.1.png)
+
 
 37. On **Device Assignment**
 	1. In the dashed box, click **"+ Add Device"**
@@ -330,15 +362,18 @@ The following is all of the information you will need to complete this lab. Feel
 ![I&T Hostnames](images/Add_CampusPod1_Devices.png)
 ![I&T Hostnames](images/Name_AccessPod1_Devices.png)
 
+
 38. On **MLAG Pairs**
 	1. Click **Continue**
 
 ![I&T Hostnames](images/image43.png)
 
+
 39. On **Software Version**
 	1. Click **Continue**
 
 ![I&T Hostnames](images/image44.png)
+
 
 40. On **VLANs**
 	1. In the dashed box, click **"+ Add VLAN"**
@@ -347,25 +382,30 @@ The following is all of the information you will need to complete this lab. Feel
 
 ![I&T Hostnames](images/image45.png)
 
+
 41. On **External Devices**
 	1. Click **Continue**
 
 ![I&T Hostnames](images/image46.png)
+
 
 42. On **Static Routes**
 	1. Click **Continue**
 
 ![I&T Hostnames](images/image47.png)
 
+
 43. On **Transit SVIs**
 	1. Click **Continue**
 
 ![I&T Hostnames](images/image48.png)
 
+
 44. On **Static Configuration**
 	1. Click **Continue**
 
 ![I&T Hostnames](images/image49.png)
+
 
 45. On Next Steps (**Next Steps for this Access Pod**)
 	1. **Don't** click  "Review and Submit"
@@ -378,6 +418,7 @@ The following is all of the information you will need to complete this lab. Feel
 ![I&T Hostnames](images/image50.png)
 ![I&T Hostnames](images/Add_Access-Pod.png)
 ![I&T Hostnames](images/Name_AccessPod.png)
+
 
 46. On **Device Assignment**
 	1. In the dashed box, click **"+ Add Device"**
@@ -394,11 +435,13 @@ The following is all of the information you will need to complete this lab. Feel
 ![I&T Hostnames](images/Select_Pod2-Devices.png)
 ![I&T Hostnames](images/Add_Devices-Access-Pod2.png)
 
+
 47. On **Software Version**
 	1. Click **Continue**
 
 ![I&T Hostnames](images/image54.png)
      
+
 48. On **VLANs**
 	1. In the dashed box, click **"+ Add VLAN"**
 		1. **Add all three VLANs to this Access Pod**
@@ -406,30 +449,36 @@ The following is all of the information you will need to complete this lab. Feel
 
 ![I&T Hostnames](images/image55.png)
 
+
 49. On **External Devices**
 	1. Click **Continue**
 
 ![I&T Hostnames](images/image56.png)
+
 
 50. On **Static Routes**
 	1. Click **Continue**
 
 ![I&T Hostnames](images/image57.png)
 
+
 51. On **Transit SVIs**
 	1. Click **Continue**
 
 ![I&T Hostnames](images/image58.png)
+
 
 52. On **Static Configuration**
 	1. Click **Continue**
 
 ![I&T Hostnames](images/image59.png)
 
+
 53. On **Next Steps (Next Steps for this Access Pod)**
 	1. **Now click "Review and Submit"**.
 
 ![I&T Hostnames](images/image60.png)
+
 
 54. You will be presented with the **Workspace Review page**, with a summation of all of the things you have done.
 	1. Review the **Proposed Configuration** changes below
@@ -443,9 +492,11 @@ The following is all of the information you will need to complete this lab. Feel
 
 ![I&T Hostnames](images/image61.png)
 
+
 55. Click **View Change Control**
 
 ![I&T Hostnames](images/image62.png)
+
 
 56. **You will be taken to the Change Control, where your changes will be deployed**
 
@@ -459,10 +510,12 @@ The following is all of the information you will need to complete this lab. Feel
 ![I&T Hostnames](images/image64.png)
 ![I&T Hostnames](images/image65.png)
 
+
 57. Click the **Logs button** at the far right of the Change Control screen to view live messages being exchanged between CloudVision and the Switches
 
 ![I&T Hostnames](images/image66.png)
 ![I&T Hostnames](images/image67.png)
+
 
 58. The Change Control will take between 10-15 minutes to complete
 
