@@ -160,6 +160,7 @@ def loadCSVInventory(tokens):
                 pod.substitutions['switches'][device.id] = device
             elif device.model[0] == 'V':
                 pod.velo.append(device)
+                pod.substitutions['switches']['velo'] = device
 
     return result
 
