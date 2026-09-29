@@ -25,7 +25,13 @@
 
 To authenticate to CloudVision you will need to visit the following page:
 
-[CloudVision Auth](https://labs.arista.com/ignition/event/9gk8a4d3)
+[**UVU: October 1st-2nd**](https://labs.arista.com/ignition/event/g7nwnc9c)
+
+[**UofU: October 8th-9th**](https://labs.arista.com/ignition/event/ehnenmpn)
+
+[**Idaho: October 14th-15th**](https://labs.arista.com/ignition/event/kpd99dy8)
+
+[**Colorado: Oct 21st-22nd**](https://labs.arista.com/ignition/event/kxpd9ttr)
 
 Each attendee will be provided with a unique access key. Enter you access key and select the Blue Arrow
 
