@@ -33,12 +33,12 @@ To authenticate to CloudVision you will need to visit the following page:
 
 [**Colorado: Oct 21st-22nd**](https://labs.arista.com/ignition/event/kxpd9ttr)
 
-Each attendee will be provided with a unique access key. Enter you access key and select the Blue Arrow
+Each attendee will be provided with a unique access key. Enter your access key and select the Blue Arrow
 
 
 ![Ignition Login](images/ignition-login.png)
 
-After succesfully authenticated you will should see **CVaaS** avaialble under Services. Selecting the CVaaS tile will authenticate you directly to the Lab CVaaS environment
+After successfully authenticated you should see **CVaaS** available under Services. Selecting the CVaaS tile will authenticate you directly to the Lab CVaaS environment
 
 ![Ignition Login](images/cvaas-tile.png)
 
@@ -111,7 +111,7 @@ There is no right or wrong way to design this hierarchy, and each organization m
 ![Static Configuration Assign Base Configlet](images/ws-assign-configlet.png)    
 
 
-12. Assign each devices to their intended containers.
+12. Assign each device to their intended containers.
     - Locate the device's intended container.
     - Select the **3 dots** next to the container.
     - Select **Add Device**

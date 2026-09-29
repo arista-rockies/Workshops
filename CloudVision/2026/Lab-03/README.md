@@ -38,12 +38,12 @@ To authenticate to CloudVision you will need to visit the following page:
 
 [**Colorado: Oct 21st-22nd**](https://labs.arista.com/ignition/event/kxpd9ttr)
 
-Each attendee will be provided with a unique access key. Enter you access key and select the Blue Arrow
+Each attendee will be provided with a unique access key. Enter your access key and select the Blue Arrow
 
 
 ![Ignition Login](images/ignition-login.png)
 
-After succesfully authenticated you will should see **CVaaS** avaialble under Services. Selecting the CVaaS tile will authenticate you directly to the Lab CVaaS environment
+After successfully authenticated you should see **CVaaS** available under Services. Selecting the CVaaS tile will authenticate you directly to the Lab CVaaS environment
 
 ![Ignition Login](images/cvaas-tile.png)
 
@@ -55,7 +55,7 @@ After succesfully authenticated you will should see **CVaaS** avaialble under Se
 
 ## Lab Overview
 
-In this lab we will demonstrate the use of the Campus Fabric Studio. We will build and L2LS Fabric and deploy the configuration. In addition we will demonstrate Studios Order of operations to provide an understanding on how Studios may handle duplicate configurations from different Studios.
+In this lab we will demonstrate the use of the Campus Fabric Studio. We will build an L2LS Fabric and deploy the configuration. In addition we will demonstrate Studios Order of operations to provide an understanding on how Studios may handle duplicate configurations from different Studios.
 
 ### Building the Fabric
 
