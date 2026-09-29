@@ -8,10 +8,11 @@
 
 ## Table of Contents
 1. [Lab Topology](#1-lab-topology)
-2. [Lab Overview](#2-lab-overview)
-3. [Connectivity Monitor](#3-Connectivity-Monitor)
-4. [Zero Touch Replacement ZTR](#4-Zero-Touch-Replacement)
-5. [Data Plane Capture Action](#5-Data-Plane-Capture)
+2. [Accessing the Lab](#2-accessing-the-lab)
+3. [Lab Overview](#3-lab-overview)
+4. [Connectivity Monitor](#4-connectivity-monitor)
+5. [Zero Touch Replacement ZTR](#5-zero-touch-replacement---ztr)
+6. [Data Plane Capture Action](#6-data-plane-capture)
 
 ---
 
@@ -24,7 +25,34 @@ Complete previous lab sections to ensure Leaf2A is provisioned before starting t
 
 ---
 
-# 2. Lab Overview
+# 2. Accessing the Lab
+
+To authenticate to CloudVision, you will need to visit the following page. Please select the correct event you are currently in:
+
+
+[**UVU: October 1st-2nd**](https://labs.arista.com/ignition/event/g7nwnc9c)
+
+[**UofU: October 8th-9th**](https://labs.arista.com/ignition/event/ehnenmpn)
+
+[**Idaho: October 14th-15th**](https://labs.arista.com/ignition/event/kpd99dy8)
+
+[**Colorado: Oct 21st-22nd**](https://labs.arista.com/ignition/event/kxpd9ttr)
+
+
+Each attendee will be provided with a unique access key. Enter your access key and select the Blue Arrow
+
+![Ignition Login](images/ignition-login.png)
+
+
+After successfully authenticating, you should see **CVaaS** available under Services. Selecting the CVaaS tile will authenticate you directly to the Lab CVaaS environment
+
+![Ignition Login](images/cvaas-tile.png)
+
+![CVaaS Home](images/cvaas-access.png)
+
+---
+
+# 3. Lab Overview
 
 
 In this lab exercise we will explore how CloudVision Streaming Telemetry, Dashboards, and Operations workflows assist the operator in troubleshooting the network.
@@ -34,7 +62,7 @@ In this lab exercise we will explore how CloudVision Streaming Telemetry, Dashbo
 - Execute a data plane capture using a CloudVision custom action.
 ---
 
-# 3. Lab Steps
+# 4. Connectivity Monitor
 
 ### Configure Connectivity Monitor to collect data plane telemetry
 
@@ -220,7 +248,7 @@ within interface vlan configurations, find entries for `ip virtual-router addres
 ```
 
 ---
-# 4. Zero Touch Replacement - ZTR
+# 5. Zero Touch Replacement - ZTR
 
 Stop and wait here until the lab instructor informs the class when CampusB-Leaf2A will be disrupted for the ZTR section. Do not start the ZTR replacement until CampusB-Leaf2A shows offline in CloudVision.
 
@@ -272,7 +300,7 @@ Investigate further by looking into the connectivity monitor events
 
 ---
 
-# 5. Data-Plane-Capture
+# 6. Data-Plane-Capture
 - Goal - Utilize CloudVision Custom Action to execute tcpdump of data plane packets
   
 ## Data Plane Capture lab special considerations  
