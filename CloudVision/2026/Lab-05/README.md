@@ -12,13 +12,13 @@
 
 ## Table of Contents
 1. [Lab Topology](#1-lab-topology)
-2. [Accessing The LAb](#2-accessing-lab)
+2. [Accessing The Lab](#2-accessing-lab)
 3. [Labs](#3-lab-details)
 4. [Lab Customize Events and Notification](#customize-events-and-notifications)
 5. [Port Profiles](#port-profiles)
 6. [Code Upgrade](#code-upgrade)
 7. [Monitor The Fabric](#syslog)
-8. [Dashboards](#dashbaords)
+8. [Dashboards](#dashboards)
 
 ---
 
@@ -40,12 +40,12 @@ To authenticate to CloudVision you will need to visit the following page:
 
 [**Colorado: Oct 21st-22nd**](https://labs.arista.com/ignition/event/kxpd9ttr)
 
-Each attendee will be provided with a unique access key. Enter you access key and select the Blue Arrow
+Each attendee will be provided with a unique access key. Enter your access key and select the Blue Arrow
 
 
 ![Ignition Login](images/ignition-login.png)
 
-After succesfully authenticated you will should see **CVaaS** avaialble under Services. Selecting the CVaaS tile will authenticate you directly to the Lab CVaaS environment
+After successfully authenticated you should see **CVaaS** available under Services. Selecting the CVaaS tile will authenticate you directly to the Lab CVaaS environment
 
 ![Ignition Login](images/cvaas-tile.png)
 
@@ -90,7 +90,7 @@ In this lab, we will setup CloudVision's tags and Events system to create a cust
 
 ![Associated Tag](images/associated-tag.png)
 
-7. Revoew **Interface Tags** by selecting the Interface Tags button (upper left)
+7. Review **Interface Tags** by selecting the Interface Tags button (upper left)
 
 ![Interface Tag](images/int-tag.png)
 
@@ -105,7 +105,7 @@ In this lab, we will setup CloudVision's tags and Events system to create a cust
 ![Uplink Tag Verified](images/uplink-verified.png)
 
 > [!NOTE] 
-> If you desire, your can create your own custom interface tags to further customize filtering events and dashboards by interface tags--for example you may wish to tag an application which uses these infrastructure components. In this Lab we are using one of the automatically provisioned interface tags. We know this tag will get configured for us on all future devices following the same provisioning procedure.
+> If you desire, you can create your own custom interface tags to further customize filtering events and dashboards by interface tags--for example you may wish to tag an application which uses these infrastructure components. In this Lab we are using one of the automatically provisioned interface tags. We know this tag will get configured for us on all future devices following the same provisioning procedure.
 
 10. Now that you have verified the custom device tag and the auto-assigned interface tags are in place, **review and submit your workspace**. No studios are modified, only a single device tag update.
 
@@ -246,7 +246,7 @@ Next, let's configure an email alert to send when our customized events are dete
 ![Approve Reboot CC](images/eventstream-events.png)
 
 > [!NOTE]  
-> CloudVision also recorded all of the default events for events and device reboots in the Events menu. However only the customized uplink alert is set to generate email alerts. Also note that even though many uplink interfaces went down, the only email alert received for this event type is for the uplinks failure occuring on Leaf2A because it is the only device matching the device tag configured for the custom event.
+> CloudVision also recorded all of the default events for events and device reboots in the Events menu. However only the customized uplink alert is set to generate email alerts. Also note that even though many uplink interfaces went down, the only email alert received for this event type is for the uplinks failure occurring on Leaf2A because it is the only device matching the device tag configured for the custom event.
 
 39. Check for alert emails sent from **cvaas-alerts@arista.com** After a few minutes you should receive the uplink failure email alert containing additional information and a link to the event in CloudVision viewport date/time
 
@@ -277,7 +277,7 @@ Next, let's configure an email alert to send when our customized events are dete
 
 ### Port Profiles 
 
-In this lab we will create a custom port profile and assign it to an interface using the Network Hierarchy portion of Cloud Vision.
+In this lab we will create a custom port profile and assign it to an interface using the Network Hierarchy portion of CloudVision.
 
 
 1. Navigate to Network Hierarchy
@@ -327,11 +327,11 @@ In this lab we will create a custom port profile and assign it to an interface u
 
 ![Port Profile Pre-Assign](images/hierarchy-port-profile-preassign.png)
 
-10. Under **Profile** seclect your profile you just created and hit **Save**
+10. Under **Profile** select your profile you just created and hit **Save**
 
 ![Assign Profile](images/hierarchy-port-profile-assign.png)
 
-11. A Worksapce should have been created showing a single change
+11. A Workspace should have been created showing a single change
 
 ![Port Profile Assign PreCC](images/hierarchy-port-profile-assign-precc.png)
 
@@ -393,7 +393,7 @@ In this lab we will be upgrading the image on a single device in our fabric, **C
 
 8. Navigate back to the Network Hierarchy Overview tab and verify the upgrade has been completed successfully
 
-![Upgrade Eigth Step](images/upgrade-eigth-nav.png)
+![Upgrade Eighth Step](images/upgrade-eigth-nav.png)
 
 9. Click on **View Details** and explore the popup that shows the completed upgrade
 
@@ -406,21 +406,21 @@ In this lab we will be upgrading the image on a single device in our fabric, **C
 ### Syslog
 In this lab we will learn where we can find important information about the fabric
 
-1. From the device inventory page, select any switch and naviagte to the **System** -> **Log Messages** section of the device
+1. From the device inventory page, select any switch and navigate to the **System** -> **Log Messages** section of the device
 
 ![Syslog First Step](images/syslog-first-nav.png)
 
-2. Click on Message and type in stp - to search for Spanning Tree relatged events
+2. Click on Message and type in stp - to search for Spanning Tree related events
 
 ![Syslog Second Step](images/syslog-second-nav.png)
 
-### Dashbaords
+### Dashboards
 
-1. Click on the Dashboards section of Cloud Vision and then on **Campus Health Dashboard**
+1. Click on the Dashboards section of CloudVision and then on **Campus Health Dashboard**
 
-![Dashbaord First Step](images/Dashbaord-first-nav.png)
+![Dashboard First Step](images/Dashbaord-first-nav.png)
 
-2. Under the Compliance section of the Dashbaord, click on **Configuration**
+2. Under the Compliance section of the Dashboard, click on **Configuration**
 
 ![Dashboard Second Step](images/dashboard-second-nav.png)
 
@@ -430,7 +430,7 @@ In this lab we will learn where we can find important information about the fabr
 
 4. Click **Sync Config** and complete the Change Control process to resolve the compliance issue
 
-![Dashbaord Fourth Step](images/dashboard-fourth-nav.png)
+![Dashboard Fourth Step](images/dashboard-fourth-nav.png)
 
 **This completes the Monitoring Section of the Lab Guide**
 

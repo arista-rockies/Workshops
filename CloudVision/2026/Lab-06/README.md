@@ -27,8 +27,7 @@ Complete previous lab sections to ensure Leaf2A is provisioned before starting t
 
 # 2. Accessing the Lab
 
-To authenticate to CloudVision, you will need to visit the following page. Please select the correct event you are currently in:
-
+To authenticate to CloudVision you will need to visit the following page:
 
 [**UVU: October 1st-2nd**](https://labs.arista.com/ignition/event/g7nwnc9c)
 
@@ -38,13 +37,12 @@ To authenticate to CloudVision, you will need to visit the following page. Pleas
 
 [**Colorado: Oct 21st-22nd**](https://labs.arista.com/ignition/event/kxpd9ttr)
 
-
 Each attendee will be provided with a unique access key. Enter your access key and select the Blue Arrow
+
 
 ![Ignition Login](images/ignition-login.png)
 
-
-After successfully authenticating, you should see **CVaaS** available under Services. Selecting the CVaaS tile will authenticate you directly to the Lab CVaaS environment
+After successfully authenticated you should see **CVaaS** available under Services. Selecting the CVaaS tile will authenticate you directly to the Lab CVaaS environment
 
 ![Ignition Login](images/cvaas-tile.png)
 
@@ -69,7 +67,7 @@ In this lab exercise we will explore how CloudVision Streaming Telemetry, Dashbo
 Goal - In this lab section, CloudVision Studios will be used to configure **Connectivity Monitor** which runs on EOS devices and sends probes to configured destinations using in-band data plane packets. 
 This feature is useful to collect latency, jitter, and packet loss within the network in real-time and to analyze historically.
 
-**Prerequisistes**
+**Prerequisites**
 
 - Designate a VLAN-ID for the host access ports
     * Host is preconfigured within subnet = 10.2.2.0/24
@@ -149,7 +147,7 @@ Modify these by staying within your existing workspace, navigate to **Provisioni
       
 10. Submit your workspace, review change control for the following elements:
     - Leaf1C and Leaf2A - trunk allowed list includes host vlan, Ethernet7 switchport access vlan id
-    - Spines - VLAN interface with ip virtual-rotuer address occupying high number IPs to avoid conflicting with existing host IP config
+    - Spines - VLAN interface with ip virtual-router address occupying high number IPs to avoid conflicting with existing host IP config
     - ![Verify Leaf](images/verifyleaf-cm.png)
     - ![Verify Spines](images/verifyspines-cm.png)
 
@@ -195,7 +193,7 @@ Modify these by staying within your existing workspace, navigate to **Provisioni
 19. Within the Monitoring Hosts list, add all three addresses the VLAN Gateway and each spine.
     - ![Add Host Entries](images/addhostentries-cm.png)
       
-20. Repeat these steps to add entires for the host NICs in 10.2.2.0/24 subnet.
+20. Repeat these steps to add entries for the host NICs in 10.2.2.0/24 subnet.
     - Create a corresponding rule to probe the host IPs **from the spine switches** in Campus B
     - ![All CM Rules](images/allcmrules-cm.png)
     - ![Exp Spine Rules](images/expspinerule-cm.png)
@@ -275,7 +273,7 @@ Goal - In this lab section, CampusB-Leaf2A will be simulated offline by blocking
 
 35. Once you have reviewed the changes, select **Continue to Replace** button
     - ![Continue Replace](images/continuereplace-ztr.png)
-    - Note - the device replacement Change Control will execute automatically for you at this stage. The replacement device will need to go through the Zero Touch Provisioning reboot process after configuration is updated. Please give the replacement Leaf2A device to go offline and reboot after replacement is initiated.
+    - Note - the device replacement Change Control will execute automatically for you at this stage. The replacement device will need to go through the Zero Touch Provisioning reboot process after configuration is updated. Please give the replacement Leaf2A device time to go offline and reboot after replacement is initiated.
 
 
 

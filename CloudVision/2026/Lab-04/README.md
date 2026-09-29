@@ -23,8 +23,7 @@
 
 # 2. Accessing the Lab
 
-To authenticate to CloudVision, you will need to visit the following page. Please select the correct event you are currently in:
-
+To authenticate to CloudVision you will need to visit the following page:
 
 [**UVU: October 1st-2nd**](https://labs.arista.com/ignition/event/g7nwnc9c)
 
@@ -34,13 +33,12 @@ To authenticate to CloudVision, you will need to visit the following page. Pleas
 
 [**Colorado: Oct 21st-22nd**](https://labs.arista.com/ignition/event/kxpd9ttr)
 
-
 Each attendee will be provided with a unique access key. Enter your access key and select the Blue Arrow
+
 
 ![Ignition Login](images/ignition-login.png)
 
-
-After successfully authenticating, you should see **CVaaS** available under Services. Selecting the CVaaS tile will authenticate you directly to the Lab CVaaS environment
+After successfully authenticated you should see **CVaaS** available under Services. Selecting the CVaaS tile will authenticate you directly to the Lab CVaaS environment
 
 ![Ignition Login](images/cvaas-tile.png)
 
