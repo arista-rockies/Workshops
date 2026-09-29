@@ -333,7 +333,7 @@ In this lab we will create a custom port profile and assign it to an interface u
 
 ![Validate Changes](images/hierarchy-port-profile-validate-changes.png)
 
-13. Naviagte Back to Network Hierarchy and check to make sure your port profile has been applied
+13. Navigate Back to Network Hierarchy and check to make sure your port profile has been applied
 
 ![Port Profile Check](images/hierarchy-port-profile-check.png)
 
