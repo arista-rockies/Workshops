@@ -85,9 +85,12 @@ The following is all of the information you will need to complete this lab. Feel
 
 5. Select the **Configuration** tab
 
-![I&T Hostnames](images/image3.png)
-   
+![I&T Hostnames](images/Campus_Config_Tab.png)
+  
 6. On **DNS**
+
+![I&T Hostnames](images/Create_DNS_Profile.png)
+
 	1. Create a **DNS Profile** by
 		1. Clicking in the Profile field
 		2. Type a name for your profile: **DNS-Servers**
@@ -99,13 +102,15 @@ The following is all of the information you will need to complete this lab. Feel
 			4. Add another DNS server: **8.8.8.8**
 		4. Click **Save** at the top right
 
-![I&T Hostnames](images/image3.png)
-![I&T Hostnames](images/image5.png)
+![I&T Hostnames](images/Add_DNS_Server.png)
 ![I&T Hostnames](images/image4.png)
 
 7. Skip past **NTP**
 
 8. On **Local Users** (left side):
+   
+![I&T Hostnames](images/Add_Local_Users.png)
+
 	1. Select **"+Add User"**
 		1. Name: **superuser**
 		2. Create an **"Assigned User Groups"**
@@ -120,70 +125,87 @@ The following is all of the information you will need to complete this lab. Feel
 		1. **Select the User Group (ug-superuser)** you just created in the drop-down menu
 	3. Click **Save**
 
-![I&T Hostnames](images/image7.png)
-![I&T Hostnames](images/image8.png)
+![I&T Hostnames](images/Add_Local_User_Attributes.png)
 
 9. Skip past **AAA**
 
 10. On Streaming Agent
+
+![I&T Hostnames](images/image9.png)
+
 	1. Click the **"+ Configure"** option below 
 	2. Select **Disabled**
 	3. Click **Save**
 
-![I&T Hostnames](images/image9.png)
-
 11. On **VRFs**
 	1. Click the **"+ Configure"** option below 
-		1. Name: **MGMT**
-	2. Click **Create**
-	3. Click **Save**
 
-![I&T Hostnames](images/image10.png)
-![I&T Hostnames](images/image11.png)
+![I&T Hostnames](images/VRF_Configure.png)
+
+		1. Name: **MGMT**
+
+![I&T Hostnames](images/Name_VRF.png)
+
+	2. Click **Create**
+
 ![I&T Hostnames](images/image12.png)
+	
+	3. Click **Save**
 
 12. Skip **Static Configuration**
 
 13. Now, let's deploy a new **Campus-Pod** under **Workshop**
 	1. Next, **hover over the Campus named Workshop** in the Network Hierarchy menu on the left. **Three dots should appear** to the right. Select those dots and click **Add Campus Pod**.
+
+![I&T Hostnames](images/Name_Access_Pod.png)
+
 		1. Call it: **CampusB**
 
-![I&T Hostnames](images/image14.png)
-
 14. For **Topology Type**, select: **L2 - L2 Leaf Spine**
-	1. Click **Continue**
 
 ![I&T Hostnames](images/image15.png)
 
-15. On **Protocols**: Do nothing
 	1. Click **Continue**
 
+15. On **Protocols**: Do nothing
+
 ![I&T Hostnames](images/image16.png)
+
+	1. Click **Continue**
     
-16. On **IP Addressing**: 
+16. On **IP Addressing**:
+
+![I&T Hostnames](images/Campus-Pod_IPAddressing.png)
+ 
 	1. Enter **172.31.0.0/24**
 	2. Click **Continue**
 
-![I&T Hostnames](images/image17.png)
-
 17. On **In-Band Management**: 
+
+![I&T Hostnames](images/Disable_InBand.png)
+
 	1. **Disable** it using the "Enable in-band management and configure its default settings" toggle
 	2. Click **Continue**
 
-![I&T Hostnames](images/image18.png)
+18. On **Out-of-Band Management**:
 
-18. On **Out-of-Band Management**: 
+![I&T Hostnames](images/Enable_OOB.png)
+
 	1. **Enable** it using the "Enable out-of-band management and configure its default settings" toggle
 	2. Create a **Profile**
+
+![I&T Hostnames](images/Populate_OOB.png)
+
 		1. Name: **CampusB_OOB**
 		2. Management VRF Name: **MGMT**
 		3. IP Address Allocation Method: **DHCP**
 	3. Click **Continue**
 
-![I&T Hostnames](images/image19.png)
-![I&T Hostnames](images/image20.png)
 
 19. On **Source Interface**:
+
+![I&T Hostnames](images/image21.png)
+
 	1. **Spine Source Interface**:
 		1. Source Type: **Out-of-band**
 		2. Source VRF: **MGMT**
@@ -193,9 +215,11 @@ The following is all of the information you will need to complete this lab. Feel
 		1. **Same**
 	4. Click **Continue**
 
-![I&T Hostnames](images/image21.png)
 
 20. On **Spanning Tree**:
+
+![I&T Hostnames](images/image22.png)
+
 	1. **Spine** Spanning Tree: 
 		1. Mode: **Rapid-PVST**
 		2. Priority: **4096**
@@ -206,44 +230,57 @@ The following is all of the information you will need to complete this lab. Feel
 		1. Priority: **61440**
 	4. Click **Continue**
 
-![I&T Hostnames](images/image22.png)
 
 21. 9. On **MLAG**:
-	1. Click **Continue**
 
 ![I&T Hostnames](images/image23.png)
+	
+	1. Click **Continue**
+
 
 22. 10. On **802.1X:**
-	1. Click **Continue**
 
 ![I&T Hostnames](images/image24.png)
 
-23. 11. On **Multicast**:
 	1. Click **Continue**
+
+
+23. 11. On **Multicast**:
 
 ![I&T Hostnames](images/image25.png)
 
-24. 12. On **IP Locking**:
 	1. Click **Continue**
+
+
+24. 12. On **IP Locking**:
 
 ![I&T Hostnames](images/image26.png)
 
-25. 13. On **PTP**:
 	1. Click **Continue**
+
+
+25. 13. On **PTP**:
 
 ![I&T Hostnames](images/image27.png)
 
+	1. Click **Continue**
+
+
 26. On **VLANs**
 	1. Create **VLAN 10, 20, 30**
+
+![I&T Hostnames](images/image28.png)
+
 		1. Name: **Whatever you want**
 		2. VLAN Type: "**L2 Only**"
 		3. **Ignore other fields** or features
 		4. Click **Save and Repeat**
-	2. Click **Continue**
 
-![I&T Hostnames](images/image28.png)
 ![I&T Hostnames](images/image29.png)
 ![I&T Hostnames](images/image30.png)
+
+	2. Click **Continue**
+
 
 27. On **Static Configuration**
 	1. Click **Continue**
@@ -251,68 +288,101 @@ The following is all of the information you will need to complete this lab. Feel
 ![I&T Hostnames](images/image31.png)
 
 28. On **"Next Steps for this Campus Pod"**
-	1. Click **Continue** under **"Add Spines Devices"**
 
 ![I&T Hostnames](images/image32.png)
+
+	1. Click **Continue** under **"Add Spines Devices"**
+
   
 29. On **Device Assignment**
+
+![I&T Hostnames](images/image33.png)
+
 	1. In the dashed box, click **"+ Add Device"**
 	2. **Find and select** both of the **Spine switches** for **CampusB**
+
+![I&T Hostnames](images/Select_Spine_Devices.png)
+
 		1. Click **Confirm Selection**
 		2. Give each a **name**:
+
+![I&T Hostnames](images/Name_Spine_Devices_Role.png)
+
 			1. **CampusB-Spine1**
 			2. **CampusB-Spine2**
 			3. Leave the **Role as "Spine"**
 	3. Click **Add Devices**
 	4. Click **Continue**
 
-![I&T Hostnames](images/image33.png)
-![I&T Hostnames](images/image34.png)
 
 30. On **Software Version**
-	1. Click **Continue**
 
 ![I&T Hostnames](images/image35.png)
+
+	1. Click **Continue**
+
   
 31. On **Protocols**
-	1. Click **Continue**
 
 ![I&T Hostnames](images/image36.png)
 
-32. On **External Devices**
 	1. Click **Continue**
 
-![I&T Hostnames](images/image7.png)
+32. On **External Devices**
+
+![I&T Hostnames](images/image37.png)
+
+	1. Click **Continue**
+
 
 33. On **Static Routes**
-	1. Click **Continue**
 
 ![I&T Hostnames](images/image38.png)
 
-34. On **Transit SVIs**
 	1. Click **Continue**
+
+
+34. On **Transit SVIs**
 
 ![I&T Hostnames](images/image39.png)
 
-35. On **Static Configuration**
 	1. Click **Continue**
+
+
+35. On **Static Configuration**
 
 ![I&T Hostnames](images/image40.png)
 
+	1. Click **Continue**
+
+
 36. On **Next Steps**
+
+![I&T Hostnames](images/image41.png)
+
 	1. Under **"Add and Configure an Access Pod"** to the right
 		1. Click **Continue**
 		2. Name this Access-Pod: **Pod1**
+
+![I&T Hostnames](images/image42.1.png)
+
 	2. Click **Add Access Pod**
 
-![I&T Hostnames](images/image41.png)
-![I&T Hostnames](images/image42.1.png)
 
 37. On **Device Assignment**
 	1. In the dashed box, click **"+ Add Device"**
+
+![I&T Hostnames](images/image41.1.png)
+
 	2. **Find and select Leaf1A, Leaf1B & Leaf1C switches**
+
+![I&T Hostnames](images/Add_CampusPod1_Devices.png)
+
 		1. Click **Confirm Selection**
 		2. Give each a name:
+
+![I&T Hostnames](images/Name_AccessPod1_Devices.png)
+		
 			1. **CampusB-Leaf1A**
 				1. Select Role: **Leaf**
 			2. **CampusB-Leaf1B**
@@ -324,108 +394,145 @@ The following is all of the information you will need to complete this lab. Feel
 			1. If they didn't take, select the pencil to the right of each of them and rename them accordingly 
 	4. Click **Continue**
 
-![I&T Hostnames](images/image41.1.png)
-![I&T Hostnames](images/image42.png)
 
 38. On **MLAG Pairs**
-	1. Click **Continue**
 
 ![I&T Hostnames](images/image43.png)
 
-39. On **Software Version**
 	1. Click **Continue**
+
+
+39. On **Software Version**
 
 ![I&T Hostnames](images/image44.png)
 
+	1. Click **Continue**
+
+
 40. On **VLANs**
+
+![I&T Hostnames](images/image45.png)
+
 	1. In the dashed box, click **"+ Add VLAN"**
 		1. **Add all three VLANs** you created earlier to this Access Pod
 	2. Click **Continue**
 
-![I&T Hostnames](images/image45.png)
 
 41. On **External Devices**
-	1. Click **Continue**
 
 ![I&T Hostnames](images/image46.png)
 
-42. On **Static Routes**
 	1. Click **Continue**
+
+
+42. On **Static Routes**
 
 ![I&T Hostnames](images/image47.png)
 
-43. On **Transit SVIs**
 	1. Click **Continue**
+
+
+43. On **Transit SVIs**
 
 ![I&T Hostnames](images/image48.png)
 
-44. On **Static Configuration**
 	1. Click **Continue**
+
+
+44. On **Static Configuration**
 
 ![I&T Hostnames](images/image49.png)
 
+	1. Click **Continue**
+
+
 45. On Next Steps (**Next Steps for this Access Pod**)
+
+![I&T Hostnames](images/image50.png)
+
 	1. **Don't** click  "Review and Submit"
 		1. If you do, though, no worries. Just select the X at the top right of the Workspace window, and you'll be right back where you were.
 		2. Instead, **we need to add the 2nd Access Pod**
 	2. Next, **hover over the CampusB Campus** in the menu on the left. Three dots should appear to the right. Select those dots and click **Add Access Pod**.
+
+![I&T Hostnames](images/Add_Access-Pod.png)
+		
 		1. Name this Access-Pod: **Pod2**
+
+![I&T Hostnames](images/Name_AccessPod.png)
+
 	3. Click **Add Access Pod**
 
-![I&T Hostnames](images/image50.png)
-![I&T Hostnames](images/image51.png)
-![I&T Hostnames](images/image52.png)
 
 46. On **Device Assignment**
 	1. In the dashed box, click **"+ Add Device"**
 	2. Find and select **Leaf2A** switch
-	3. Click **Confirm Selection**
-	4. Give the switch a name:
+
+![I&T Hostnames](images/Select_Pod2-Devices.png)
+ 
+	4. Click **Confirm Selection**
+	5. Give the switch a name:
+
+![I&T Hostnames](images/Add_Devices-Access-Pod2.png)
+
 		1. **CampusB-Leaf2A**
 			1. Select Role: **Leaf**
-	5. Click **Add Devices**
+	6. Click **Add Devices**
 		1. Confirm the hostname looks correct
 			1. If they didn't take, select the pencil to the right of each of them and rename them accordingly 
-	6. Click **Continue**
+	7. Click **Continue**
 
-![I&T Hostnames](images/image53.png)
 
 47. On **Software Version**
-	1. Click **Continue**
 
 ![I&T Hostnames](images/image54.png)
+
+	1. Click **Continue**
+
      
 48. On **VLANs**
 	1. In the dashed box, click **"+ Add VLAN"**
 		1. **Add all three VLANs to this Access Pod**
-	2. Click **Continue**
 
 ![I&T Hostnames](images/image55.png)
 
+	2. Click **Continue**
+
+
 49. On **External Devices**
-	1. Click **Continue**
 
 ![I&T Hostnames](images/image56.png)
 
-50. On **Static Routes**
 	1. Click **Continue**
+
+
+50. On **Static Routes**
 
 ![I&T Hostnames](images/image57.png)
 
-51. On **Transit SVIs**
 	1. Click **Continue**
+
+
+51. On **Transit SVIs**
 
 ![I&T Hostnames](images/image58.png)
 
-52. On **Static Configuration**
 	1. Click **Continue**
+
+
+52. On **Static Configuration**
 
 ![I&T Hostnames](images/image59.png)
 
+	1. Click **Continue**
+
+
 53. On **Next Steps (Next Steps for this Access Pod)**
-	1. **Now click "Review and Submit"**.
 
 ![I&T Hostnames](images/image60.png)
+
+	1. **Now click "Review and Submit"**.
+
 
 54. You will be presented with the **Workspace Review page**, with a summation of all of the things you have done.
 	1. Review the **Proposed Configuration** changes below
@@ -438,24 +545,32 @@ The following is all of the information you will need to complete this lab. Feel
 			1. At the top right, select **Submit Workspace**
 
 ![I&T Hostnames](images/image61.png)
-![I&T Hostnames](images/image62.png)
 
 55. Click **View Change Control**
 
+![I&T Hostnames](images/image62.png)
+
 56. **You will be taken to the Change Control, where your changes will be deployed**
+
 	1. There will be changes to both the CampusA and CampusB networks. This is expected.
 	2. Then click **Review and Approve** at the top right
-	3. Review the details of your Change Control one last time
-	4. Turn on the **toggle at the bottom right "Execute immediately"** and **click Approve and Execute** at the bottom right to tell CloudVision to push the configuration to the devices
-	5. The **Change Control has now been activated**
 
 ![I&T Hostnames](images/image63.png)
+
+	3. Review the details of your Change Control one last time
+	4. Turn on the **toggle at the bottom right "Execute immediately"** and **click Approve and Execute** at the bottom right to tell CloudVision to push the configuration to the devices
+
 ![I&T Hostnames](images/image64.png)
+
+	5. The **Change Control has now been activated**
+
 ![I&T Hostnames](images/image65.png)
+
 
 57. Click the **Logs button** at the far right of the Change Control screen to view live messages being exchanged between CloudVision and the Switches
 
 ![I&T Hostnames](images/image66.png)
+
 ![I&T Hostnames](images/image67.png)
 
 58. The Change Control will take between 10-15 minutes to complete
