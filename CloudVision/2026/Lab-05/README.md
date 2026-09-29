@@ -66,8 +66,8 @@ In this lab, we will setup CloudVision's tags and Events system to create a cust
 ![Create Tag](images/create-tag.png)
 
 3. Set a new tag Name and a value for devices you wish to receive an alert for.
-  - Create the tag as Assignment Type - Device tag
-  - Click Create
+   - Create the tag as Assignment Type - Device tag
+   - Click Create
 
 ![Device Tag](images/dev-tag.png)
 
