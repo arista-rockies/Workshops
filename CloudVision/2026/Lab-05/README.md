@@ -359,7 +359,7 @@ In this lab we will be upgrading the image on a single device in our fabric, **C
 ![Upgrade Third Step](images/upgrade-third-nav.png)
 
 4. Configure your preferred method of upgrade, for this example we will use the following
-   - Under **MLAG Pair** Seelect **MLAG ISSU** *(This will not be used in this section but is a required selection)*
+   - Under **MLAG Pair** Select **MLAG ISSU** *(This will not be used in this section but is a required selection)*
    - Under **Non-MLAG Pair**
    - Select **SSU**
    - In the Dropdown Select **Fall Back to Normal**, **On Error Only**
