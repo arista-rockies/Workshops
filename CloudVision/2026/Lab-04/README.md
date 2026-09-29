@@ -84,9 +84,11 @@ The following is all of the information you will need to complete this lab. Feel
 > We will be utilizing Universal Cloud Network Architecture to identify device types in future lab guides (Leaf, Spine, Member Leaf, Border Leaf), so try to make it easy for yourself to identify those device types in your naming convention.
 
 ![I&T Hostnames](images/Campus_Config_Tab.png)
+
 5. Select the **Configuration** tab
 
 ![I&T Hostnames](images/Create_DNS_Profile.png)
+
 6. On **DNS**
 	1. Create a **DNS Profile** by
 		1. Clicking in the Profile field
@@ -105,6 +107,7 @@ The following is all of the information you will need to complete this lab. Feel
 7. Skip past **NTP**
 
 ![I&T Hostnames](images/Add_Local_Users.png)
+
 8. On **Local Users** (left side):
 	1. Select **"+Add User"**
 		1. Name: **superuser**
@@ -119,6 +122,7 @@ The following is all of the information you will need to complete this lab. Feel
 	2. Select the drop-down menu under **"User Group"**
 		1. **Select the User Group (ug-superuser)** you just created in the drop-down menu
 	3. Click **Save**
+
 ![I&T Hostnames](images/Add_Local_User_Attributes.png)
 
 9. Skip past **AAA**
