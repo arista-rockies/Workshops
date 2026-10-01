@@ -58,6 +58,7 @@ class ActClient():
         _addArgument('-actResetBlocks', action='store_true', default=False)
         _addArgument('-actUnblockCampusB', action='store_true', default=False)
         _addArgument('-actUnblockZTR', action='store_true', default=False)
+        _addArgument('-actFactoryReset', action='store_true', default=False)
             
     def __init__(self, pod: Pod):
         self.pod = pod
@@ -97,16 +98,10 @@ class ActClient():
             return
 
         if config.args.actTest:
-            name = self.resourceName.format(self.pod.pod)
+            return
 
-            # getLabByName uses the local cache, getLabByID hits the api
-            lab = self.getLabByName(name)
-            l = self.getLabByID(lab["id"])
-            if not l.get("devices", None):
-                print("could not find any devices in this lab.  has it finished being deployed?")
-                return
-
-            print(json.dumps(l, indent=2))
+        if config.args.actFactoryReset:
+            self.factoryReset()
             return
 
         if config.args.actResetBlocks:
@@ -325,7 +320,7 @@ class ActClient():
         url = f'/rest/v1/labs/{id}/stop'
         resp = self._executeRequest(requestType='POST', url=url)
 
-        #FIXME does this function return anything?
+        return resp
 
     def deployLab(self, id, timeout=None):
         url = f'/rest/v1/labs/{id}/deploy'
@@ -348,17 +343,16 @@ class ActClient():
         return resp
 
     def doStopLab(self):
-        print(f"{self.pod.pod} - doStopLab")
-
         name = self.resourceName.format(self.pod.pod)
         lab = self.getLabByName(name)
+        print(f"{self.pod.pod} - doStopLab - {name}: {LabState(lab["state"])}")
         if LabState(lab["state"]) == LabState.RUNNING:
-            self.stopLab(lab["id"])
+            resp = self.stopLab(lab["id"])
 
     def doStartLab(self):
-        print(f"{self.pod.pod} - doStartLab")
         name = self.resourceName.format(self.pod.pod)
         lab = self.getLabByName(name)
+        print(f"{self.pod.pod} - doStartLab - {name}: {LabState(lab["state"])}")
         if LabState(lab["state"]) == LabState.STOPPED:
             res = self.startLab(lab["id"])
 
@@ -491,6 +485,46 @@ class ActClient():
                 print(f"{dev['hostname']}: {dev['internal_ip']}")
 
         return True
+
+    def factoryReset(self):
+        print(f"{self.pod.pod} - ztp")
+        name = self.resourceName.format(self.pod.pod)
+        # getLabByName uses the local cache, getLabByID hits the api
+        lab = self.getLabByName(name)
+        l = self.getLabByID(lab["id"])
+        if not l.get("devices", None):
+            print("could not find any devices in this lab.  has it finished being deployed?")
+            return
+
+        jhClient = None
+        # i know the bootstrap box is a generic
+        for host in l["devices"]["generic"]:
+            if "bootstrap" in host["hostname"]:
+                # this is the box i want to connect to
+                sshUser = "administrator"
+                sshPassword = self.pod.tokens.act.sshPassword
+                jhClient = self._setupSSH(host["internal_ip"], sshUser, sshPassword)
+                break
+
+        if not jhClient:
+            return
+
+        for veos in l["devices"]["veos"]:
+            try:
+                jhTunnel = jhClient.get_transport().open_channel("direct-tcpip", (veos["internal_ip"], 22), ('127.0.0.1', 0))
+                pmClient = paramiko.SSHClient()
+                pmClient.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+                pmClient.connect(hostname=veos["internal_ip"], username="arista", password=self.pod.tokens.act.sshPassword, sock=jhTunnel)
+
+                print(f"connected - {veos['hostname']}-{veos['internal_ip']}")
+                stdin, stdout, stderr = pmClient.exec_command("enable \n bash rm /mnt/flash/zerotouch-config \n write erase now")
+
+                t = stdout.read().decode()
+                time.sleep(1)
+                stdin, stdout, stderr = pmClient.exec_command("enable \n reload now")
+                t = stdout.read().decode()
+            except:
+                print(f"connection to {veos['hostname']}-{veos['internal_ip']} failed")
 
     def _setupSSH(self, ip, sshUser, sshPassword):
         # https://stackoverflow.com/questions/47441351/using-paramiko-with-socks-proxy
