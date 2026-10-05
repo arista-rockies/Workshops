@@ -121,27 +121,35 @@ There is no right or wrong way to design this hierarchy, and each organization m
 
  ![Static Configuration Add Device](images/scs-add-device1.png)     
 
-13. Select the intended device.
+13. Select the device you are adding from the list of available devices
     - Select **Add**
 
- ![Static Configuration Add Device](images/scs-add-device2.png)     
+ ![Static Configuration Add Device](images/scs-add-device2.png)   
 
-14. Select the newly added device.
+14. After you have added the devices to their intended containers you will need to add a base configlet to each device: 
+    - Locate and select the device on the left
     - Select **+ Configlet**
     - Select **Configlet Library**
+
 
  ![Static Configuration Device Configlet](images/scs-dev-configlet1.png)    
 
 15. Locate the pre-staged configlets for the added device. We are utilizing the UCN nomenclature for our configlet names: **mgmt_$Device**
     - Select **Assign**
 
+ ![Static Configuration Device Configlet](images/scs-dev-configlet2.png)    
+
    > [!NOTE]
    > The **mgmt_$Device** configlet does assign a hostname. If you wish to continue utilizing your previously established names, update the hostname field in the per-device configlet.
 
+ ![Static Configuration Custom Hostname](images/custom-hostname.png)   
 
- ![Static Configuration Device Configlet](images/scs-dev-configlet2.png)    
+16. Repeat this process until all devices in the topology have their per-device configlet assigned. 
+    - Each device in **CampusA** will have a configlet assigned.
+    - To verify each configlet is in use: select **Configlet Library**
+    - the **Status** for each configlet should read **Single**
 
-16. Repeat this process until all devices in the topology have their per-device configlet assigned.
+ ![Static Configuration Assigned Configlets](images/assigned-configlets.png)   
 
 17. After all devices have their per-device configlet and base configlet associated, select the **Clipboard Icon**
 
