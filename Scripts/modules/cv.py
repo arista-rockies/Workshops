@@ -15,6 +15,7 @@ from cloudvision.Connector.codec import Wildcard, Path
 import json
 #######
 import pyavd, asyncio, pyavd._cv.client
+from pyavd._cv.client.models import CVTagAssignment, CVTag
 import pyavd._cv.api.arista.studio.v1
 import pyavd._cv.api.fmp
 import pyavd._cv.api.arista.tag.v2
@@ -145,15 +146,15 @@ class pgfCVClient():
         newTags = []
         for tag in tagConfig.get("tags", []):
             for value in tag.get("values", []):
-                newTags.append( (tag["key"], value) )
+                newTags.append( CVTag("device", tag["key"], value) )
 
         newAssignments = []
         for assignment in tagConfig.get("assignments", []):
             for device in assignment.get("devices", []):
-                newAssignments.append( (assignment["key"], assignment["value"], device, None) )
+                newAssignments.append(CVTagAssignment("device", assignment["key"], assignment["value"], device, None) )
 
-        await c.set_tags(workspaceID, newTags, "device", 300)
-        await c.set_tag_assignments(workspaceID, newAssignments, "device", 300)
+        await c.set_tags(workspaceID, newTags, 300)
+        await c.set_tag_assignments(workspaceID, newAssignments, 300)
 
     async def _cvCheckpointTopology(self, c, workspaceID, basePath):
         def _buildCache(currentTopology):
@@ -288,11 +289,10 @@ class pgfCVClient():
         for tag in tagAssignments:
             eType = "device" if tag.key.element_type == pyavd._cv.api.arista.tag.v2.ElementType.DEVICE else "interface"
 
-            t = (tag.key.label, tag.key.value, tag.key.device_id, tag.key.interface_id)
+            t = CVTagAssignment(eType, tag.key.label, tag.key.value, tag.key.device_id, tag.key.interface_id)
             await c.delete_tag_assignments(
                 workspace_id=workspaceID,
-                tag_assignments=[t],
-                element_type=eType)
+                tag_assignments=[t])
 
         # now we can get all tags and delete them
         tags = await c.get_tags(workspace_id=workspaceID, creator_type="user")
@@ -399,11 +399,28 @@ class pgfCVClient():
 
     async def buildAndSubmitWorkspace(self, c, workspaceID, expectCC=True):
         print(f"{self.pod.pod} - buildAndSubmit")
-        result = await c.build_workspace(workspaceID)
-        print("building workspace")
-        buildResult, workspace = await c.wait_for_workspace_response(workspaceID, result.request_params.request_id)
-        if buildResult.status != 1: # SUCCESS
-            raise Exception(f"build failed for pod: {self.pod.pod} {workspaceID}: {buildResult.status}")
+
+        ws = await c.get_workspace(workspaceID)
+        print("building workspace", flush=True, end="")
+        maxBuilds=30
+
+        while ws.needs_build:
+            print(".", flush=True, end="")
+            result = await c.build_workspace(workspaceID)
+
+            maxBuilds -= 1
+            buildResult, workspace = await c.wait_for_workspace_response(workspaceID, result.request_params.request_id)
+            ws = await c.get_workspace(workspaceID)
+
+            # the logic here is messed up because of how the api returns results.  if SUCCESS and not needs_build we are done
+            if buildResult.status == 1 and not ws.needs_build:
+                break
+            #elif buildResult.status == 1:
+                #break
+            elif buildResult.status == 2 or not maxBuilds: # FAIL
+                raise Exception(f"build failed for pod: {self.pod.pod} {workspaceID}: {buildResult.status}")
+
+        print("", flush=True)
 
         if config.args.cvDryrun:
             return
@@ -515,7 +532,7 @@ class pgfCVClient():
             # from here on out, let's reconnect with the second token
             #  this allows for us to complete even if four-eyes is set
             c = pyavd._cv.client.CVClient(self.server, token=self.tok2)
-            c._connect()
+            await c._connect()
             print("executing the ztp change control")
             await self.executeChangeControl(c, ccID, wait=False)
 
@@ -561,7 +578,7 @@ class pgfCVClient():
         # from here on out, let's reconnect with the second token
         #  this allows for us to complete even if four-eyes is set
         c = pyavd._cv.client.CVClient(self.server, token=self.tok2)
-        c._connect()
+        await c._connect()
         print("executing the ztp change control")
         await self.executeChangeControl(c, ccID, wait=False)
 
@@ -794,7 +811,7 @@ class pgfCVClient():
         cvpRacClient.connect(nodes=[self.server], username='', password='', is_cvaas=True, api_token=self.tok)
 
         c = pyavd._cv.client.CVClient(self.server, token=self.tok)
-        c._connect()
+        await c._connect()
 
         grpcClient = GRPCClient(self.server, tokenValue=self.tok)
 
@@ -920,7 +937,7 @@ class pgfCVClient():
             # from here on out, let's reconnect with the second token
             #  this allows for us to complete even if four-eyes is set
             c = pyavd._cv.client.CVClient(self.server, token=self.tok2)
-            c._connect()
+            await c._connect()
 
             if ccID:
                 await self.executeChangeControl(c, ccID, wait=False)

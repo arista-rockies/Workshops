@@ -1,7 +1,7 @@
 cloudvision
 pyyaml
 cvprac
-pyavd==5.7.3
+pyavd #==5.7.3
 nmcli
 paramiko
 selenium
