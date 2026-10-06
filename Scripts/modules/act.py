@@ -58,6 +58,7 @@ class ActClient():
         _addArgument('-actResetBlocks', action='store_true', default=False)
         _addArgument('-actUnblockCampusB', action='store_true', default=False)
         _addArgument('-actUnblockZTR', action='store_true', default=False)
+        _addArgument('-actUnblockAll', action='store_true', default=False)
         _addArgument('-actFactoryReset', action='store_true', default=False)
             
     def __init__(self, pod: Pod):
@@ -114,6 +115,10 @@ class ActClient():
 
         if config.args.actUnblockZTR:
             self._iptables("unBlockZTR")
+            return
+
+        if config.args.actUnblockAll:
+            self._iptables("unBlockAll")
             return
 
         if config.args.actStartLab:
