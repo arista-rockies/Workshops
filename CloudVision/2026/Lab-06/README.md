@@ -374,6 +374,17 @@ Referencing the Connectivity Monitor events and dashboards, what information has
 ```
 
 ---
-
-
 **LAB GUIDE COMPLETE**
+---
+# Lab Guide Appendix
+---
+If you notice that Quick Actions such as the Replace Device workflow get stuck at the Workspace or Change Control steps, follow these workaround steps:
+![ZTR Failed](images/ztrfail-appendix.png)
+
+- Refresh your browser or duplicate your current tab and this should allow the left blue menu navigation to open back up.
+- Navigate to Provisioning, Workspaces, and look for any workspace with designation "Pending"
+- ![Open Workspace](images/openworkspace-appendix.png)
+- Click the rebuild button to force a fresh rebuild of the workspace
+- ![Rebuild Workspace](images/rebuildws-appendix.png)
+- If your workspace is otherwise correct, you should achieve all four Build Status validation checks and can click Submit Workspace to create a Change Control
+- Approve and Execute the change control as normal to complete the ZTR replacement.
