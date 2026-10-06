@@ -287,7 +287,7 @@ Goal - In this lab section, CampusB-Leaf2A will be simulated offline by blocking
 37. Finally, let's clean up the event notification settings so that you do not getting additional email alerts about the virtual lab.
     - Browse to Events main menu and click Configure, Event Notifications
     - ![Navigate Notifications](images/naveventnotification-ztr.png)
-    - Within Receivers menu, click Delete to remove the Receiver, and select save to keep your changes.
+    - Within Receivers menu, click Delete to remove the Receiver, and be sure to click **Save** in the upper right to keep your changes.
     - ![Remove Receiver](images/removereceiver-ztr.png)
 
 **This Concludes the ZTR lab section**
