@@ -143,8 +143,17 @@ class pgfCVClient():
         jinjaEnv = Environment(loader=FileSystemLoader(f'{basePath}/tags/'))
         tagConfig = yaml.safe_load(jinjaEnv.get_template("config.yml").render(self.pod.substitutions))
 
+        # let's get all tag assignments and we can remove the ones we are interested in
+        oldAssignments = await c.get_tag_assignments(workspaceID, "device")
+        remAssignments = []
+
         newTags = []
         for tag in tagConfig.get("tags", []):
+            # this is a crappy way to do this, but let's search the old assignments
+            for oldAssignment in oldAssignments:
+                if oldAssignment.key.label == tag["key"]:
+                    remAssignments.append(CVTagAssignment("device", oldAssignment.key.label, oldAssignment.key.value, oldAssignment.key.device_id, None))
+
             for value in tag.get("values", []):
                 newTags.append( CVTag("device", tag["key"], value) )
 
@@ -153,6 +162,9 @@ class pgfCVClient():
             for device in assignment.get("devices", []):
                 newAssignments.append(CVTagAssignment("device", assignment["key"], assignment["value"], device, None) )
 
+        if len(remAssignments):
+            print(remAssignments)
+            await c.delete_tag_assignments(workspaceID, remAssignments, 300)
         await c.set_tags(workspaceID, newTags, 300)
         await c.set_tag_assignments(workspaceID, newAssignments, 300)
 
