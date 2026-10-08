@@ -153,6 +153,11 @@ class pgfCVClient():
             for device in assignment.get("devices", []):
                 newAssignments.append(CVTagAssignment("device", assignment["key"], assignment["value"], device, None) )
 
+<<<<<<< Updated upstream
+=======
+        if len(remAssignments):
+            await c.delete_tag_assignments(workspaceID, remAssignments, 300)
+>>>>>>> Stashed changes
         await c.set_tags(workspaceID, newTags, 300)
         await c.set_tag_assignments(workspaceID, newAssignments, 300)
 
