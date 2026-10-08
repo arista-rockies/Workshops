@@ -284,6 +284,12 @@ Goal - In this lab section, CampusB-Leaf2A will be simulated offline by blocking
     - ![Events Screen](images/mainevents-cm.png)
     - ![CM Event](images/event-cm.png)
 
+37. Finally, let's clean up the event notification settings so that you do not getting additional email alerts about the virtual lab.
+    - Browse to Events main menu and click Configure, Event Notifications
+    - ![Navigate Notifications](images/naveventnotification-ztr.png)
+    - Within Receivers menu, click Delete to remove the Receiver, and be sure to click **Save** in the upper right to keep your changes.
+    - ![Remove Receiver](images/removereceiver-ztr.png)
+
 **This Concludes the ZTR lab section**
 ---
 AskAVA Prompts:
@@ -368,6 +374,23 @@ Referencing the Connectivity Monitor events and dashboards, what information has
 ```
 
 ---
-
-
 **LAB GUIDE COMPLETE**
+
+---
+# Lab Guide Appendix
+---
+- If you notice that Quick Actions such as the Replace Device workflow get stuck at the Workspace or Change Control steps, follow these workaround steps:
+  
+![ZTR Failed](images/ztrfail-appendix.png)
+
+- Refresh your browser or duplicate your current tab and this should allow the left blue menu navigation to open back up.
+- Navigate to Provisioning, Workspaces, and look for any workspace with designation "Pending"
+  
+![Open Workspace](images/openworkspace-appendix.png)
+
+- Click the rebuild button to force a fresh rebuild of the workspace
+![Rebuild Workspace](images/rebuildws-appendix.png)
+
+- If your workspace is otherwise correct, you should achieve all four Build Status validation checks and can click Submit Workspace to create a Change Control
+- Approve and Execute the change control as normal to complete the ZTR replacement.
+---
