@@ -163,7 +163,6 @@ class pgfCVClient():
                 newAssignments.append(CVTagAssignment("device", assignment["key"], assignment["value"], device, None) )
 
         if len(remAssignments):
-            print(remAssignments)
             await c.delete_tag_assignments(workspaceID, remAssignments, 300)
         await c.set_tags(workspaceID, newTags, 300)
         await c.set_tag_assignments(workspaceID, newAssignments, 300)
