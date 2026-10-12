@@ -129,8 +129,20 @@ class pgfCVClient():
 
         jinjaEnv = Environment(loader=FileSystemLoader(f'{basePath}/studios/'))
 
+        for studio in studiosConfig.get("newStudios", []):
+            print(f"  creating - {studio['name']}")
+            studioTemplate = jinjaEnv.get_template(studio["filename"])
+            # this is a bit of a hack, but a studio export is a list, and we don't need the whole thing
+            self.pod.substitutions["workspaceID"] = workspaceID
+            self.pod.substitutions["studioID"] = studio["id"]
+            studio = yaml.safe_load(studioTemplate.render(self.pod.substitutions))[0]["body"]["value"]
+
+            url = f'{self.baseURL}/api/resources/studio/v1/StudioConfig'
+            resp = requests.post(url, json=studio, timeout=300, headers={'Authorization': f'Bearer {self.tok}'})
+            resp.raise_for_status()
+
         for studio in studiosConfig.get("studios", []):
-            print(f"  - {studio['name']}")
+            print(f"  inputs - {studio['name']}")
             if (filename := studio.get("filename", None)):
                 studioTemplate = jinjaEnv.get_template(filename)
                 studio["text"] = yaml.safe_load(studioTemplate.render(self.pod.substitutions))["inputs"]

@@ -3,3 +3,6 @@
 
 - name: configlets
   directory: configlets
+
+- name: studios
+  directory: studios
