@@ -177,7 +177,7 @@ There is no right or wrong way to design this hierarchy, and each organization m
 
  ![Change Control Execute](images/cc-execute.png) 
 
-23. Pushing the configuration to the devices will take them out of Zero Touch Provisioning. This requires a reload and may take a few minutes. After the devices have reloaded and the configuration has been applied, your Change Control will complete.
+23. When the Change Control is complete, all the proposed configuration has been applied to your devices.
 
  ![Change Control Execute](images/cc-complete.png) 
 
