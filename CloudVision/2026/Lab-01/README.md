@@ -102,14 +102,37 @@ The following is all of the information you will need to complete this lab. Feel
 
 ![Workspace Island Review](images/island-review.png)
 
-9. After the workspace builds, there should be no device configuration changes within the lab. However, we have added the devices to the Inventory and Topology Studio. Select **Submit Workspace** to save those changes.
+9. After the workspace builds, you should see changes to all devices within CampusA. 
+
+![Inventory and Topology Review](images/iandt-review.png)
+
+> [!NOTE]
+> There is a **Base Configuration** that is being applied to devices via a **Custom Studio**. Adding the devices to the **Inventory and Topology Studio** triggers the assignment of the configuration necessary to maintain connectivity to the CVaaS environment. 
+
+![Custom Studio](images/custom-studio.png)
+
+10. After you have reviewed the proposed changes, select **Submit Workspace** to save those changes.
 
 ![Submit Workspace](images/iandt-submit.png)
 
-10. Select **Exit Workspace**
+11. Select **View Change Control**
 
-![Exit Workspace](images/exit-workspace.png)
+![View Change Control](images/view-cc.png)
 
+12. You are now presented with a Change Control that will push the configuration to the devices.
+    - Select **Review and Approve**
+
+![Change Control Review and Approve](images/cc-review.png)
+
+13. If the **Execute Immediately Slider** is greyed out, select the slider.
+    - Select **Approve and Execute**
+
+ ![Change Control Execute](images/cc-execute.png) 
+
+ 14. Pushing the configuration to the devices will take them out of Zero Touch Provisioning. This requires a reload and may take a few minutes. After the devices have reloaded and the configuration has been applied, your Change Control will complete.
+
+ ![Change Control Complete](images/cc-complete.png) 
+ 
 ---
 
 **LAB GUIDE COMPLETE**
