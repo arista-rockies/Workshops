@@ -1,0 +1,101 @@
+- service: arista.studio.v1.StudioConfigService
+  method: Set
+  body:
+    value:
+      key:
+        studio_id: {{ studioID }}
+        workspace_id: {{ workspaceID }}
+      display_name: CV Workshop Escape Hatch
+      description: ''
+      template:
+        type: TEMPLATE_TYPE_MAKO
+        body: |-
+          <%
+          # this function uses the mako context to output a formatted string
+          #  for cvp to process the generated configuration it's important
+          #  that the string be newLine terminated.  rather than requiring
+          #  the user to specify that manually on every line we append it here
+          #  unless asked not to. this method of indenting will almost certainly
+          #  not behave as intended for complex types
+          def output(outStr: str, indent: int=2, level: int=0, flush: bool=True):
+              # if the input is not a string, let's just use the default converter
+              #  for whatevever it is and hope for the best.
+              if DEBUG:
+                  if not isinstance(outStr, str):
+                      outStr = f'{outStr}'
+                  if not outStr:
+                      return
+
+              context.write(f'{outStr.rjust((indent*level)+len(outStr))}')
+              if flush:
+                  context.write("\n")
+                
+          me = ctx.getDevice()
+          if not "CampusA" in me.id:
+                  return
+
+          ips = {
+              "{{switches['CampusA-Leaf1A'].sn}}": "192.168.1.32/22",
+              "{{switches['CampusA-Leaf1B'].sn}}": "192.168.1.33/22",
+              "{{switches['CampusA-Leaf1C'].sn}}": "192.168.1.34/22",
+              "{{switches['CampusA-Leaf2A'].sn}}": "192.168.1.35/22",
+              "{{switches['CampusA-Spine1'].sn}}": "192.168.1.30/22",
+              "{{switches['CampusA-Spine2'].sn}}": "192.168.1.31/22"
+          }
+
+          output('username arista privilege 15 secret sha512 $6$w9ly3p/1pA7Y9s5b$ootdVu9KEFr/u.WjTt4ipK.K3LnysLn5z3Gt0ztlKqVBEqL87vIsM1mQwUf.ZhaiGj59/QUnsk35G7oWpGRLv/')
+          output('vrf instance MGMT')
+          output('daemon TerminAttr')
+          output('exec /usr/bin/TerminAttr -smashexcludes=ale,flexCounter,hardware,kni,pulse,strata -cvaddr=apiserver.arista.io:443 -cvauth=token-secure,/tmp/cv-onboarding-token -cvvrf=MGMT -taillogs -disableaaa', level=1)
+          output('no shutdown', level=1)
+
+          output('ip name-server vrf MGMT 1.1.1.1')
+          output('ip route vrf MGMT 0.0.0.0/0 192.168.0.1')
+          output('ntp server vrf MGMT 100.64.0.1')
+
+          output('interface Management1')
+          output('vrf MGMT', level=1)
+          output(f'ip address {ips[me.id]}', level=1)
+
+          %>
+      input_schema:
+        fields:
+          values:
+            48aa4194-25b4-4906-85a3-e1b7e04bcf92:
+              id: 48aa4194-25b4-4906-85a3-e1b7e04bcf92
+              type: INPUT_FIELD_TYPE_BOOLEAN
+              name: droids
+              label: Droids
+              description: These aren't the droids you're looking for
+              required: false
+              boolean_props:
+                default_value: null
+              integer_props: null
+              float_props: null
+              string_props: null
+              group_props: null
+              collection_props: null
+              resolver_props: null
+              auto_fill_action_id: null
+              tag_matcher_props: null
+            root:
+              id: root
+              type: INPUT_FIELD_TYPE_GROUP
+              name: ''
+              label: ''
+              description: ''
+              required: false
+              boolean_props: null
+              integer_props: null
+              float_props: null
+              string_props: null
+              group_props:
+                members:
+                  values:
+                    - 48aa4194-25b4-4906-85a3-e1b7e04bcf92
+              collection_props: null
+              resolver_props: null
+              auto_fill_action_id: null
+              tag_matcher_props: null
+        layout:
+          value: ''

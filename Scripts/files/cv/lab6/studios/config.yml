@@ -1,3 +1,8 @@
+newStudios:
+  - name: EscapeHatch
+    filename: hatch.j2
+    id: dba53197-634a-469e-8ea5-a094b9079232
+
 studios:
   - name: Authentication
     id: studio-authentication
