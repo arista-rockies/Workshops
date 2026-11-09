@@ -33,6 +33,8 @@ To authenticate to CloudVision you will need to visit the following page:
 
 [**Colorado: Oct 21st-22nd**](https://labs.arista.com/ignition/event/kxpd9ttr)
 
+[**El Segundo, CA: Nov 12-13**](https://labs.arista.com/ignition/event/tn93yw7d)
+
 Each attendee will be provided with a unique access key. Enter your access key and select the Blue Arrow
 
 
